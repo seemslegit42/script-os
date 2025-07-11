@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScribeGlyph } from "./icons";
+import { ScribeSigil } from "./icons";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -34,7 +34,7 @@ export function ScribeForm({ formAction, formRef, isPending }: ScribeFormProps) 
       )}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 sigil-obelisk">
-            <ScribeGlyph className="h-6 w-6" />
+            <ScribeSigil className="h-6 w-6" />
             <span>Scribe Invocation</span>
           </CardTitle>
           <CardDescription className="sigil-codex">

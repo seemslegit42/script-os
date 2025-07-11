@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { AnnotationGlyph } from './icons';
+import { MessageSquareQuote } from 'lucide-react';
 
 export type Annotation = {
   id: string;
@@ -80,7 +80,7 @@ export function Annotator({ children, contentId, onAnnotate }: AnnotatorProps) {
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild style={getPopoverStyle()}>
                 <Button variant="outline" size="icon" className="rounded-full shadow-lg shadow-primary/20 bg-card border-primary">
-                    <AnnotationGlyph className="h-5 w-5 text-primary" />
+                    <MessageSquareQuote className="h-5 w-5 text-primary" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 bg-card/90 backdrop-blur-lg border-primary/30">

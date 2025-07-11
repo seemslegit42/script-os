@@ -3,7 +3,7 @@
 
 import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
-import { ScribeGlyph } from "@/components/icons";
+import { ScribeSigil } from "@/components/icons";
 import { LogIn, Swords, Save } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
@@ -87,9 +87,9 @@ export default function ScriptoriumLayout() {
       <AethericStreams />
       
       <header className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
-        <div className="text-left">
-          <ScribeGlyph className="h-8 w-8 text-primary inline-block" />
-          <span className="text-xl font-bold tracking-wider sigil-obelisk text-primary ml-2 align-middle">
+        <div className="flex items-center gap-2">
+          <ScribeSigil className="h-10 w-10 text-primary" />
+          <span className="text-xl font-bold tracking-wider sigil-obelisk text-primary align-middle">
             SIGILFORGE
           </span>
         </div>

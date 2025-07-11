@@ -7,13 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Swords, ArrowLeft, BookOpen, NotebookText } from 'lucide-react';
+import { Swords, ArrowLeft, BookOpen, NotebookText, MessageSquareQuote } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { FocusLayer } from '@/components/focus-layer';
 import { UploadSigil } from './upload-sigil';
 import { InterrogationPanel } from './interrogation-panel';
-import { ScribeGlyph, AnnotationGlyph } from '@/components/icons';
+import { ScribeSigil } from '@/components/icons';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getDocsAction } from './actions';
 import { Separator } from '@/components/ui/separator';
@@ -74,7 +74,7 @@ export default function ForgePage() {
   if (authLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <ScribeGlyph className="h-16 w-16 animate-spin text-primary" />
+        <ScribeSigil className="h-16 w-16 text-primary" />
       </div>
     );
   }
@@ -93,7 +93,7 @@ export default function ForgePage() {
                   <Sheet>
                     <SheetTrigger asChild>
                       <Button variant="outline" size="sm" disabled={annotations.length === 0}>
-                        <AnnotationGlyph className="mr-2" />
+                        <MessageSquareQuote className="mr-2" />
                         Annotations ({annotations.length})
                       </Button>
                     </SheetTrigger>
@@ -195,7 +195,7 @@ export default function ForgePage() {
           ) : sigils.length === 0 ? (
             <Card className="text-center p-12 bg-card/70 backdrop-blur-sm border-primary/20">
                 <CardHeader>
-                    <ScribeGlyph className="h-16 w-16 mx-auto text-muted-foreground" />
+                    <ScribeSigil className="h-16 w-16 mx-auto text-muted-foreground" />
                     <CardTitle className="mt-4 sigil-obelisk">Your Scriptorium is Empty</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -229,7 +229,7 @@ export default function ForgePage() {
                           />
                       ) : (
                         <div className="w-full aspect-video bg-background/50 rounded-md flex items-center justify-center">
-                            <ScribeGlyph className="h-16 w-16 text-muted-foreground/50"/>
+                            <ScribeSigil className="h-16 w-16 text-muted-foreground/50"/>
                         </div>
                       )}
                     </CardContent>

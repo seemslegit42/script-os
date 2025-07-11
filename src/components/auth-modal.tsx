@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/auth-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ScribeGlyph } from './icons';
+import { ScribeSigil } from './icons';
 
 /**
  * A modal component for user authentication (Login and Sign Up), framed as an 'Initiation' ritual.
@@ -80,7 +80,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-card/70 backdrop-blur-lg border-primary/30">
         <DialogHeader className="text-center items-center">
-            <ScribeGlyph className="h-10 w-10 text-primary mb-2" />
+            <ScribeSigil className="h-10 w-10 text-primary mb-2" />
           <DialogTitle className="text-2xl sigil-obelisk">{isLogin ? 'Enter the Sanctum' : 'Begin Your Initiation'}</DialogTitle>
           <DialogDescription className="sigil-codex">
             {isLogin ? "Access your personal Scriptorium of sigils." : "Create an account to begin your journey."}
