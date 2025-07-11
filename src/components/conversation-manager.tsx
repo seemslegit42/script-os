@@ -6,6 +6,7 @@ import { unifiedConversationAction, ConversationState } from '@/app/actions';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore } from '@/hooks/use-firestore';
+import { useTypographicState } from '@/context/typographic-state-context';
 
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,7 @@ export function ConversationManager() {
   const { toast } = useToast();
   const { addDocument } = useFirestore('sigils');
   const router = useRouter();
+  const { applyState } = useTypographicState();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -56,6 +58,15 @@ export function ConversationManager() {
       }
     }
   }, [state.conversation]);
+  
+  useEffect(() => {
+    // When the agent is thinking, shift the typographic state.
+    if(isPending) {
+      applyState('active');
+    } else {
+      applyState('default');
+    }
+  }, [isPending, applyState]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -181,6 +192,8 @@ export function ConversationManager() {
             className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
             rows={1}
             disabled={isPending}
+            onFocus={() => applyState('active')}
+            onBlur={() => applyState('default')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
