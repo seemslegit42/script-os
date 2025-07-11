@@ -5,16 +5,18 @@ import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LogIn } from 'lucide-react';
+import { LogIn, Swords } from 'lucide-react';
 import { ScribeSigil } from './icons';
 import { AuthModal } from './auth-modal';
 import { UserStats } from './user-stats';
+import Link from 'next/link';
 
 type HeaderProps = {
     children?: React.ReactNode;
+    page?: 'scribe' | 'forge';
 }
 
-export function Header({ children }: HeaderProps) {
+export function Header({ children, page }: HeaderProps) {
     const { user, loading, signOut } = useAuth();
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     
@@ -22,12 +24,12 @@ export function Header({ children }: HeaderProps) {
         <>
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
             <header className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-10 bg-background/30 backdrop-blur-lg border-b border-primary/20">
-                <div className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2 cursor-pointer">
                     <ScribeSigil className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
                     <span className="text-lg sm:text-xl font-bold tracking-wider sigil-obelisk text-primary align-middle">
                         SCRIPTORIUM
                     </span>
-                </div>
+                </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
                   {children}
                    {loading ? (
@@ -35,6 +37,9 @@ export function Header({ children }: HeaderProps) {
                   ) : user ? (
                     <>
                         <UserStats />
+                        <Link href="/forge">
+                          <Button variant="outline"><Swords /> My Scriptorium</Button>
+                        </Link>
                         <Button onClick={() => signOut()} variant="outline" size="sm">End Session</Button>
                     </>
                   ) : (

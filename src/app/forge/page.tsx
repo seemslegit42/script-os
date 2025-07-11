@@ -111,7 +111,7 @@ export default function ForgePage() {
           <title>Scriptorium | Viewing Scripture</title>
         </Head>
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
-            <Header pageTitle={selectedSigil.query || selectedSigil.fileName || selectedSigil.title}>
+            <Header>
                  <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                   <Sheet>
                     <SheetTrigger asChild>
@@ -148,7 +148,7 @@ export default function ForgePage() {
                   </Button>
                 </div>
             </Header>
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0 pt-20">
                 <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
                     <CardContent className="p-6 flex-grow min-h-0">
                       <ScrollArea className="h-full pr-4">
@@ -190,11 +190,11 @@ export default function ForgePage() {
         <title>Scriptorium | Forge</title>
     </Head>
     <main className="container mx-auto p-4 sm:p-8">
-      <Header pageTitle="The Scriptorium">
-         <Button onClick={handleBackToMain} size={isMobile ? 'sm' : 'default'}>Back to Main</Button>
+      <Header>
+         <Button onClick={handleBackToMain} size={isMobile ? 'sm' : 'default'}>Back to Scribe</Button>
       </Header>
 
-      <div className="mb-12 mt-8">
+      <div className="mb-12 mt-28">
         <UploadSigil />
       </div>
 

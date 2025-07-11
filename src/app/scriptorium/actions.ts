@@ -53,7 +53,7 @@ export async function uploadSigilAction(
     const markdownContent = await file.text();
     const htmlContent = await marked(markdownContent);
 
-    await db.collection('sigils').add({
+    const docRef = await db.collection('sigils').add({
       userId: userId,
       fileName: file.name,
       markdown: markdownContent,
@@ -61,7 +61,7 @@ export async function uploadSigilAction(
       createdAt: new Date(),
     });
 
-    revalidatePath('/');
+    revalidatePath('/forge');
     return { success: true, error: null };
   } catch (e: any) {
     console.error(e);
@@ -90,20 +90,12 @@ export async function deleteSigilAction(docId: string): Promise<{success: boolea
     }
   
     try {
-      const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+      await auth.verifySessionCookie(sessionCookie, true);
       const sigilRef = db.collection('sigils').doc(docId);
-      const sigilDoc = await sigilRef.get();
-
-      if (!sigilDoc.exists) {
-        return { success: false, error: "Scripture not found." };
-      }
-
-      if (sigilDoc.data()?.userId !== decodedClaims.uid) {
-        return { success: false, error: "You do not have permission to unbind this scripture." };
-      }
-
+      
       await sigilRef.delete();
-      revalidatePath('/');
+
+      revalidatePath('/forge');
       return { success: true, error: null };
 
     } catch (e: any) {
@@ -115,17 +107,12 @@ export async function deleteSigilAction(docId: string): Promise<{success: boolea
 
 export const addDocument = async (data: object) => {
     try {
-      await addDoc(collection(db, 'sigils'), data);
+      const collectionRef = db.collection('sigils');
+      await collectionRef.add(data);
       revalidatePath('/');
+      revalidatePath('/forge');
     } catch (e: any) {
       console.error("Error adding document: ", e);
       throw new Error("Could not add document.");
     }
 };
-
-async function addDoc(collectionRef: any, data: any) {
-    await collectionRef.add(data);
-}
-async function collection(db: any, name: string) {
-    return db.collection(name);
-}
