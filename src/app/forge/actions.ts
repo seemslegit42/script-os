@@ -175,3 +175,5 @@ export async function deleteSigilAction(docId: string): Promise<{success: boolea
       return { success: false, error: e.message || 'An unknown error occurred during unbinding.' };
     }
 }
+
+    
