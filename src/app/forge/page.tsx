@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Swords, ArrowLeft, BookOpen, NotebookText, MessageSquareQuote, Trash2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, NotebookText, MessageSquareQuote, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { FocusLayer } from '@/components/focus-layer';
@@ -109,6 +109,10 @@ export default function ForgePage() {
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
             <Header />
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 pt-20">
+              <Button onClick={handleBackToScriptorium} variant="outline" size={isMobile ? 'icon' : 'sm'}>
+                <ArrowLeft />
+                <span className="hidden sm:inline sm:ml-2">Scriptorium</span>
+              </Button>
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline" size={isMobile ? 'icon' : 'sm'} disabled={annotations.length === 0}>
@@ -138,10 +142,6 @@ export default function ForgePage() {
                   </ScrollArea>
                 </SheetContent>
               </Sheet>
-              <Button onClick={handleBackToScriptorium} variant="outline" size={isMobile ? 'icon' : 'sm'}>
-                <ArrowLeft />
-                <span className="hidden sm:inline sm:ml-2">Scriptorium</span>
-              </Button>
             </div>
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0 pt-4">
                 <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
@@ -230,7 +230,7 @@ export default function ForgePage() {
                     className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all group"
                 >
                     <CardHeader 
-                      className="cursor-pointer"
+                      className="cursor-pointer flex-grow"
                       onClick={() => setSelectedSigil(sigil)}
                     >
                         <CardTitle className="sigil-codex truncate">{sigil.query || sigil.fileName}</CardTitle>
@@ -239,7 +239,7 @@ export default function ForgePage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent 
-                      className="flex-grow flex flex-col justify-end cursor-pointer"
+                      className="flex-grow flex flex-col justify-end cursor-pointer p-6 pt-0"
                       onClick={() => setSelectedSigil(sigil)}
                     >
                       {sigil.imageUrl ? (
@@ -317,3 +317,5 @@ export default function ForgePage() {
     </>
   );
 }
+
+    

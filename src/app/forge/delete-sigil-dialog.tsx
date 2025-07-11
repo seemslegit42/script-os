@@ -42,14 +42,14 @@ export function DeleteSigilDialog({ sigilId, sigilName, children, onDeleted }: D
         <AlertDialogHeader>
           <AlertDialogTitle className="sigil-obelisk text-destructive">Unbind This Scripture?</AlertDialogTitle>
           <AlertDialogDescription className="sigil-codex">
-            This action is irreversible. The sigil known as <strong className="text-destructive-foreground">"{sigilName}"</strong> will be permanently unboud from your Scriptorium and returned to the aether.
+            This action is irreversible. The sigil known as <strong className="text-destructive-foreground">"{sigilName}"</strong> will be permanently unbound from your Scriptorium and returned to the aether.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button variant="outline" disabled={isPending}>Cancel</Button>
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isPending} className="bg-destructive hover:bg-destructive/90">
+          <AlertDialogAction onClick={handleDelete} disabled={isPending} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
             {isPending ? 'Unbinding...' : 'Unbind Forever'}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -57,3 +57,5 @@ export function DeleteSigilDialog({ sigilId, sigilName, children, onDeleted }: D
     </AlertDialog>
   );
 }
+
+    
