@@ -1,56 +1,110 @@
-
 'use server';
 
 import { generateSigil, GenerateSigilOutput } from '@/ai/flows/generate-sigil';
 import { generateSigilImage } from '@/ai/flows/generate-sigil-image';
+import { interrogateSigil } from '@/ai/flows/interrogate-sigil-flow';
+import { generateSpeech } from '@/ai/flows/generate-speech-flow';
+import type { ConversationMessage } from '@/components/conversation-manager';
 
-/**
- * Represents the state of the sigil creation form.
- * @property {GenerateSigilOutput | null} sigil - The generated sigil text content, or null if not yet generated.
- * @property {string | null} sigilImageUrl - The URL of the generated sigil image, or null.
- * @property {string | null} error - An error message, if any occurred during the process.
- * @property {string} query - The user's original query.
- */
-type FormState = {
-  sigil: GenerateSigilOutput | null;
-  sigilImageUrl: string | null;
+export type ConversationState = {
+  conversation: ConversationMessage[];
+  context: string | null;
+  contextImageUrl: string | null;
+  contextQuery: string | null;
   error: string | null;
-  query: string;
 };
 
-/**
- * A server action that generates a new sigil, including text and an image.
- * It calls two separate AI flows in parallel to generate the content.
- * @param {FormState} prevState - The previous state of the form.
- * @param {FormData} formData - The form data submitted by the user.
- * @returns {Promise<FormState>} The new state of the form, including the generated sigil and image URL, or an error.
- */
-export async function createSigilAction(
-  prevState: FormState,
+export async function unifiedConversationAction(
+  prevState: ConversationState,
   formData: FormData
-): Promise<FormState> {
+): Promise<ConversationState> {
   const query = formData.get('query') as string;
 
   if (!query) {
-    return { sigil: null, sigilImageUrl: null, error: 'Query is required.', query: '' };
+    return { ...prevState, error: 'Query is required.' };
   }
 
-  try {
-    // Run both AI flows in parallel for maximum efficiency
-    const [textOutput, imageOutput] = await Promise.all([
-      generateSigil({ query }),
-      generateSigilImage({ query })
-    ]);
-    
-    return { 
-      sigil: textOutput, 
-      sigilImageUrl: imageOutput.imageUrl, 
-      error: null,
-      query: query
-    };
+  const userMessage: ConversationMessage = { role: 'user', content: query };
+  let newConversation = [...prevState.conversation, userMessage];
 
+  try {
+    // If there is no context, this is a creation query
+    if (!prevState.context) {
+      const agentThinkingMessage: ConversationMessage = {
+        role: 'agent',
+        content: 'The Scribe is forging a new scripture...',
+        isThinking: true,
+      };
+      newConversation.push(agentThinkingMessage);
+
+      const [textOutput, imageOutput] = await Promise.all([
+        generateSigil({ query }),
+        generateSigilImage({ query }),
+      ]);
+
+      const sigilContext = `${textOutput.why}\n\n${textOutput.how}`;
+      const agentResponseMessage: ConversationMessage = {
+        role: 'agent',
+        content: `I have forged the scripture for "${query}". You may now interrogate it.`,
+        sigil: textOutput,
+        imageUrl: imageOutput.imageUrl,
+        query: query,
+        isCreation: true,
+      };
+
+      // Replace the "thinking" message with the final response
+      newConversation[newConversation.length - 1] = agentResponseMessage;
+
+      return {
+        conversation: newConversation,
+        context: sigilContext,
+        contextImageUrl: imageOutput.imageUrl,
+        contextQuery: query,
+        error: null,
+      };
+    } else {
+      // If there is context, this is an interrogation query
+      const context = prevState.context;
+
+      const agentThinkingMessage: ConversationMessage = {
+        role: 'agent',
+        content: 'The Oracle is contemplating...',
+        isThinking: true,
+      };
+      newConversation.push(agentThinkingMessage);
+      
+      const textResult = await interrogateSigil({ query, context });
+      const speechResult = await generateSpeech(textResult.answer);
+
+      const agentResponseMessage: ConversationMessage = {
+        role: 'agent',
+        content: textResult.answer,
+        audioUrl: speechResult.audioUrl,
+      };
+      
+      // Replace the "thinking" message with the final response
+      newConversation[newConversation.length - 1] = agentResponseMessage;
+
+      return {
+        ...prevState,
+        conversation: newConversation,
+        error: null,
+      };
+    }
   } catch (e: any) {
     console.error(e);
-    return { sigil: null, sigilImageUrl: null, error: e.message || 'An unknown error occurred.', query: query };
+    const errorMessage = e.message || 'An unknown error occurred.';
+    const agentErrorMessage: ConversationMessage = {
+      role: 'agent',
+      content: `An error occurred: ${errorMessage}`,
+      isError: true,
+    };
+    // Add error message to the conversation
+    newConversation.push(agentErrorMessage);
+    return {
+      ...prevState,
+      conversation: newConversation,
+      error: errorMessage,
+    };
   }
 }
