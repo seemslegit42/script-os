@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send } from 'lucide-react';
+import { Bot, User, Send, CircleDashed } from 'lucide-react';
 import { interrogationAction, InterrogationFormState } from './actions';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -70,14 +70,18 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
                            {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary" />}
                            <div className={cn("p-3 rounded-lg max-w-sm prose prose-invert prose-sm sigil-codex", msg.role === 'user' ? 'bg-primary/20 text-primary-foreground' : 'bg-background/50')}>
                                 <p className="m-0">{msg.content}</p>
+                                {msg.audioUrl && (
+                                  <audio controls autoPlay src={msg.audioUrl} className="w-full mt-3 h-8" />
+                                )}
                            </div>
                            {msg.role === 'user' && <User className="flex-shrink-0 text-accent" />}
                       </div>
                   ))}
                   {isPending && (
                        <div className="flex items-start gap-3 justify-start">
-                            <Bot className="flex-shrink-0 text-primary" />
-                             <div className="p-3 rounded-lg max-w-sm bg-background/50">
+                            <Bot className="flex-shrink-0 text-primary animate-pulse" />
+                             <div className="p-3 rounded-lg max-w-sm bg-background/50 space-y-2">
+                                <Skeleton className="h-4 w-32" />
                                 <Skeleton className="h-4 w-24" />
                              </div>
                         </div>
@@ -102,7 +106,7 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
             }}
           />
           <Button type="submit" size="icon" disabled={isPending}>
-            <Send />
+            {isPending ? <CircleDashed className="animate-spin"/> : <Send />}
           </Button>
         </form>
       </CardFooter>
