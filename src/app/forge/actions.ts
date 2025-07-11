@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase-admin';
 import { cookies } from 'next/headers';
 import { marked } from 'marked';
 import { interrogateSigil, InterrogateSigilOutput } from '@/ai/flows/interrogate-sigil-flow';
+import { getDocs } from '@/lib/docs';
 
 /**
  * Represents the state of the sigil upload form.
@@ -107,4 +108,13 @@ export async function interrogationAction(prevState: InterrogationFormState, for
         newConversation = [...newConversation, errorMessage];
         return { conversation: newConversation, error: e.message };
     }
+}
+
+
+/**
+ * Server action to fetch and parse all canonical documentation from the /docs directory.
+ * @returns {Promise<Array<{id: string, title: string, html: string, markdown: string}>>} A promise that resolves to an array of document objects.
+ */
+export async function getDocsAction(): Promise<Array<{id: string, title: string, html: string, markdown: string}>> {
+    return getDocs();
 }
