@@ -10,39 +10,105 @@ import { ScribeGlyph } from "@/components/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const mockScriptures = [
-    { id: 'core-protocol', title: 'Core Protocol', icon: Shield },
-    { id: 'aether-spec', title: 'Aether Specifications', icon: FileText },
-    { id: 'nexus-api', title: 'Nexus API', icon: FileText },
+type Scripture = {
+  id: string;
+  title: string;
+  icon: React.ElementType;
+  content: string;
+};
+
+const mockScriptures: Scripture[] = [
+    { 
+        id: 'core-protocol', 
+        title: 'Core Protocol', 
+        icon: Shield,
+        content: `
+          <p>This is the content for the Core Protocol. It defines the foundational security and operational principles of the entire Nexus OS.</p>
+          <p>The Obelisk tier is used for headings, creating a monumental, authoritative feel. The Codex tier provides the core reading experience—clear, neutral, and unobtrusive. The Glyph tier is reserved for <code>code snippets</code>, offering a precise, monospaced view of raw data and commands.</p>
+          <pre><code class="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
+  nexus.command({
+    action: "ACTIVATE_SENTIENCE",
+    target: "TYPOGRAPHY_ENGINE",
+    params: {
+      mode: "EXTREME"
+    }
+  })
+          </code></pre>
+          <p>Interacting with these protocols requires Level 3 clearance. Unauthorized access attempts are logged and reported to Aegis command.</p>
+        `
+    },
+    { 
+        id: 'aether-spec', 
+        title: 'Aether Specifications', 
+        icon: FileText,
+        content: `
+            <p>The Aether Specifications detail the data transport layer of the Nexus. All inter-module communication flows through the Aether.</p>
+            <p>This document outlines the packet structure, encryption standards, and bandwidth allocation protocols.</p>
+            <pre><code class="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
+  struct AetherPacket {
+    uint64_t timestamp;
+    uuid_t source_module;
+    uuid_t target_module;
+    byte[] payload;
+  }
+            </code></pre>
+        `
+    },
+    { 
+        id: 'nexus-api', 
+        title: 'Nexus API', 
+        icon: FileText,
+        content: `
+            <p>The Nexus API provides the primary interface for developers to interact with the OS core functions.</p>
+            <p>Access is managed via token-based authentication. All endpoints are versioned.</p>
+        `
+    },
 ];
 
-const mockManuals = [
-    { id: 'getting-started', title: 'Getting Started', icon: Book },
-    { id: 'advanced-config', title: 'Advanced Configuration', icon: Settings },
+const mockManuals: Scripture[] = [
+    { 
+        id: 'getting-started', 
+        title: 'Getting Started', 
+        icon: Book,
+        content: `
+            <p>This manual provides a step-by-step guide for new initiates to the Nexus OS.</p>
+            <p>Your first step is to configure your terminal environment and authenticate with the Genesis block.</p>
+        `
+    },
+    { 
+        id: 'advanced-config', 
+        title: 'Advanced Configuration', 
+        icon: Settings,
+        content: `
+            <p>This manual covers advanced topics such as kernel-level modifications, custom agent development, and network topology adjustments.</p>
+            <p>Proceed with caution. Incorrect configuration can lead to system instability.</p>
+        `
+    },
 ]
 
+const allScriptures = [...mockScriptures, ...mockManuals];
+
 export default function ScriptoriumLayout() {
-  const [sigilContent, setSigilContent] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [activeScripture, setActiveScripture] = React.useState<Scripture>(mockScriptures[0]);
+  const [sigilContent, setSigilContent] = React.useState<string | null>(activeScripture.content);
+  const [isLoading, setIsLoading] = React.useState(false);
   
-  // This effect simulates loading the initial scripture
+  const handleSelectScripture = (scripture: Scripture) => {
+    setIsLoading(true);
+    setActiveScripture(scripture);
+    // Simulate fetching content
+    setTimeout(() => {
+        setSigilContent(scripture.content);
+        setIsLoading(false);
+    }, 500);
+  };
+
+  // Initial load effect
   React.useEffect(() => {
+    setIsLoading(true);
     const timer = setTimeout(() => {
-      setSigilContent(`
-        <p>This is where the content of your selected markdown file will be rendered. The system is designed to parse and display the scriptures with the appropriate typographic sigils.</p>
-        <p>The Obelisk tier is used for headings, creating a monumental, authoritative feel. The Codex tier provides the core reading experience—clear, neutral, and unobtrusive. The Glyph tier is reserved for <code>code snippets</code>, offering a precise, monospaced view of raw data and commands.</p>
-        <pre><code class="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
-nexus.command({
-  action: "ACTIVATE_SENTIENCE",
-  target: "TYPOGRAPHY_ENGINE",
-  params: {
-    mode: "EXTREME"
-  }
-})
-        </code></pre>
-        <p>Select a different scripture from the sidebar to see the content change. The typographic state will adapt based on your interactions and the context of the information displayed.</p>
-      `);
-      setIsLoading(false);
+        setSigilContent(activeScripture.content);
+        setIsLoading(false);
     }, 750);
     return () => clearTimeout(timer);
   }, []);
@@ -67,7 +133,11 @@ nexus.command({
               <SidebarMenu>
                 {mockScriptures.map(item => (
                   <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton tooltip={item.title} isActive={item.id === 'core-protocol'}>
+                    <SidebarMenuButton 
+                        tooltip={item.title} 
+                        isActive={item.id === activeScripture.id}
+                        onClick={() => handleSelectScripture(item)}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </SidebarMenuButton>
@@ -81,7 +151,11 @@ nexus.command({
                 <SidebarMenu>
                     {mockManuals.map(item => (
                         <SidebarMenuItem key={item.id}>
-                            <SidebarMenuButton tooltip={item.title}>
+                            <SidebarMenuButton 
+                                tooltip={item.title}
+                                isActive={item.id === activeScripture.id}
+                                onClick={() => handleSelectScripture(item)}
+                            >
                                 <item.icon />
                                 <span>{item.title}</span>
                             </SidebarMenuButton>
@@ -96,7 +170,9 @@ nexus.command({
         <div className="p-4 sm:p-8">
             <div className="flex items-center gap-4 mb-8">
                 <SidebarTrigger />
-                <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary">Core Protocol</h1>
+                <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary">
+                    {isLoading ? <Skeleton className="h-6 w-48" /> : activeScripture.title}
+                </h1>
             </div>
             
             <Card className="mt-8 bg-card/50">
