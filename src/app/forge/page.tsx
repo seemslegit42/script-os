@@ -6,7 +6,7 @@ import { useAuth } from '@/context/auth-context';
 import { useFirestore } from '@/hooks/use-firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/header';
-import { getDocsAction } from '@/app/actions';
+import { getDocsAction, deleteSigilAction } from '@/app/actions';
 import { Scripture } from '@/lib/types';
 import { Annotation, Annotator } from '@/components/annotator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';

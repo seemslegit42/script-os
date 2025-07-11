@@ -132,35 +132,36 @@ export async function unifiedConversationAction(
   }
 }
 
-export async function addDocument(data: Omit<Scripture, 'id'>) {
-  const sessionCookie = cookies().get('session')?.value;
-  if (!sessionCookie) {
-    throw new Error('Authentication required. You must be an Initiate to bind a sigil.');
-  }
+export async function addDocument(data: Omit<Scripture, 'id' | 'createdAt'>) {
+    const sessionCookie = cookies().get('session')?.value;
+    if (!sessionCookie) {
+        throw new Error('Authentication required. You must be an Initiate to bind a sigil.');
+    }
 
-  let decodedClaims;
-  try {
-    decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-  } catch (error) {
-    throw new Error('Invalid session. Please log in again.');
-  }
+    let decodedClaims;
+    try {
+        decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    } catch (error) {
+        throw new Error('Invalid session. Please log in again.');
+    }
 
-  const userId = decodedClaims.uid;
+    const userId = decodedClaims.uid;
 
-  try {
-    const collectionRef = db.collection('sigils');
-    await collectionRef.add({
-      ...data,
-      userId,
-      createdAt: new Date(),
-    });
-    revalidatePath('/');
-    revalidatePath('/forge');
-  } catch (e: any) {
-    console.error('Error adding document: ', e);
-    throw new Error('Could not add document.');
-  }
+    try {
+        const collectionRef = db.collection('sigils');
+        await collectionRef.add({
+            ...data,
+            userId,
+            createdAt: new Date(),
+        });
+        revalidatePath('/');
+        revalidatePath('/forge');
+    } catch (e: any) {
+        console.error('Error adding document: ', e);
+        throw new Error('Could not add document.');
+    }
 }
+
 
 export async function deleteSigilAction(
   docId: string

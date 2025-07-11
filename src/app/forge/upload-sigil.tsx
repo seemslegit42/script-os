@@ -1,15 +1,16 @@
 
 'use client';
 
-import React, { useState, useCallback, useActionState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, FileText, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadSigilAction } from '@/app/actions';
+import { useActionState } from 'react';
 
-const initialState = { success: false, error: null };
+const initialState = { success: false, error: null as string | null };
 
 export function UploadSigil() {
   const [file, setFile] = useState<File | null>(null);
