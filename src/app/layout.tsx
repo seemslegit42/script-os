@@ -27,10 +27,10 @@ export default function RootLayout({
         <style dangerouslySetInnerHTML={{ __html: `
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
           /* This is a fallback. For Söhne, you'd use @font-face rules. */
-          .font-body { font-family: 'Inter', sans-serif; } 
+          body { --font-body: 'Inter', sans-serif; } 
         `}} />
       </head>
-      <body className={cn('font-body antialiased')}>
+      <body className={cn('antialiased')}>
         <TypographicStateProvider>
           <SidebarProvider>
             {children}
