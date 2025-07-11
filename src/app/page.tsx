@@ -5,6 +5,7 @@ import React, { useActionState, useRef, useEffect } from "react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Shield } from "lucide-react";
+import Image from "next/image";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,36 +13,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScribeForm } from "@/components/scribe-form";
 import { createSigilAction } from "./actions";
 import { useTypographicState } from "@/context/typographic-state-context";
-import { cn } from "@/lib/utils";
+
+const initialState = { sigilContent: null, sigilImageUrl: null, error: null };
 
 export default function ScriptoriumLayout() {
   const formRef = useRef<HTMLFormElement>(null);
-  const [state, formAction] = useActionState(createSigilAction, { sigilContent: null, error: null });
-  const { sigilContent, error } = state;
+  const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
+  const { sigilContent, sigilImageUrl, error } = state;
   const { applyState, currentState } = useTypographicState();
-  
-  // Directly use the form's pending state from the ref.
-  // This is a more robust way to track loading state with server actions.
-  const [isPending, setIsPending] = React.useState(false);
-  
-  useEffect(() => {
-    const form = formRef.current;
-    if (!form) return;
-    
-    // Check pending status on mount and whenever the form might re-render.
-    setIsPending(form.hasAttribute('data-pending'));
-    
-    // We can also observe for changes if needed, but often checking on re-render is enough.
-    const observer = new MutationObserver(() => {
-      setIsPending(form.hasAttribute('data-pending'));
-    });
-    
-    observer.observe(form, { attributes: true, attributeFilter: ['data-pending'] });
-    
-    return () => observer.disconnect();
-    
-  }, [state]); // Re-run when `state` changes, which signals action completion.
-
 
   useEffect(() => {
     if (isPending) {
@@ -94,15 +73,18 @@ export default function ScriptoriumLayout() {
             
             <ScribeForm formAction={formAction} formRef={formRef} isPending={isPending} />
 
-            {(isPending || sigilContent || error) && (
+            {(isPending || sigilContent || sigilImageUrl || error) && (
               <Card className="mt-8 bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10">
                   <CardContent className="p-6">
-                      {isPending && !sigilContent && !error ? (
-                          <div className="space-y-4">
-                              <Skeleton className="h-4 w-3/4 bg-muted/50" />
-                              <Skeleton className="h-4 w-full bg-muted/50" />
-                              <Skeleton className="h-20 w-full bg-muted/50" />
-                              <Skeleton className="h-4 w-1/2 bg-muted/50" />
+                      {isPending ? (
+                          <div className="space-y-6">
+                              <Skeleton className="h-64 w-full bg-muted/50" />
+                              <div className="space-y-4">
+                                  <Skeleton className="h-4 w-3/4 bg-muted/50" />
+                                  <Skeleton className="h-4 w-full bg-muted/50" />
+                                  <Skeleton className="h-20 w-full bg-muted/50" />
+                                  <Skeleton className="h-4 w-1/2 bg-muted/50" />
+                              </div>
                           </div>
                       ) : error ? (
                           <div className="prose prose-invert max-w-none sigil-codex text-destructive">
@@ -110,10 +92,24 @@ export default function ScriptoriumLayout() {
                             <p>{error}</p>
                           </div>
                       ) : (
-                          <div 
-                              className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
-                              dangerouslySetInnerHTML={{ __html: sigilContent || "" }}
-                          />
+                        <div className="space-y-6">
+                          {sigilImageUrl && (
+                            <Image 
+                              src={sigilImageUrl}
+                              alt="Generated Sigil Image"
+                              width={512}
+                              height={512}
+                              className="w-full h-auto rounded-lg border border-primary/30"
+                              priority
+                            />
+                          )}
+                          {sigilContent && (
+                             <div 
+                                className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
+                                dangerouslySetInnerHTML={{ __html: sigilContent }}
+                            />
+                          )}
+                        </div>
                       )}
                   </CardContent>
               </Card>
