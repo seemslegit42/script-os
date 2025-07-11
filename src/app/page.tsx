@@ -1,8 +1,10 @@
+
 "use client";
 
-import React, { useActionState, useRef, useEffect } from "react";
+import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
+import { Bot, User, LogIn, Swords } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,6 +12,9 @@ import { ScribeForm } from "@/components/scribe-form";
 import { createSigilAction } from "./actions";
 import { useTypographicState } from "@/context/typographic-state-context";
 import { FocusLayer } from "@/components/focus-layer";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/auth-context";
+import { AuthModal } from "@/components/auth-modal";
 
 const initialState = { sigil: null, sigilImageUrl: null, error: null };
 
@@ -18,6 +23,8 @@ export default function ScriptoriumLayout() {
   const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
   const { sigil, sigilImageUrl, error } = state;
   const { applyState, currentState } = useTypographicState();
+  const { user, loading, signOut } = useAuth();
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (isPending) {
@@ -29,6 +36,7 @@ export default function ScriptoriumLayout() {
   
   return (
     <>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
       <AethericStreams />
       
       <header className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
@@ -37,6 +45,29 @@ export default function ScriptoriumLayout() {
           <span className="text-xl font-bold tracking-wider sigil-obelisk text-primary ml-2 align-middle">
             SIGILFORGE
           </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => {
+            if (user) {
+              // Navigate to forge, for now just an alert
+              alert("Entering The Forge...");
+            } else {
+              setAuthModalOpen(true);
+            }
+          }}>
+            <Swords className="mr-2"/>
+            My Forge
+          </Button>
+          {loading ? (
+            <Skeleton className="h-10 w-24 bg-muted/50" />
+          ) : user ? (
+             <Button onClick={signOut} variant="outline">Sign Out</Button>
+          ) : (
+            <Button onClick={() => setAuthModalOpen(true)}>
+              <LogIn className="mr-2" />
+              Login
+            </Button>
+          )}
         </div>
       </header>
 
