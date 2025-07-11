@@ -5,16 +5,17 @@ import { auth } from '@/lib/firebase-admin';
 import { db } from '@/lib/firebase-admin';
 import { cookies } from 'next/headers';
 import { marked } from 'marked';
+import { interrogateSigil, InterrogateSigilOutput } from '@/ai/flows/interrogate-sigil-flow';
 
-type FormState = {
+type UploadFormState = {
   success: boolean;
   error: string | null;
 };
 
 export async function uploadSigilAction(
-  prevState: FormState,
+  prevState: UploadFormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<UploadFormState> {
   const sessionCookie = cookies().get('session')?.value;
   if (!sessionCookie) {
     return { success: false, error: 'You must be logged in to upload a file.' };
@@ -51,4 +52,35 @@ export async function uploadSigilAction(
     console.error(e);
     return { success: false, error: e.message || 'An unknown error occurred during upload.' };
   }
+}
+
+
+export type InterrogationFormState = {
+    conversation: { role: 'user' | 'agent'; content: string }[];
+    error: string | null;
+}
+
+export async function interrogationAction(prevState: InterrogationFormState, formData: FormData): Promise<InterrogationFormState> {
+    const query = formData.get('query') as string;
+    const context = formData.get('context') as string;
+
+    if(!query || !context) {
+        return { ...prevState, error: "Missing query or context."};
+    }
+    
+    const userMessage = { role: 'user' as const, content: query };
+    let newConversation = [...prevState.conversation, userMessage];
+
+    try {
+        const result: InterrogateSigilOutput = await interrogateSigil({ query, context });
+        const agentMessage = { role: 'agent' as const, content: result.answer };
+        newConversation = [...newConversation, agentMessage];
+        return { conversation: newConversation, error: null };
+
+    } catch (e: any) {
+        console.error(e);
+        const errorMessage = { role: 'agent' as const, content: `Error: ${e.message || 'An unknown error occurred.'}` };
+        newConversation = [...newConversation, errorMessage];
+        return { conversation: newConversation, error: e.message };
+    }
 }

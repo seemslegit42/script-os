@@ -6,20 +6,21 @@ import { useFirestore } from '@/hooks/use-firestore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ScribeGlyph } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { Swords } from 'lucide-react';
+import { Swords, ArrowLeft, Bot, User } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { FocusLayer } from '@/components/focus-layer';
 import { UploadSigil } from './upload-sigil';
+import { InterrogationPanel } from './interrogation-panel';
+import { ScribeGlyph } from '@/components/icons';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function ForgePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [selectedSigil, setSelectedSigil] = useState<any>(null);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/');
@@ -48,37 +49,46 @@ export default function ForgePage() {
   }
 
   if (selectedSigil) {
+    const sigilContext = selectedSigil.html || `${selectedSigil.why}\n\n${selectedSigil.how}`;
     return (
-        <main className="container mx-auto p-4 sm:p-8">
-             <header className="flex justify-between items-center mb-8">
-                <h1 className="text-4xl sigil-obelisk text-primary flex items-center gap-4 truncate">
+        <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
+             <header className="flex justify-between items-center mb-4 flex-shrink-0">
+                <h1 className="text-2xl md:text-4xl sigil-obelisk text-primary flex items-center gap-4 truncate">
                     {selectedSigil.query || selectedSigil.fileName}
                 </h1>
-                <Button onClick={handleBack}>Back to Forge</Button>
+                <Button onClick={handleBack} variant="outline" size="sm">
+                  <ArrowLeft className="mr-2"/>
+                  Back to Forge
+                </Button>
             </header>
-            <Card className="bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10">
-                <CardContent className="p-6">
-                    <div className="space-y-6">
-                        {selectedSigil.imageUrl && (
-                            <Image 
-                                src={selectedSigil.imageUrl}
-                                alt={`Sigil for ${selectedSigil.query}`}
-                                width={1024}
-                                height={576}
-                                className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
-                            />
-                        )}
-                        {selectedSigil.html ? (
-                             <div
-                                className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
-                                dangerouslySetInnerHTML={{ __html: selectedSigil.html }}
-                            />
-                        ) : (
-                            <FocusLayer whyContent={selectedSigil.why} howContent={selectedSigil.how} />
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
+                <Card className="bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
+                    <CardContent className="p-6 flex-grow min-h-0">
+                      <ScrollArea className="h-full pr-4">
+                        <div className="space-y-6">
+                            {selectedSigil.imageUrl && (
+                                <Image 
+                                    src={selectedSigil.imageUrl}
+                                    alt={`Sigil for ${selectedSigil.query}`}
+                                    width={1024}
+                                    height={576}
+                                    className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
+                                />
+                            )}
+                            {selectedSigil.html ? (
+                                <div
+                                    className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
+                                    dangerouslySetInnerHTML={{ __html: selectedSigil.html }}
+                                />
+                            ) : (
+                                <FocusLayer whyContent={selectedSigil.why} howContent={selectedSigil.how} />
+                            )}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                </Card>
+                 <InterrogationPanel context={sigilContext} />
+            </div>
         </main>
     );
   }
@@ -90,7 +100,7 @@ export default function ForgePage() {
           <Swords className="h-10 w-10" />
           My Forge
         </h1>
-        <Button onClick={handleBack}>Back to Scribe</Button>
+        <Button onClick={() => router.push('/')}>Back to Scribe</Button>
       </header>
 
       <div className="mb-12">
@@ -126,7 +136,7 @@ export default function ForgePage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sigils.map(sigil => (
+          {sigils.map((sigil: any) => (
             <Card 
                 key={sigil.id} 
                 className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all cursor-pointer"
@@ -135,7 +145,7 @@ export default function ForgePage() {
                 <CardHeader>
                     <CardTitle className="sigil-codex truncate">{sigil.query || sigil.fileName}</CardTitle>
                     <CardDescription>
-                        {new Date(sigil.createdAt.seconds * 1000).toLocaleDateString()}
+                        {sigil.createdAt.seconds ? new Date(sigil.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow flex flex-col justify-end">
