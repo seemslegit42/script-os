@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Book, FileText, Settings, Shield } from "lucide-react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
-import { ScribeForm } from "@/components/scribe-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -99,8 +98,6 @@ nexus.command({
                 <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary">Core Protocol</h1>
             </div>
             
-            <ScribeForm setSigilContent={setSigilContent} />
-
             <Card className="mt-8 bg-card/50">
                 <CardContent className="p-6">
                     {isLoading || !sigilContent ? (
