@@ -1,3 +1,6 @@
+// This component is no longer used and can be removed in a future cleanup.
+// For now, it remains to avoid breaking any potential lingering imports,
+// but the core UI has shifted away from a sidebar-based layout.
 "use client"
 
 import * as React from "react"

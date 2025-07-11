@@ -1,18 +1,18 @@
 
 "use client";
 
-import React, { useActionState, useRef, useEffect } from "react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Shield } from "lucide-react";
-import Image from "next/image";
+import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
-import { ScribeGlyph } from "@/components/icons";
+import { ScribeGlyph, Bot, User } from "lucide-react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScribeForm } from "@/components/scribe-form";
 import { createSigilAction } from "./actions";
 import { useTypographicState } from "@/context/typographic-state-context";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/auth-context";
+import { AuthModal } from "@/components/auth-modal";
 
 const initialState = { sigilContent: null, sigilImageUrl: null, error: null };
 
@@ -21,6 +21,8 @@ export default function ScriptoriumLayout() {
   const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
   const { sigilContent, sigilImageUrl, error } = state;
   const { applyState, currentState } = useTypographicState();
+  const { user, loading } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (isPending) {
@@ -32,44 +34,30 @@ export default function ScriptoriumLayout() {
   
   return (
     <>
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
       <AethericStreams />
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2 p-2">
-            <ScribeGlyph className="h-8 w-8 text-primary" />
-            <div className="flex flex-col">
-              <h2 className="text-lg font-semibold tracking-widest sigil-obelisk">ΛΞVON OS</h2>
-              <p className="text-xs text-muted-foreground sigil-codex">Sentient Codex</p>
+      <div className="absolute top-4 right-4 z-10">
+        {loading ? (
+          <Skeleton className="h-10 w-24" />
+        ) : user ? (
+          <Button variant="secondary" onClick={() => { /* TODO: Implement Forge Link */ }}>
+            My Forge
+          </Button>
+        ) : (
+          <Button onClick={() => setAuthModalOpen(true)}>
+            Login / Sign Up
+          </Button>
+        )}
+      </div>
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8">
+        <div className="mx-auto max-w-4xl w-full">
+            <div className="text-center mb-8">
+              <ScribeGlyph className="h-16 w-16 text-primary mx-auto mb-4 animate-pulse [animation-duration:3s]" />
+              <h1 className="text-4xl font-bold tracking-wider sigil-obelisk text-primary">
+                  SIGILFORGE
+              </h1>
+              <p className="sigil-codex text-muted-foreground mt-2">Generate living ideas. Instantly.</p>
             </div>
-          </div>
-        </SidebarHeader>
-        <ScrollArea className="flex-1">
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>System Protocols</SidebarGroupLabel>
-              <SidebarMenu>
-                 <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Core Protocol" isActive={true}>
-                      <Shield />
-                      <span>Core Protocol</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Aether Specifications">
-                      <FileText />
-                      <span>Aether Specs</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroup>
-          </SidebarContent>
-        </ScrollArea>
-      </Sidebar>
-      <main className="flex-1 p-4 sm:p-8">
-        <div className="mx-auto max-w-4xl">
-            <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary mb-8 animate-pulse [animation-duration:3s]">
-                Summon the Scribe
-            </h1>
             
             <ScribeForm formAction={formAction} formRef={formRef} isPending={isPending} />
 

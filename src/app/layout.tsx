@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { TypographicStateProvider } from '@/context/typographic-state-context';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
   title: 'The Scriptorium Cypher',
@@ -31,12 +31,12 @@ export default function RootLayout({
         `}} />
       </head>
       <body className={cn('antialiased')}>
-        <TypographicStateProvider>
-          <SidebarProvider>
+        <AuthProvider>
+          <TypographicStateProvider>
             {children}
             <Toaster />
-          </SidebarProvider>
-        </TypographicStateProvider>
+          </TypographicStateProvider>
+        </AuthProvider>
       </body>
     </html>
   );
