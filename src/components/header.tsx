@@ -5,18 +5,13 @@ import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LogIn, Swords } from 'lucide-react';
+import { LogIn, Swords, LogOut } from 'lucide-react';
 import { ScribeSigil } from './icons';
 import { AuthModal } from './auth-modal';
 import { UserStats } from './user-stats';
 import Link from 'next/link';
 
-type HeaderProps = {
-    children?: React.ReactNode;
-    page?: 'scribe' | 'forge';
-}
-
-export function Header({ children, page }: HeaderProps) {
+export function Header() {
     const { user, loading, signOut } = useAuth();
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     
@@ -31,16 +26,17 @@ export function Header({ children, page }: HeaderProps) {
                     </span>
                 </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
-                  {children}
                    {loading ? (
                     <Skeleton className="h-10 w-48 bg-muted/50" />
                   ) : user ? (
                     <>
                         <UserStats />
                         <Link href="/forge">
-                          <Button variant="outline"><Swords /> My Scriptorium</Button>
+                          <Button variant="outline"><Swords /> Scriptorium</Button>
                         </Link>
-                        <Button onClick={() => signOut()} variant="outline" size="sm">End Session</Button>
+                        <Button onClick={() => signOut()} variant="ghost" size="icon" title="End Session">
+                            <LogOut />
+                        </Button>
                     </>
                   ) : (
                     <div className="flex items-center gap-2 sm:gap-4">

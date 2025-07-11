@@ -10,6 +10,7 @@ import { addDocument } from "./scriptorium/actions";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 
 export default function ScriptoriumPage() {
@@ -41,7 +42,9 @@ export default function ScriptoriumPage() {
         title: "Sigil Bound",
         description: "The scripture has been bound to your personal Scriptorium.",
         action: (
-          <button onClick={() => router.push('/forge')} className="p-2 bg-primary-foreground text-primary rounded-md">View Scriptorium</button>
+          <Button onClick={() => router.push('/forge')} className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
+            View in Scriptorium
+          </Button>
         )
       });
     } catch(e: any) {
@@ -56,9 +59,7 @@ export default function ScriptoriumPage() {
         <title>Scriptorium | Scribe</title>
       </Head>
       <AethericStreams isThinking={isPending} />
-      <Header page="scribe">
-        <div />
-      </Header>
+      <Header />
       
       <main className="container mx-auto flex flex-col h-[calc(100vh-80px)] pt-20">
         <ConversationManager 

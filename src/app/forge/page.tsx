@@ -63,10 +63,6 @@ export default function ForgePage() {
     user ? [['userId', '==', user.uid]] : null
   );
 
-  const handleBackToMain = () => {
-    router.push('/');
-  }
-
   const handleBackToScriptorium = () => {
     setSelectedSigil(null);
     setAnnotations([]); // Clear annotations when leaving a document
@@ -111,44 +107,43 @@ export default function ForgePage() {
           <title>Scriptorium | Viewing Scripture</title>
         </Head>
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
-            <Header>
-                 <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button variant="outline" size={isMobile ? 'icon' : 'sm'} disabled={annotations.length === 0}>
-                        <MessageSquareQuote />
-                        <span className="hidden sm:inline sm:ml-2">Annotations ({annotations.length})</span>
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent className="bg-card/90 backdrop-blur-lg border-primary/30">
-                      <SheetHeader>
-                        <SheetTitle className="sigil-obelisk">Session Annotations</SheetTitle>
-                      </SheetHeader>
-                      <ScrollArea className="h-[calc(100%-4rem)] mt-4 pr-4">
-                        <div className="space-y-4">
-                          {annotations.length > 0 ? (
-                            annotations.map(ann => (
-                              <div key={ann.id} className="p-3 rounded-lg bg-background/50 border border-primary/20">
-                                <p className="text-sm text-muted-foreground italic border-l-2 border-accent/70 pl-2 sigil-codex">
-                                  &ldquo;{ann.selection}&rdquo;
-                                </p>
-                                <p className="mt-2 sigil-glyph">{ann.comment}</p>
-                              </div>
-                            ))
-                          ) : (
-                            <p className="text-muted-foreground text-center mt-8">No annotations for this session.</p>
-                          )}
-                        </div>
-                      </ScrollArea>
-                    </SheetContent>
-                  </Sheet>
-                  <Button onClick={handleBackToScriptorium} variant="outline" size={isMobile ? 'icon' : 'sm'}>
-                    <ArrowLeft />
-                    <span className="hidden sm:inline sm:ml-2">Scriptorium</span>
+            <Header />
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 pt-20">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size={isMobile ? 'icon' : 'sm'} disabled={annotations.length === 0}>
+                    <MessageSquareQuote />
+                    <span className="hidden sm:inline sm:ml-2">Annotations ({annotations.length})</span>
                   </Button>
-                </div>
-            </Header>
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0 pt-20">
+                </SheetTrigger>
+                <SheetContent className="bg-card/90 backdrop-blur-lg border-primary/30">
+                  <SheetHeader>
+                    <SheetTitle className="sigil-obelisk">Session Annotations</SheetTitle>
+                  </SheetHeader>
+                  <ScrollArea className="h-[calc(100%-4rem)] mt-4 pr-4">
+                    <div className="space-y-4">
+                      {annotations.length > 0 ? (
+                        annotations.map(ann => (
+                          <div key={ann.id} className="p-3 rounded-lg bg-background/50 border border-primary/20">
+                            <p className="text-sm text-muted-foreground italic border-l-2 border-accent/70 pl-2 sigil-codex">
+                              &ldquo;{ann.selection}&rdquo;
+                            </p>
+                            <p className="mt-2 sigil-glyph">{ann.comment}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center mt-8">No annotations for this session.</p>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </SheetContent>
+              </Sheet>
+              <Button onClick={handleBackToScriptorium} variant="outline" size={isMobile ? 'icon' : 'sm'}>
+                <ArrowLeft />
+                <span className="hidden sm:inline sm:ml-2">Scriptorium</span>
+              </Button>
+            </div>
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0 pt-4">
                 <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
                     <CardContent className="p-6 flex-grow min-h-0">
                       <ScrollArea className="h-full pr-4">
@@ -190,9 +185,7 @@ export default function ForgePage() {
         <title>Scriptorium | Forge</title>
     </Head>
     <main className="container mx-auto p-4 sm:p-8">
-      <Header>
-         <Button onClick={handleBackToMain} size={isMobile ? 'sm' : 'default'}>Back to Scribe</Button>
-      </Header>
+      <Header />
 
       <div className="mb-12 mt-28">
         <UploadSigil />
