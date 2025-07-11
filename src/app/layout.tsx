@@ -35,7 +35,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Lexend:wght@100..900&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap" rel="stylesheet" />
         <style dangerouslySetInnerHTML={{ __html: `
-          body { --font-body: 'Lexend', sans-serif; } 
+          body { 
+            --font-headline: 'Comfortaa', sans-serif;
+            --font-body: 'Lexend', sans-serif;
+            --font-code: 'Recursive', monospace;
+          } 
         `}} />
       </head>
       <body className={cn('antialiased')}>

@@ -5,25 +5,25 @@
 
 @layer base {
   :root {
-    --background: 240 13% 6%; /* #08080B */
+    --background: 0 0% 4%; /* Obsidian Black */
     --foreground: 0 0% 98%;
-    --card: 240 10% 8%; /* Slightly lighter than background for depth */
+    --card: 279 50% 12%; /* Darker purple, for depth */
     --card-foreground: 0 0% 98%;
-    --popover: 240 14% 4%;
+    --popover: 279 60% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 275 100% 41%; /* Imperial Purple */
-    --primary-foreground: 275 20% 95%;
-    --secondary: 150 25% 25%; /* Patina Green - for secondary elements */
-    --secondary-foreground: 150 15% 95%;
+    --primary: 279 100% 34%; /* #6A0DAD Imperial Purple */
+    --primary-foreground: 279 20% 95%;
+    --secondary: 158 51% 55%; /* #3EB991 Patina Green */
+    --secondary-foreground: 158 40% 10%;
     --muted: 240 5% 15%;
     --muted-foreground: 240 5% 65%;
-    --accent: 180 100% 70%; /* Roman Aqua - for accents */
-    --accent-foreground: 180 50% 10%;
+    --accent: 177 70% 41%; /* #20B2AA Roman Aqua */
+    --accent-foreground: 177 50% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 10% 20%; /* Slightly more visible border */
-    --input: 240 10% 15%;
-    --ring: 275 100% 51%;
+    --border: 279 50% 30%; /* Purple-tinted border */
+    --input: 279 30% 20%;
+    --ring: 177 80% 51%; /* Ring color from Roman Aqua */
     --radius: 0.5rem;
 
     /* Typographic Variables */
@@ -34,25 +34,25 @@
   }
 
   .dark {
-    --background: 240 13% 6%; /* #08080B */
+    --background: 0 0% 4%; /* Obsidian Black */
     --foreground: 0 0% 98%;
-    --card: 240 10% 8%; /* Slightly lighter than background for depth */
+    --card: 279 50% 12%; /* Darker purple, for depth */
     --card-foreground: 0 0% 98%;
-    --popover: 240 14% 4%;
+    --popover: 279 60% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 275 100% 41%; /* Imperial Purple */
-    --primary-foreground: 275 20% 95%;
-    --secondary: 150 25% 25%; /* Patina Green - for secondary elements */
-    --secondary-foreground: 150 15% 95%;
+    --primary: 279 100% 34%; /* #6A0DAD Imperial Purple */
+    --primary-foreground: 279 20% 95%;
+    --secondary: 158 51% 55%; /* #3EB991 Patina Green */
+    --secondary-foreground: 158 40% 10%;
     --muted: 240 5% 15%;
     --muted-foreground: 240 5% 65%;
-    --accent: 180 100% 70%; /* Roman Aqua - for accents */
-    --accent-foreground: 180 50% 10%;
+    --accent: 177 70% 41%; /* #20B2AA Roman Aqua */
+    --accent-foreground: 177 50% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 10% 20%; /* Slightly more visible border */
-    --input: 240 10% 15%;
-    --ring: 275 100% 51%;
+    --border: 279 50% 30%; /* Purple-tinted border */
+    --input: 279 30% 20%;
+    --ring: 177 80% 51%; /* Ring color from Roman Aqua */
   }
 }
 
@@ -75,22 +75,24 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     background: 
-      radial-gradient(ellipse 80% 80% at 50% -20%, hsl(var(--primary) / 0.3), transparent),
-      radial-gradient(ellipse 80% 80% at 50% 120%, hsl(var(--accent) / 0.1), transparent);
-    animation: background-shimmer 15s ease-in-out infinite alternate;
+      radial-gradient(ellipse 50% 40% at 20% 30%, hsl(var(--primary) / 0.15), transparent),
+      radial-gradient(ellipse 40% 30% at 80% 60%, hsl(var(--secondary) / 0.15), transparent),
+      radial-gradient(ellipse 50% 40% at 50% 95%, hsl(var(--accent) / 0.15), transparent);
+    animation: background-shimmer 20s ease-in-out infinite alternate;
     z-index: -20;
     pointer-events: none;
+    transform-origin: center;
   }
 
   @keyframes background-shimmer {
     from {
-      transform: rotate(0deg) scale(1.5);
+      transform: rotate(0deg) scale(1.2);
     }
     to {
-      transform: rotate(90deg) scale(1.2);
+      transform: rotate(180deg) scale(1.5);
     }
   }
 

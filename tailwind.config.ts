@@ -21,9 +21,9 @@ const config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
-        body: ["Lexend", "sans-serif"], 
-        headline: ["Comfortaa", "sans-serif"],
-        code: ["Recursive", "monospace"],
+        body: ["var(--font-body)", "sans-serif"], 
+        headline: ["var(--font-headline)", "sans-serif"],
+        code: ["var(--font-code)", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
