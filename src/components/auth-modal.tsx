@@ -17,11 +17,21 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { ScribeGlyph } from './icons';
 
+/**
+ * Props for the AuthModal component.
+ * @property {boolean} isOpen - Controls whether the modal is visible.
+ * @property {() => void} onClose - Function to call when the modal should be closed.
+ */
 type AuthModalProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
+/**
+ * A modal component for user authentication (Login and Sign Up).
+ * It provides forms for email/password and Google sign-in.
+ * @param {AuthModalProps} props - The component props.
+ */
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
