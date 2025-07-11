@@ -4,17 +4,20 @@
 import { useAuth } from '@/context/auth-context';
 import { useFirestore } from '@/hooks/use-firestore';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScribeGlyph } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Swords } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import { FocusLayer } from '@/components/focus-layer';
+import { UploadSigil } from './upload-sigil';
 
 export default function ForgePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [selectedSigil, setSelectedSigil] = useState<any>(null);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -28,11 +31,55 @@ export default function ForgePage() {
     user ? [['userId', '==', user.uid]] : null
   );
 
+  const handleBack = () => {
+    if (selectedSigil) {
+      setSelectedSigil(null);
+    } else {
+      router.push('/');
+    }
+  }
+
   if (authLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <ScribeGlyph className="h-16 w-16 animate-spin text-primary" />
       </div>
+    );
+  }
+
+  if (selectedSigil) {
+    return (
+        <main className="container mx-auto p-4 sm:p-8">
+             <header className="flex justify-between items-center mb-8">
+                <h1 className="text-4xl sigil-obelisk text-primary flex items-center gap-4 truncate">
+                    {selectedSigil.query || selectedSigil.fileName}
+                </h1>
+                <Button onClick={handleBack}>Back to Forge</Button>
+            </header>
+            <Card className="bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10">
+                <CardContent className="p-6">
+                    <div className="space-y-6">
+                        {selectedSigil.imageUrl && (
+                            <Image 
+                                src={selectedSigil.imageUrl}
+                                alt={`Sigil for ${selectedSigil.query}`}
+                                width={1024}
+                                height={576}
+                                className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
+                            />
+                        )}
+                        {selectedSigil.html ? (
+                             <div
+                                className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
+                                dangerouslySetInnerHTML={{ __html: selectedSigil.html }}
+                            />
+                        ) : (
+                            <FocusLayer whyContent={selectedSigil.why} howContent={selectedSigil.how} />
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </main>
     );
   }
   
@@ -43,8 +90,12 @@ export default function ForgePage() {
           <Swords className="h-10 w-10" />
           My Forge
         </h1>
-        <Button onClick={() => router.push('/')}>Back to Scribe</Button>
+        <Button onClick={handleBack}>Back to Scribe</Button>
       </header>
+
+      <div className="mb-12">
+        <UploadSigil />
+      </div>
 
       {sigilsLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -68,7 +119,7 @@ export default function ForgePage() {
             </CardHeader>
             <CardContent>
                 <CardDescription>
-                    Return to the Scribe to generate and save your first sigil.
+                    Generate sigils with the Scribe or upload your own scriptures.
                 </CardDescription>
                 <Button className="mt-6" onClick={() => router.push('/')}>Summon the Scribe</Button>
             </CardContent>
@@ -76,15 +127,19 @@ export default function ForgePage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sigils.map(sigil => (
-            <Card key={sigil.id} className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all">
+            <Card 
+                key={sigil.id} 
+                className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all cursor-pointer"
+                onClick={() => setSelectedSigil(sigil)}
+            >
                 <CardHeader>
-                    <CardTitle className="sigil-codex truncate">{sigil.query}</CardTitle>
+                    <CardTitle className="sigil-codex truncate">{sigil.query || sigil.fileName}</CardTitle>
                     <CardDescription>
                         {new Date(sigil.createdAt.seconds * 1000).toLocaleDateString()}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow flex flex-col justify-end">
-                  {sigil.imageUrl && (
+                  {sigil.imageUrl ? (
                       <Image
                         src={sigil.imageUrl}
                         alt={`Sigil for ${sigil.query}`}
@@ -92,8 +147,11 @@ export default function ForgePage() {
                         height={288}
                         className="w-full h-auto object-cover rounded-md aspect-video"
                       />
+                  ) : (
+                    <div className="w-full aspect-video bg-background/50 rounded-md flex items-center justify-center">
+                        <ScribeGlyph className="h-16 w-16 text-muted-foreground/50"/>
+                    </div>
                   )}
-                  {/* Future: Add button to view/annotate */}
                 </CardContent>
             </Card>
           ))}
