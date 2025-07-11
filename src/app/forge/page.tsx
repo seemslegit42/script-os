@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { FocusLayer } from '@/components/focus-layer';
 import { UploadSigil } from './upload-sigil';
-import { InterrogationPanel } from './interrogation-panel';
+import { InterrogationPanel } from '@/components/scribe/interrogation-panel';
 import { ScribeSigil } from '@/components/icons';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getDocsAction } from './actions';

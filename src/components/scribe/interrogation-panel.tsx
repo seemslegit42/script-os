@@ -7,9 +7,29 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, User, Send, CircleDashed } from 'lucide-react';
-import { interrogationAction, InterrogationFormState } from './actions';
+import { interrogationAction } from '@/app/scribe/actions';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+
+
+/**
+ * Represents a single message in the interrogation conversation.
+ */
+export type ConversationMessage = {
+    role: 'user' | 'agent';
+    content: string;
+    audioUrl?: string | null;
+};
+
+/**
+ * Represents the state of the interrogation chat panel.
+ * @property {Array<ConversationMessage>} conversation - A history of the conversation.
+ * @property {string | null} error - An error message, if any occurred during the last turn.
+ */
+export type InterrogationFormState = {
+    conversation: ConversationMessage[];
+    error: string | null;
+}
 
 const initialState: InterrogationFormState = {
   conversation: [],
@@ -33,6 +53,7 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
   const [state, formAction, isPending] = useActionState(interrogationAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const isContextEmpty = !context || context.trim() === '';
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -46,6 +67,9 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const query = formData.get('query') as string;
+    if(!query?.trim()) return; // Don't submit empty queries
+
     formAction(formData);
     // Reset the textarea after submission
     if(formRef.current) {
@@ -65,6 +89,11 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
       <CardContent className="flex-grow min-h-0">
           <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
               <div className="space-y-4">
+                  {state.conversation.length === 0 && (
+                    <div className="text-center text-muted-foreground sigil-codex pt-8">
+                        <p>{isContextEmpty ? "Forge a sigil to begin." : "The Oracle is silent. Pose a question to begin the interrogation."}</p>
+                    </div>
+                  )}
                   {state.conversation.map((msg, index) => (
                       <div key={index} className={cn("flex items-start gap-3", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                            {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary" />}
@@ -94,18 +123,21 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
           <input type="hidden" name="context" value={context} />
           <Textarea
             name="query"
-            placeholder="Ask a question about this document..."
+            placeholder={isContextEmpty ? "No context loaded." : "Ask a question about the context..."}
             required
             className="flex-grow sigil-glyph bg-background/50 focus:bg-background/80 resize-none"
             rows={1}
+            disabled={isContextEmpty || isPending}
             onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    formRef.current?.requestSubmit();
+                    if (!isContextEmpty && !isPending) {
+                      formRef.current?.requestSubmit();
+                    }
                 }
             }}
           />
-          <Button type="submit" size="icon" disabled={isPending}>
+          <Button type="submit" size="icon" disabled={isContextEmpty || isPending}>
             {isPending ? <CircleDashed className="animate-spin"/> : <Send />}
           </Button>
         </form>
