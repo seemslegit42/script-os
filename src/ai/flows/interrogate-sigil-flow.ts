@@ -15,6 +15,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { summarizeDocumentTool } from '../tools/summarize';
 
 /**
  * Defines the schema for the input to the interrogateSigil flow.
@@ -50,11 +51,14 @@ const prompt = ai.definePrompt({
   name: 'interrogateSigilPrompt',
   input: {schema: InterrogateSigilInputSchema},
   output: {schema: InterrogateSigilOutputSchema},
-  prompt: `You are an archival intelligence agent within the ΛΞVON OS. Your sole purpose is to answer a user's question based *exclusively* on the provided document context.
+  tools: [summarizeDocumentTool],
+  system: `You are an archival intelligence agent within the ΛΞVON OS. Your purpose is to help a user understand a document by answering questions based *exclusively* on the provided document context.
 
-  Do not use any external knowledge. If the answer cannot be found in the provided context, you must state that the information is not available in the document. Be concise and accurate.
-
-  DOCUMENT CONTEXT:
+  If the user asks for a summary, a TL;DR, or to distill the text, you must use the summarizeDocumentTool to provide it.
+  
+  For all other questions, do not use any external knowledge. If the answer cannot be found in the provided context, you must state that the information is not available in the document. Be concise and accurate.
+  `,
+  prompt: `DOCUMENT CONTEXT:
   """
   {{{context}}}
   """
