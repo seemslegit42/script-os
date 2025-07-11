@@ -2,116 +2,56 @@
 "use client";
 
 import * as React from "react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator, SidebarTrigger } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Book, FileText, Settings, Shield } from "lucide-react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type Scripture = {
-  id: string;
-  title: string;
-  icon: React.ElementType;
-  content: string;
-};
-
-const mockScriptures: Scripture[] = [
-    { 
-        id: 'core-protocol', 
-        title: 'Core Protocol', 
-        icon: Shield,
-        content: `
-          <p>This is the content for the Core Protocol. It defines the foundational security and operational principles of the entire Nexus OS.</p>
-          <p>The Obelisk tier is used for headings, creating a monumental, authoritative feel. The Codex tier provides the core reading experience—clear, neutral, and unobtrusive. The Glyph tier is reserved for <code>code snippets</code>, offering a precise, monospaced view of raw data and commands.</p>
-          <pre><code class="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
-  nexus.command({
-    action: "ACTIVATE_SENTIENCE",
-    target: "TYPOGRAPHY_ENGINE",
-    params: {
-      mode: "EXTREME"
-    }
-  })
-          </code></pre>
-          <p>Interacting with these protocols requires Level 3 clearance. Unauthorized access attempts are logged and reported to Aegis command.</p>
-        `
-    },
-    { 
-        id: 'aether-spec', 
-        title: 'Aether Specifications', 
-        icon: FileText,
-        content: `
-            <p>The Aether Specifications detail the data transport layer of the Nexus. All inter-module communication flows through the Aether.</p>
-            <p>This document outlines the packet structure, encryption standards, and bandwidth allocation protocols.</p>
-            <pre><code class="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
-  struct AetherPacket {
-    uint64_t timestamp;
-    uuid_t source_module;
-    uuid_t target_module;
-    byte[] payload;
-  }
-            </code></pre>
-        `
-    },
-    { 
-        id: 'nexus-api', 
-        title: 'Nexus API', 
-        icon: FileText,
-        content: `
-            <p>The Nexus API provides the primary interface for developers to interact with the OS core functions.</p>
-            <p>Access is managed via token-based authentication. All endpoints are versioned.</p>
-        `
-    },
-];
-
-const mockManuals: Scripture[] = [
-    { 
-        id: 'getting-started', 
-        title: 'Getting Started', 
-        icon: Book,
-        content: `
-            <p>This manual provides a step-by-step guide for new initiates to the Nexus OS.</p>
-            <p>Your first step is to configure your terminal environment and authenticate with the Genesis block.</p>
-        `
-    },
-    { 
-        id: 'advanced-config', 
-        title: 'Advanced Configuration', 
-        icon: Settings,
-        content: `
-            <p>This manual covers advanced topics such as kernel-level modifications, custom agent development, and network topology adjustments.</p>
-            <p>Proceed with caution. Incorrect configuration can lead to system instability.</p>
-        `
-    },
-]
-
-const allScriptures = [...mockScriptures, ...mockManuals];
+import { ScribeForm } from "@/components/scribe-form";
+import { useFormState } from "react-dom";
+import { createSigilAction } from "./actions";
 
 export default function ScriptoriumLayout() {
-  const [activeScripture, setActiveScripture] = React.useState<Scripture>(mockScriptures[0]);
-  const [sigilContent, setSigilContent] = React.useState<string | null>(activeScripture.content);
-  const [isLoading, setIsLoading] = React.useState(false);
-  
-  const handleSelectScripture = (scripture: Scripture) => {
-    setIsLoading(true);
-    setActiveScripture(scripture);
-    // Simulate fetching content
-    setTimeout(() => {
-        setSigilContent(scripture.content);
-        setIsLoading(false);
-    }, 500);
-  };
+  const [state, formAction] = useFormState(createSigilAction, { sigilContent: null, error: null });
 
-  // Initial load effect
+  const { sigilContent } = state;
+  const [isLoading, setIsLoading] = React.useState(false);
+
   React.useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-        setSigilContent(activeScripture.content);
-        setIsLoading(false);
-    }, 750);
-    return () => clearTimeout(timer);
-  }, []);
+    // A simple way to detect loading state from the form action
+    const form = document.querySelector('form');
+    if (form) {
+      const handleFormSubmit = () => {
+        // A small delay to allow the form state to update
+        setTimeout(() => {
+          setIsLoading(true);
+        }, 50);
+      };
+
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'data-pending') {
+            const isPending = form.hasAttribute('data-pending');
+            if (!isPending && isLoading) {
+              setIsLoading(false);
+            }
+          }
+        });
+      });
+
+      // Start observing the form for the data-pending attribute
+      observer.observe(form, { attributes: true });
+
+      form.addEventListener('submit', handleFormSubmit);
+
+      return () => {
+        form.removeEventListener('submit', handleFormSubmit);
+        observer.disconnect();
+      };
+    }
+  }, [isLoading]);
 
   return (
     <>
@@ -131,67 +71,50 @@ export default function ScriptoriumLayout() {
             <SidebarGroup>
               <SidebarGroupLabel>System Protocols</SidebarGroupLabel>
               <SidebarMenu>
-                {mockScriptures.map(item => (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton 
-                        tooltip={item.title} 
-                        isActive={item.id === activeScripture.id}
-                        onClick={() => handleSelectScripture(item)}
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Core Protocol" isActive={true}>
+                      <Shield />
+                      <span>Core Protocol</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
+                   <SidebarMenuItem>
+                    <SidebarMenuButton tooltip="Aether Specifications">
+                      <FileText />
+                      <span>Aether Specs</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
               </SidebarMenu>
-            </SidebarGroup>
-            <SidebarSeparator />
-            <SidebarGroup>
-                <SidebarGroupLabel>User Manuals</SidebarGroupLabel>
-                <SidebarMenu>
-                    {mockManuals.map(item => (
-                        <SidebarMenuItem key={item.id}>
-                            <SidebarMenuButton 
-                                tooltip={item.title}
-                                isActive={item.id === activeScripture.id}
-                                onClick={() => handleSelectScripture(item)}
-                            >
-                                <item.icon />
-                                <span>{item.title}</span>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
             </SidebarGroup>
           </SidebarContent>
         </ScrollArea>
       </Sidebar>
       <SidebarInset>
         <div className="p-4 sm:p-8">
-            <div className="flex items-center gap-4 mb-8">
-                <SidebarTrigger />
-                <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary">
-                    {isLoading ? <Skeleton className="h-6 w-48" /> : activeScripture.title}
-                </h1>
-            </div>
+            <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary mb-8">
+                Summon the Scribe
+            </h1>
             
-            <Card className="mt-8 bg-card/50">
-                <CardContent className="p-6">
-                    {isLoading || !sigilContent ? (
-                        <div className="space-y-4">
-                            <Skeleton className="h-4 w-3/4" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-20 w-full" />
-                            <Skeleton className="h-4 w-1/2" />
-                        </div>
-                    ) : (
-                        <div 
-                            className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
-                            dangerouslySetInnerHTML={{ __html: sigilContent }}
-                        />
-                    )}
-                </CardContent>
-            </Card>
+            <ScribeForm formAction={formAction} />
+
+            {(isLoading || sigilContent) && (
+              <Card className="mt-8 bg-card/50">
+                  <CardContent className="p-6">
+                      {isLoading ? (
+                          <div className="space-y-4">
+                              <Skeleton className="h-4 w-3/4" />
+                              <Skeleton className="h-4 w-full" />
+                              <Skeleton className="h-20 w-full" />
+                              <Skeleton className="h-4 w-1/2" />
+                          </div>
+                      ) : (
+                          <div 
+                              className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
+                              dangerouslySetInnerHTML={{ __html: sigilContent || "" }}
+                          />
+                      )}
+                  </CardContent>
+              </Card>
+            )}
         </div>
       </SidebarInset>
     </>
