@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ScribeGlyph, AnnotationGlyph } from "@/components/icons";
 import { createSigilAction } from "./actions";
-import { ArrowLeft, GitFork, Loader2, PlusCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, GitFork, Loader2, PlusCircle, Sparkles, WandSparkles } from "lucide-react";
+import { useTypographicState } from "@/context/typographic-state-context";
 
 const formSchema = z.object({
   query: z.string().min(10, {
@@ -32,6 +33,7 @@ export default function Scriptorium() {
   const [sigilContent, setSigilContent] = React.useState<string | null>(null);
   const [annotations, setAnnotations] = React.useState<Annotation[]>([]);
   const { toast } = useToast();
+  const { applyState, currentState } = useTypographicState();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,6 +41,16 @@ export default function Scriptorium() {
       query: "",
     },
   });
+
+  React.useEffect(() => {
+    if (isLoading) {
+      applyState('contextSwitch');
+    } else if (sigilContent) {
+      applyState('active');
+    } else {
+      applyState('default');
+    }
+  }, [isLoading, sigilContent, applyState]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -51,6 +63,7 @@ export default function Scriptorium() {
         title: "Error",
         description: result.error,
       });
+      applyState('default');
     } else if (result.success) {
       setSigilContent(result.success);
       setAnnotations([]); // Reset annotations for new sigil
@@ -64,11 +77,11 @@ export default function Scriptorium() {
       .replace(/\n/g, "<br />")
       .replace(/```([\s\S]*?)```/g, (match, code) => {
         const safeCode = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        return `<div class="my-4 p-4 bg-black/30 rounded-lg border border-border"><pre class="font-code text-sm text-accent whitespace-pre-wrap">${safeCode}</pre><button class="mt-2 text-xs text-primary hover:underline" onclick="alert('Simulation feature not implemented.')">Run Simulation</button></div>`;
+        return `<div class="my-4 p-4 bg-black/30 rounded-lg border border-border"><pre class="sigil-glyph text-sm text-accent whitespace-pre-wrap">${safeCode}</pre><button class="mt-2 text-xs text-primary hover:underline" onclick="alert('Simulation feature not implemented.')">Run Simulation</button></div>`;
       })
-      .replace(/\b([A-Z_]{4,})\b/g, '<span class="font-headline text-primary cursor-pointer hover:underline" title="Forge Link">$1</span>');
+      .replace(/\b([A-Z_]{4,})\b/g, '<span class="sigil-obelisk text-primary cursor-pointer hover:underline" title="Forge Link">$1</span>');
 
-    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} className="text-foreground/80 leading-relaxed" />;
+    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} className="sigil-codex text-foreground/80 leading-relaxed" />;
   };
 
   const handleAddAnnotation = () => {
@@ -79,6 +92,10 @@ export default function Scriptorium() {
     };
     setAnnotations((prev) => [...prev, newAnnotation]);
     toast({ title: "Annotation added", description: "Your glyph has been placed on the canvas." });
+    
+    // Demonstrate echo state
+    applyState('echo');
+    setTimeout(() => applyState('active'), 400);
   };
   
   const handleFork = () => {
@@ -86,6 +103,9 @@ export default function Scriptorium() {
       title: "Scripture Forked",
       description: "A new branch of knowledge has been created.",
     });
+     // Demonstrate sanctuary state
+    applyState('sanctuary');
+    setTimeout(() => applyState('active'), 1500);
   };
 
   const resetView = () => {
@@ -113,7 +133,7 @@ export default function Scriptorium() {
                   </Button>
               </div>
               <CardHeader className="text-center">
-                <CardTitle className="font-headline text-2xl tracking-widest text-primary drop-shadow-[0_0_8px_hsl(var(--primary))]">
+                <CardTitle className="sigil-obelisk text-2xl tracking-widest text-primary drop-shadow-[0_0_8px_hsl(var(--primary))]">
                   Living Sigil
                 </CardTitle>
                 <div className="flex justify-center gap-2 mt-4">
@@ -150,10 +170,10 @@ export default function Scriptorium() {
             className="w-full max-w-2xl text-center"
           >
             <ScribeGlyph className="mx-auto h-16 w-16 text-primary drop-shadow-[0_0_15px_hsl(var(--primary))] motion-safe:animate-pulse" />
-            <h1 className="mt-6 font-headline text-4xl sm:text-5xl font-bold tracking-widest text-primary-foreground">
+            <h1 className="mt-6 font-headline text-4xl sm:text-5xl font-bold tracking-widest text-primary-foreground sigil-obelisk">
               The Scriptorium Cypher
             </h1>
-            <p className="mt-4 text-lg text-foreground/70">
+            <p className="mt-4 text-lg text-foreground/70 sigil-codex">
               Converse with the Scribe. Manifest a Living Sigil from the query of your choosing.
             </p>
             <Card className="mt-8 w-full border-primary/20 bg-card/80 backdrop-blur-sm">
@@ -168,7 +188,7 @@ export default function Scriptorium() {
                           <FormControl>
                             <Input
                               placeholder="e.g., Explain the architecture of this very application..."
-                              className="h-12 text-center text-base bg-background/50 border-primary/30 focus:ring-primary"
+                              className="h-12 text-center text-base bg-background/50 border-primary/30 focus:ring-primary sigil-glyph"
                               {...field}
                             />
                           </FormControl>
@@ -180,12 +200,12 @@ export default function Scriptorium() {
                       type="submit"
                       disabled={isLoading}
                       size="lg"
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 sigil-obelisk"
                     >
                       {isLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
-                        <Sparkles className="mr-2 h-4 w-4" />
+                        <WandSparkles className="mr-2 h-4 w-4" />
                       )}
                       Manifest Sigil
                     </Button>

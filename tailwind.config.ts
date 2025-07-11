@@ -22,7 +22,7 @@ const config = {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         body: ["Inter", "sans-serif"],
         headline: ["Orbitron", "sans-serif"],
-        code: ["Geist Mono", "monospace"],
+        code: ["Recursive", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

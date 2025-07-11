@@ -24,6 +24,12 @@
     --input: 240 5.9% 90%;
     --ring: 283 81% 60%;
     --radius: 0.5rem;
+
+    /* Typographic Variables */
+    --sigil-wght: 400;
+    --sigil-slnt: 0;
+    --sigil-casl: 0;
+    --sigil-letterspacing: 0%;
   }
 
   .dark {
@@ -56,6 +62,26 @@
   body {
     @apply bg-background text-foreground;
     min-height: 100vh;
+    font-variation-settings: 
+      "wght" var(--sigil-wght),
+      "slnt" var(--sigil-slnt),
+      "CASL" var(--sigil-casl);
+    transition: font-variation-settings 0.4s ease, letter-spacing 0.4s ease, transform 0.4s ease;
+  }
+
+  /* Tier Classes */
+  .sigil-obelisk {
+    font-family: var(--font-headline);
+    text-transform: uppercase;
+  }
+
+  .sigil-codex {
+    font-family: var(--font-body);
+    letter-spacing: var(--sigil-letterspacing);
+  }
+
+  .sigil-glyph {
+    font-family: var(--font-code);
   }
 }
 
