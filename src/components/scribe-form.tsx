@@ -9,12 +9,22 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import React from "react";
 
+/**
+ * Props for the ScribeForm component.
+ * @property {(payload: FormData) => void} formAction - The server action to execute on form submission.
+ * @property {React.RefObject<HTMLFormElement>} formRef - A ref to the form element.
+ * @property {boolean} isPending - A boolean indicating if the form submission is currently in progress.
+ */
 type ScribeFormProps = {
   formAction: (payload: FormData) => void;
   formRef: React.RefObject<HTMLFormElement>;
   isPending: boolean;
 };
 
+/**
+ * A form component for submitting a query to the Scribe Agent to generate a sigil.
+ * @param {ScribeFormProps} props - The component props.
+ */
 export function ScribeForm({ formAction, formRef, isPending }: ScribeFormProps) {
 
   return (

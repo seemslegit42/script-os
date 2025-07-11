@@ -7,11 +7,24 @@ import { cookies } from 'next/headers';
 import { marked } from 'marked';
 import { interrogateSigil, InterrogateSigilOutput } from '@/ai/flows/interrogate-sigil-flow';
 
+/**
+ * Represents the state of the sigil upload form.
+ * @property {boolean} success - Indicates whether the upload was successful.
+ * @property {string | null} error - An error message, if any occurred.
+ */
 type UploadFormState = {
   success: boolean;
   error: string | null;
 };
 
+/**
+ * Server action to handle the upload of a Markdown file.
+ * It verifies user authentication, processes the .md file, converts it to HTML,
+ * and saves both versions to Firestore.
+ * @param {UploadFormState} prevState - The previous state of the form.
+ * @param {FormData} formData - The form data containing the file to upload.
+ * @returns {Promise<UploadFormState>} The new state of the form, indicating success or failure.
+ */
 export async function uploadSigilAction(
   prevState: UploadFormState,
   formData: FormData
@@ -54,12 +67,23 @@ export async function uploadSigilAction(
   }
 }
 
-
+/**
+ * Represents the state of the interrogation chat panel.
+ * @property {Array<{ role: 'user' | 'agent'; content: string }>} conversation - A history of the conversation.
+ * @property {string | null} error - An error message, if any occurred during the last turn.
+ */
 export type InterrogationFormState = {
     conversation: { role: 'user' | 'agent'; content: string }[];
     error: string | null;
 }
 
+/**
+ * Server action to handle a user's question about a document.
+ * It calls the `interrogateSigil` AI flow with the user's query and the document context.
+ * @param {InterrogationFormState} prevState - The previous state of the conversation.
+ * @param {FormData} formData - The form data containing the user's query and the document context.
+ * @returns {Promise<InterrogationFormState>} The new conversation state, including the agent's answer or an error.
+ */
 export async function interrogationAction(prevState: InterrogationFormState, formData: FormData): Promise<InterrogationFormState> {
     const query = formData.get('query') as string;
     const context = formData.get('context') as string;

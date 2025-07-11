@@ -16,10 +16,19 @@ const initialState: InterrogationFormState = {
   error: null,
 };
 
+/**
+ * Props for the InterrogationPanel component.
+ * @property {string} context - The full text content of the document to be interrogated.
+ */
 type InterrogationPanelProps = {
   context: string;
 };
 
+/**
+ * A component that provides a chat-like interface for users to "interrogate" a document.
+ * It manages the conversation state and calls a server action to get answers from an AI agent.
+ * @param {InterrogationPanelProps} props - The component props.
+ */
 export function InterrogationPanel({ context }: InterrogationPanelProps) {
   const [state, formAction, isPending] = useActionState(interrogationAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);

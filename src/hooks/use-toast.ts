@@ -1,3 +1,4 @@
+
 "use client"
 
 // Inspired by react-hot-toast library
@@ -142,6 +143,12 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
+/**
+ * Displays a toast notification.
+ * @param {Toast} props - The properties of the toast to display.
+ * @returns {{ id: string, dismiss: () => void, update: (props: ToasterToast) => void }}
+ * An object with functions to control the toast.
+ */
 function toast({ ...props }: Toast) {
   const id = genId()
 
@@ -171,6 +178,15 @@ function toast({ ...props }: Toast) {
   }
 }
 
+/**
+ * A custom hook to manage and display toast notifications.
+ * It provides the current list of toasts and functions to add or dismiss them.
+ * @returns {{
+*   toasts: ToasterToast[],
+*   toast: (props: Toast) => { id: string, dismiss: () => void, update: (props: ToasterToast) => void },
+*   dismiss: (toastId?: string) => void
+* }}
+*/
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 
