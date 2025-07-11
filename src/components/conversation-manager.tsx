@@ -1,8 +1,8 @@
 
 'use client';
 
-import React, { useActionState, useRef, useEffect } from 'react';
-import { unifiedConversationAction, ConversationState } from '@/app/actions';
+import React, { useRef, useEffect } from 'react';
+import { ConversationState } from '@/app/actions';
 import { useAuth } from '@/context/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore } from '@/hooks/use-firestore';
@@ -32,16 +32,13 @@ export type ConversationMessage = {
   isError?: boolean;
 };
 
-const initialState: ConversationState = {
-  conversation: [],
-  context: null,
-  contextImageUrl: null,
-  contextQuery: null,
-  error: null,
-};
+type ConversationManagerProps = {
+    state: ConversationState;
+    formAction: (payload: FormData) => void;
+    isPending: boolean;
+}
 
-export function ConversationManager() {
-  const [state, formAction, isPending] = useActionState(unifiedConversationAction, initialState);
+export function ConversationManager({ state, formAction, isPending }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
