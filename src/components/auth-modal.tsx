@@ -18,9 +18,9 @@ import { cn } from '@/lib/utils';
 import { ScribeGlyph } from './icons';
 
 /**
- * Props for the AuthModal component.
- * @property {boolean} isOpen - Controls whether the modal is visible.
- * @property {() => void} onClose - Function to call when the modal should be closed.
+ * A modal component for user authentication (Login and Sign Up), framed as an 'Initiation' ritual.
+ * It provides forms for email/password and Google sign-in.
+ * @param {AuthModalProps} props - The component props.
  */
 type AuthModalProps = {
   isOpen: boolean;
@@ -77,17 +77,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setError(null);
   };
   
-  // ADHD-friendly UX: Clear labels, one primary action, minimal visual clutter.
-  // The error message is prominent and uses a destructive color to draw immediate attention.
-  // The form is simple, with no unnecessary fields.
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-card/80 backdrop-blur-lg border-primary/30">
         <DialogHeader className="text-center items-center">
             <ScribeGlyph className="h-10 w-10 text-primary mb-2" />
-          <DialogTitle className="text-2xl sigil-obelisk">{isLogin ? 'Enter the Sanctum' : 'Join the Forge'}</DialogTitle>
+          <DialogTitle className="text-2xl sigil-obelisk">{isLogin ? 'Enter the Sanctum' : 'Begin Your Initiation'}</DialogTitle>
           <DialogDescription className="sigil-codex">
-            {isLogin ? "Access your personal Forge of sigils." : "Create an account to begin your journey."}
+            {isLogin ? "Access your personal Scriptorium of sigils." : "Create an account to begin your journey."}
           </DialogDescription>
         </DialogHeader>
 
@@ -107,7 +104,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Authenticating..." : (isLogin ? 'Sign In' : 'Sign Up')}
+                {isLoading ? "Authenticating..." : (isLogin ? 'Enter' : 'Initiate')}
             </Button>
         </form>
         
@@ -128,9 +125,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </Button>
         
         <div className="mt-4 text-center text-sm">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            {isLogin ? "Do not have an account?" : "Already an Initiate?"}
             <Button variant="link" onClick={toggleMode} className="pl-1">
-                {isLogin ? 'Sign Up' : 'Sign In'}
+                {isLogin ? 'Begin Initiation' : 'Enter the Sanctum'}
             </Button>
         </div>
 

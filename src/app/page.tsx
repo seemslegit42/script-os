@@ -53,14 +53,14 @@ export default function ScriptoriumLayout() {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "You must be logged in to save a sigil to your Forge.",
+        description: "You must be an Initiate to bind a sigil to your Scriptorium.",
         variant: "destructive",
       });
       setAuthModalOpen(true);
       return;
     }
     if (!sigil || !sigilImageUrl || !query) {
-       toast({ title: "Error", description: "Cannot save an incomplete sigil.", variant: "destructive" });
+       toast({ title: "Error", description: "Cannot bind an incomplete sigil.", variant: "destructive" });
        return;
     }
     try {
@@ -73,11 +73,11 @@ export default function ScriptoriumLayout() {
         createdAt: new Date(),
       });
       toast({
-        title: "Sigil Saved",
-        description: "The scripture has been saved to your personal Forge.",
+        title: "Sigil Bound",
+        description: "The scripture has been bound to your personal Scriptorium.",
       });
     } catch(e: any) {
-       toast({ title: "Save Failed", description: e.message || "Could not save sigil.", variant: "destructive" });
+       toast({ title: "Binding Failed", description: e.message || "Could not bind sigil.", variant: "destructive" });
     }
   };
 
@@ -96,16 +96,16 @@ export default function ScriptoriumLayout() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={handleMyForgeClick}>
             <Swords className="mr-2"/>
-            My Forge
+            My Scriptorium
           </Button>
           {loading ? (
             <Skeleton className="h-10 w-24 bg-muted/50" />
           ) : user ? (
-             <Button onClick={() => router.push('/api/auth/signout')} variant="outline">Sign Out</Button>
+             <Button onClick={() => router.push('/api/auth/signout')} variant="outline">End Session</Button>
           ) : (
             <Button onClick={() => setAuthModalOpen(true)}>
               <LogIn className="mr-2" />
-              Login
+              Login / Initiate
             </Button>
           )}
         </div>
@@ -153,7 +153,7 @@ export default function ScriptoriumLayout() {
                               <div className="flex justify-end">
                                 <Button onClick={handleSaveToForge} variant="outline" size="sm">
                                   <Save className="mr-2" />
-                                  Save to Forge
+                                  Bind to Scriptorium
                                 </Button>
                               </div>
                               <FocusLayer whyContent={sigil.why} howContent={sigil.how} />

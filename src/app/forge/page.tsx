@@ -79,7 +79,7 @@ export default function ForgePage() {
                 </h1>
                 <Button onClick={handleBack} variant="outline" size="sm">
                   <ArrowLeft className="mr-2"/>
-                  Back to Forge
+                  Back to Scriptorium
                 </Button>
             </header>
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
@@ -151,11 +151,11 @@ export default function ForgePage() {
             <Card className="text-center p-12 bg-card/70 backdrop-blur-sm border-primary/20">
                 <CardHeader>
                     <ScribeGlyph className="h-16 w-16 mx-auto text-muted-foreground" />
-                    <CardTitle className="mt-4">Your Forge is Empty</CardTitle>
+                    <CardTitle className="mt-4">Your Scriptorium is Empty</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <CardDescription>
-                        Generate sigils with the Scribe or upload your own scriptures.
+                        Forge sigils with the Scribe or upload your own scriptures to begin your journey.
                     </CardDescription>
                 </CardContent>
             </Card>

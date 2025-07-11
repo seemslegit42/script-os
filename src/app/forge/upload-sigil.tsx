@@ -49,7 +49,7 @@ export function UploadSigil() {
   
   React.useEffect(() => {
     if (state.success) {
-      toast({ title: 'Success', description: 'Your scripture has been forged.' });
+      toast({ title: 'Success', description: 'Your scripture has been forged and bound to your Scriptorium.' });
       setFile(null); // Clear file on successful upload
     }
     if (state.error) {
@@ -61,7 +61,7 @@ export function UploadSigil() {
     <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-md">
       <CardHeader>
         <CardTitle className="sigil-obelisk">Forge a Scripture</CardTitle>
-        <CardDescription>Upload a Markdown (.md) file to add it to your personal library.</CardDescription>
+        <CardDescription>Upload a Markdown (.md) file to add it to your personal Scriptorium.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
@@ -85,7 +85,7 @@ export function UploadSigil() {
               <input {...getInputProps()} />
               <UploadCloud className="h-12 w-12 text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
-                {isDragActive ? 'Drop the file here ...' : "Drag 'n' drop a .md file here, or click to select"}
+                {isDragActive ? 'Drop the file here...' : "Drag 'n' drop a .md file here, or click to select"}
               </p>
             </div>
           )}
