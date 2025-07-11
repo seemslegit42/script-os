@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScribeGlyph } from "./icons";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -28,7 +28,7 @@ export function ScribeForm({ formAction, formRef, isPending }: ScribeFormProps) 
             <ScribeGlyph className="h-6 w-6" />
             <span>Scribe Input</span>
           </CardTitle>
-          <CardDescription className="sigil-codex">
+          <CardDescription>
             Provide a query to the Scribe Agent. It will generate a Living Sigil
             tailored to your needs.
           </CardDescription>
