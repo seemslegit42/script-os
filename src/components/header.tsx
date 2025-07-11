@@ -41,7 +41,7 @@ export function Header({ pageTitle, children }: HeaderProps) {
                         </h1>
                     ) : (
                         <span className="text-lg sm:text-xl font-bold tracking-wider sigil-obelisk text-primary align-middle">
-                            SIGILFORGE
+                            SCRIPTORIUM
                         </span>
                     )}
                 </div>

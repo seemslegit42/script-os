@@ -16,6 +16,7 @@ import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useFirestore } from "@/hooks/use-firestore";
 import { Header } from "@/components/header";
+import Head from "next/head";
 
 
 const initialState = { sigil: null, sigilImageUrl: null, error: null, query: '' };
@@ -71,6 +72,9 @@ export default function ScriptoriumLayout() {
 
   return (
     <>
+      <Head>
+        <title>Scriptorium | Scribe</title>
+      </Head>
       <AethericStreams />
       <Header />
       

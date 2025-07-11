@@ -23,6 +23,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { DeleteSigilDialog } from './delete-sigil-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/header';
+import Head from 'next/head';
 
 type Doc = {
     id: string;
@@ -105,6 +106,10 @@ export default function ForgePage() {
     const contentId = selectedSigil.id || selectedSigil.query;
     
     return (
+      <>
+        <Head>
+          <title>Scriptorium | Viewing Scripture</title>
+        </Head>
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
             <Header pageTitle={selectedSigil.query || selectedSigil.fileName || selectedSigil.title}>
                  <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
@@ -175,13 +180,18 @@ export default function ForgePage() {
                  <InterrogationPanel context={sigilContext} />
             </div>
         </main>
+      </>
     );
   }
   
   return (
+    <>
+    <Head>
+        <title>Scriptorium | Forge</title>
+    </Head>
     <main className="container mx-auto p-4 sm:p-8">
       <Header pageTitle="The Scriptorium">
-         <Button onClick={handleBackToMain} size={isMobile ? 'sm' : 'default'}>Back to Scribe</Button>
+         <Button onClick={handleBackToMain} size={isMobile ? 'sm' : 'default'}>Back to Main</Button>
       </Header>
 
       <div className="mb-12 mt-8">
@@ -311,5 +321,6 @@ export default function ForgePage() {
         </div>
       </div>
     </main>
+    </>
   );
 }

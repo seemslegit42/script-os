@@ -11,8 +11,8 @@ import { AuthProvider } from '@/context/auth-context';
  * This information is used by search engines and the browser.
  */
 export const metadata: Metadata = {
-  title: 'The Scriptorium Cypher',
-  description: 'The Sentient Codex',
+  title: 'Scriptorium',
+  description: 'A sentient codex for personal myth.',
 };
 
 /**
