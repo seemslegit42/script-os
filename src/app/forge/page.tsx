@@ -19,6 +19,7 @@ import { getDocsAction } from './actions';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Annotator, Annotation } from '@/components/annotator';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Doc = {
     id: string;
@@ -34,6 +35,7 @@ export default function ForgePage() {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [docsLoading, setDocsLoading] = useState(true);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -85,16 +87,16 @@ export default function ForgePage() {
     
     return (
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
-             <header className="flex justify-between items-center mb-4 flex-shrink-0">
+             <header className="flex justify-between items-center mb-4 flex-shrink-0 gap-4">
                 <h1 className="text-2xl md:text-4xl sigil-obelisk text-primary flex items-center gap-4 truncate">
                     {selectedSigil.query || selectedSigil.fileName || selectedSigil.title}
                 </h1>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                   <Sheet>
                     <SheetTrigger asChild>
-                      <Button variant="outline" size="sm" disabled={annotations.length === 0}>
-                        <MessageSquareQuote className="mr-2" />
-                        Annotations ({annotations.length})
+                      <Button variant="outline" size={isMobile ? 'icon' : 'sm'} disabled={annotations.length === 0}>
+                        <MessageSquareQuote />
+                        <span className="hidden sm:inline sm:ml-2">Annotations ({annotations.length})</span>
                       </Button>
                     </SheetTrigger>
                     <SheetContent className="bg-card/90 backdrop-blur-lg border-primary/30">
@@ -119,9 +121,9 @@ export default function ForgePage() {
                       </ScrollArea>
                     </SheetContent>
                   </Sheet>
-                  <Button onClick={handleBack} variant="outline" size="sm">
-                    <ArrowLeft className="mr-2"/>
-                    Back to Scriptorium
+                  <Button onClick={handleBack} variant="outline" size={isMobile ? 'icon' : 'sm'}>
+                    <ArrowLeft />
+                    <span className="hidden sm:inline sm:ml-2">Back to Scriptorium</span>
                   </Button>
                 </div>
             </header>
@@ -138,6 +140,7 @@ export default function ForgePage() {
                                         width={1024}
                                         height={576}
                                         className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
+                                        data-ai-hint="abstract symbol"
                                     />
                                 )}
                                 {selectedSigil.html ? (
@@ -162,13 +165,13 @@ export default function ForgePage() {
   return (
     <main className="container mx-auto p-4 sm:p-8">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl sigil-obelisk text-primary flex items-center gap-4">
-          <Swords className="h-10 w-10" />
+        <h1 className="text-3xl sm:text-4xl sigil-obelisk text-primary flex items-center gap-4">
+          <Swords className="h-8 w-8 sm:h-10 sm:w-10" />
           The Scriptorium
         </h1>
-        <div className="flex items-center gap-4">
-            <Button onClick={() => router.push('/')}>Back to Scribe</Button>
-            <Button onClick={() => signOut()} variant="outline">End Session</Button>
+        <div className="flex items-center gap-2 sm:gap-4">
+            <Button onClick={() => router.push('/')} size={isMobile ? 'sm' : 'default'}>Back to Scribe</Button>
+            <Button onClick={() => signOut()} variant="outline" size={isMobile ? 'sm' : 'default'}>End Session</Button>
         </div>
       </header>
 
@@ -229,6 +232,7 @@ export default function ForgePage() {
                             width={512}
                             height={288}
                             className="w-full h-auto object-cover rounded-md aspect-video"
+                            data-ai-hint="abstract symbol"
                           />
                       ) : (
                         <div className="w-full aspect-video bg-background/50 rounded-md flex items-center justify-center">

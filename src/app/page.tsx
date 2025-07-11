@@ -88,15 +88,15 @@ export default function ScriptoriumLayout() {
       
       <header className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-2">
-          <ScribeSigil className="h-10 w-10 text-primary" />
-          <span className="text-xl font-bold tracking-wider sigil-obelisk text-primary align-middle">
+          <ScribeSigil className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+          <span className="text-lg sm:text-xl font-bold tracking-wider sigil-obelisk text-primary align-middle">
             SIGILFORGE
           </span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <Button variant="ghost" onClick={handleMyForgeClick}>
-            <Swords className="mr-2"/>
-            My Scriptorium
+            <Swords className="mr-0 sm:mr-2"/>
+            <span className="hidden sm:inline">My Scriptorium</span>
           </Button>
           {loading ? (
             <Skeleton className="h-10 w-24 bg-muted/50" />
@@ -104,8 +104,8 @@ export default function ScriptoriumLayout() {
              <Button onClick={() => signOut()} variant="outline">End Session</Button>
           ) : (
             <Button onClick={() => setAuthModalOpen(true)}>
-              <LogIn className="mr-2" />
-              Login / Initiate
+              <LogIn className="mr-0 sm:mr-2" />
+              <span className="hidden sm:inline">Login / Initiate</span>
             </Button>
           )}
         </div>
@@ -146,6 +146,7 @@ export default function ScriptoriumLayout() {
                               height={576}
                               className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
                               priority
+                              data-ai-hint="abstract spiritual"
                             />
                           )}
                           {sigil && (
