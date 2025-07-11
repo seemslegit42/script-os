@@ -18,7 +18,8 @@ const GenerateSigilInputSchema = z.object({
 export type GenerateSigilInput = z.infer<typeof GenerateSigilInputSchema>;
 
 const GenerateSigilOutputSchema = z.object({
-  sigilContent: z.string().describe('The generated content of the Living Sigil.'),
+  why: z.string().describe("The high-level, conceptual explanation of the topic. The 'why' behind it."),
+  how: z.string().describe("The detailed, actionable, and technical explanation. The 'how' to implement or use it. This should include code examples if relevant."),
 });
 export type GenerateSigilOutput = z.infer<typeof GenerateSigilOutputSchema>;
 
@@ -34,12 +35,14 @@ const prompt = ai.definePrompt({
 
   Query: {{{query}}}
 
-  Generate a Living Sigil that directly addresses the query, providing a comprehensive and unified explanation.
-  Ensure the Living Sigil is well-structured, easy to understand, and perfectly tailored to the user's needs.
-  The Living Sigil should be structured as a single string of text.
-  The Living Sigil MUST NOT contain any invalid XML syntax.
+  Your task is to generate two distinct components for the Living Sigil:
+  1.  **The 'Why'**: A high-level, conceptual explanation. It should focus on the core ideas, the purpose, and the philosophy behind the topic. This is for building foundational understanding.
+  2.  **The 'How'**: A detailed, actionable, and technical explanation. It should provide concrete steps, code examples, API usage, and practical instructions. This is for implementation.
+
+  Generate both components to be comprehensive and well-structured.
+  The content MUST NOT contain any invalid XML syntax.
   Do not include any image tags.
-  Be as detailed as possible, and ensure the explanation is thorough.
+  Be as detailed as possible in both sections.
   `,
 });
 

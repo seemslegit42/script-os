@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useActionState, useRef, useEffect, useState } from "react";
+import React, { useActionState, useRef, useEffect } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
 import Image from "next/image";
@@ -10,13 +9,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScribeForm } from "@/components/scribe-form";
 import { createSigilAction } from "./actions";
 import { useTypographicState } from "@/context/typographic-state-context";
+import { FocusLayer } from "@/components/focus-layer";
 
-const initialState = { sigilContent: null, sigilImageUrl: null, error: null };
+const initialState = { sigil: null, sigilImageUrl: null, error: null };
 
 export default function ScriptoriumLayout() {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
-  const { sigilContent, sigilImageUrl, error } = state;
+  const { sigil, sigilImageUrl, error } = state;
   const { applyState, currentState } = useTypographicState();
 
   useEffect(() => {
@@ -44,12 +44,15 @@ export default function ScriptoriumLayout() {
         <div className="mx-auto max-w-3xl w-full space-y-8">
             <ScribeForm formAction={formAction} formRef={formRef} isPending={isPending} />
 
-            {(isPending || sigilContent || sigilImageUrl || error) && (
+            {(isPending || sigil || sigilImageUrl || error) && (
               <Card className="bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10">
                   <CardContent className="p-6">
                       {isPending ? (
                           <div className="space-y-6">
-                              <Skeleton className="h-64 w-full bg-muted/50" />
+                              <Skeleton className="aspect-video w-full bg-muted/50" />
+                              <div className="space-y-2">
+                                <Skeleton className="h-8 w-48 bg-muted/50" />
+                              </div>
                               <div className="space-y-4">
                                   <Skeleton className="h-4 w-3/4 bg-muted/50" />
                                   <Skeleton className="h-4 w-full bg-muted/50" />
@@ -68,17 +71,14 @@ export default function ScriptoriumLayout() {
                             <Image 
                               src={sigilImageUrl}
                               alt="Generated Sigil Image"
-                              width={512}
-                              height={512}
-                              className="w-full h-auto rounded-lg border border-primary/30"
+                              width={1024}
+                              height={576}
+                              className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
                               priority
                             />
                           )}
-                          {sigilContent && (
-                              <div 
-                                className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
-                                dangerouslySetInnerHTML={{ __html: sigilContent }}
-                            />
+                          {sigil && (
+                              <FocusLayer whyContent={sigil.why} howContent={sigil.how} />
                           )}
                         </div>
                       )}
