@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/auth-context';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
 import { ScribeGlyph } from './icons';
 
 /**
@@ -79,7 +78,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-card/80 backdrop-blur-lg border-primary/30">
+      <DialogContent className="sm:max-w-md bg-card/70 backdrop-blur-lg border-primary/30">
         <DialogHeader className="text-center items-center">
             <ScribeGlyph className="h-10 w-10 text-primary mb-2" />
           <DialogTitle className="text-2xl sigil-obelisk">{isLogin ? 'Enter the Sanctum' : 'Begin Your Initiation'}</DialogTitle>
@@ -96,14 +95,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         <form onSubmit={handleAuthAction} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="architect@domain.com" />
+                <Label htmlFor="email" className="sigil-codex">Email</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="architect@domain.com" className="sigil-glyph"/>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" />
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" className="sigil-glyph"/>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full sigil-obelisk" disabled={isLoading}>
                 {isLoading ? "Authenticating..." : (isLogin ? 'Enter' : 'Initiate')}
             </Button>
         </form>
@@ -119,14 +118,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
+        <Button variant="outline" className="w-full sigil-obelisk" onClick={handleGoogleSignIn} disabled={isLoading}>
           <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 21.2 177.2 55.4l-62.1 62.1C335.6 97.2 293.8 80 248 80c-82.8 0-150.5 67.7-150.5 150.5S165.2 406.5 248 406.5c70.2 0 129.2-47.3 148.2-113.3H248v-87.2h239.2c.5 12.3.8 24.8.8 37.8z"></path></svg>
           Google
         </Button>
         
         <div className="mt-4 text-center text-sm">
             {isLogin ? "Do not have an account?" : "Already an Initiate?"}
-            <Button variant="link" onClick={toggleMode} className="pl-1">
+            <Button variant="link" onClick={toggleMode} className="pl-1 sigil-obelisk">
                 {isLogin ? 'Begin Initiation' : 'Enter the Sanctum'}
             </Button>
         </div>

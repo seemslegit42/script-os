@@ -7,22 +7,22 @@
   :root {
     --background: 240 13% 6%; /* #08080B */
     --foreground: 0 0% 98%;
-    --card: 240 10% 8%;
+    --card: 240 10% 8%; /* Slightly lighter than background for depth */
     --card-foreground: 0 0% 98%;
     --popover: 240 14% 4%;
     --popover-foreground: 0 0% 98%;
-    --primary: 275 100% 41%; /* #9400D3 */
+    --primary: 275 100% 41%; /* Imperial Purple */
     --primary-foreground: 275 20% 95%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 60 100% 78%; /* #FFFF8F */
-    --accent-foreground: 60 50% 10%;
+    --secondary: 150 25% 25%; /* Patina Green - for secondary elements */
+    --secondary-foreground: 150 15% 95%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 180 100% 70%; /* Roman Aqua - for accents */
+    --accent-foreground: 180 50% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
+    --border: 240 10% 20%; /* Slightly more visible border */
+    --input: 240 10% 15%;
     --ring: 275 100% 51%;
     --radius: 0.5rem;
 
@@ -36,22 +36,22 @@
   .dark {
     --background: 240 13% 6%; /* #08080B */
     --foreground: 0 0% 98%;
-    --card: 240 10% 8%;
+    --card: 240 10% 8%; /* Slightly lighter than background for depth */
     --card-foreground: 0 0% 98%;
     --popover: 240 14% 4%;
     --popover-foreground: 0 0% 98%;
-    --primary: 275 100% 41%; /* #9400D3 */
+    --primary: 275 100% 41%; /* Imperial Purple */
     --primary-foreground: 275 20% 95%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 60 100% 78%; /* #FFFF8F */
-    --accent-foreground: 60 50% 10%;
+    --secondary: 150 25% 25%; /* Patina Green - for secondary elements */
+    --secondary-foreground: 150 15% 95%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 180 100% 70%; /* Roman Aqua - for accents */
+    --accent-foreground: 180 50% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
+    --border: 240 10% 20%; /* Slightly more visible border */
+    --input: 240 10% 15%;
     --ring: 275 100% 51%;
   }
 }

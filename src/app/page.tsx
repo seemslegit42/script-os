@@ -4,7 +4,7 @@
 import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
-import { Bot, User, LogIn, Swords, Save } from "lucide-react";
+import { LogIn, Swords, Save } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -116,12 +116,12 @@ export default function ScriptoriumLayout() {
             <ScribeForm formAction={formAction} formRef={formRef} isPending={isPending} />
 
             {(isPending || sigil || sigilImageUrl || error) && (
-              <Card className="bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10">
+              <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10">
                   <CardContent className="p-6">
                       {isPending ? (
                           <div className="space-y-6">
                               <Skeleton className="aspect-video w-full bg-muted/50" />
-                              <div className="space-y-2">
+                              <div className="space-y-2 pt-4">
                                 <Skeleton className="h-8 w-48 bg-muted/50" />
                               </div>
                               <div className="space-y-4">

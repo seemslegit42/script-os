@@ -83,7 +83,7 @@ export default function ForgePage() {
                 </Button>
             </header>
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
-                <Card className="bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
+                <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
                     <CardContent className="p-6 flex-grow min-h-0">
                       <ScrollArea className="h-full pr-4">
                         <div className="space-y-6">
@@ -151,7 +151,7 @@ export default function ForgePage() {
             <Card className="text-center p-12 bg-card/70 backdrop-blur-sm border-primary/20">
                 <CardHeader>
                     <ScribeGlyph className="h-16 w-16 mx-auto text-muted-foreground" />
-                    <CardTitle className="mt-4">Your Scriptorium is Empty</CardTitle>
+                    <CardTitle className="mt-4 sigil-obelisk">Your Scriptorium is Empty</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <CardDescription>

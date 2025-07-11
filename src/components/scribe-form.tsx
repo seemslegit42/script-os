@@ -29,7 +29,7 @@ export function ScribeForm({ formAction, formRef, isPending }: ScribeFormProps) 
   return (
     <form action={formAction} ref={formRef}>
       <Card className={cn(
-        "bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 transition-all duration-500",
+        "bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 transition-all duration-500",
         isPending && "border-accent shadow-accent/20"
       )}>
         <CardHeader>
@@ -37,7 +37,7 @@ export function ScribeForm({ formAction, formRef, isPending }: ScribeFormProps) 
             <ScribeGlyph className="h-6 w-6" />
             <span>Scribe Invocation</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="sigil-codex">
             State your intent to the Scribe Agent. It will forge a Living Sigil,
             a unique crystallization of knowledge for your personal myth.
           </CardDescription>
@@ -55,7 +55,7 @@ export function ScribeForm({ formAction, formRef, isPending }: ScribeFormProps) 
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isPending} variant={isPending ? "secondary" : "default"}>
+          <Button type="submit" disabled={isPending} variant={isPending ? "secondary" : "default"} className="sigil-obelisk">
             {isPending ? "Summoning..." : "Forge Sigil"}
           </Button>
         </CardFooter>
