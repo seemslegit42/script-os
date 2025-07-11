@@ -26,7 +26,7 @@ export default function RootLayout({
         {/* In a real project, you would host the font files or use a font service. */}
         <style dangerouslySetInnerHTML={{ __html: `
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-          /* This is a fallback. For Söhne, you'd use @font-face rules. */
+          /* This is a fallback. For Söhne, you'd use @font-face rules. */}
           body { --font-body: 'Inter', sans-serif; } 
         `}} />
       </head>
