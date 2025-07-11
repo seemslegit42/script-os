@@ -7,16 +7,18 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Swords, ArrowLeft, BookOpen } from 'lucide-react';
+import { Swords, ArrowLeft, BookOpen, NotebookText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { FocusLayer } from '@/components/focus-layer';
 import { UploadSigil } from './upload-sigil';
 import { InterrogationPanel } from './interrogation-panel';
-import { ScribeGlyph } from '@/components/icons';
+import { ScribeGlyph, AnnotationGlyph } from '@/components/icons';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getDocsAction } from './actions';
 import { Separator } from '@/components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Annotator, Annotation } from '@/components/annotator';
 
 type Doc = {
     id: string;
@@ -31,6 +33,7 @@ export default function ForgePage() {
   const [selectedSigil, setSelectedSigil] = useState<any>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [docsLoading, setDocsLoading] = useState(true);
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -56,10 +59,17 @@ export default function ForgePage() {
   const handleBack = () => {
     if (selectedSigil) {
       setSelectedSigil(null);
+      setAnnotations([]); // Clear annotations when leaving a document
     } else {
       router.push('/');
     }
   }
+
+  const handleAddAnnotation = (annotation: Omit<Annotation, 'id'>) => {
+    const newAnnotation: Annotation = { ...annotation, id: `ann-${Date.now()}` };
+    setAnnotations(prev => [...prev, newAnnotation]);
+  }
+
 
   if (authLoading || !user) {
     return (
@@ -71,40 +81,75 @@ export default function ForgePage() {
 
   if (selectedSigil) {
     const sigilContext = selectedSigil.html || `${selectedSigil.why}\n\n${selectedSigil.how}`;
+    const contentId = selectedSigil.id || selectedSigil.query;
+    
     return (
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
              <header className="flex justify-between items-center mb-4 flex-shrink-0">
                 <h1 className="text-2xl md:text-4xl sigil-obelisk text-primary flex items-center gap-4 truncate">
                     {selectedSigil.query || selectedSigil.fileName || selectedSigil.title}
                 </h1>
-                <Button onClick={handleBack} variant="outline" size="sm">
-                  <ArrowLeft className="mr-2"/>
-                  Back to Scriptorium
-                </Button>
+                <div className="flex items-center gap-4">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" size="sm" disabled={annotations.length === 0}>
+                        <AnnotationGlyph className="mr-2" />
+                        Annotations ({annotations.length})
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent className="bg-card/90 backdrop-blur-lg border-primary/30">
+                      <SheetHeader>
+                        <SheetTitle className="sigil-obelisk">Session Annotations</SheetTitle>
+                      </SheetHeader>
+                      <ScrollArea className="h-[calc(100%-4rem)] mt-4 pr-4">
+                        <div className="space-y-4">
+                          {annotations.length > 0 ? (
+                            annotations.map(ann => (
+                              <div key={ann.id} className="p-3 rounded-lg bg-background/50 border border-primary/20">
+                                <p className="text-sm text-muted-foreground italic border-l-2 border-accent/70 pl-2 sigil-codex">
+                                  &ldquo;{ann.selection}&rdquo;
+                                </p>
+                                <p className="mt-2 sigil-glyph">{ann.comment}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-muted-foreground text-center mt-8">No annotations for this session.</p>
+                          )}
+                        </div>
+                      </ScrollArea>
+                    </SheetContent>
+                  </Sheet>
+                  <Button onClick={handleBack} variant="outline" size="sm">
+                    <ArrowLeft className="mr-2"/>
+                    Back to Scriptorium
+                  </Button>
+                </div>
             </header>
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
                 <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
                     <CardContent className="p-6 flex-grow min-h-0">
                       <ScrollArea className="h-full pr-4">
-                        <div className="space-y-6">
-                            {selectedSigil.imageUrl && (
-                                <Image 
-                                    src={selectedSigil.imageUrl}
-                                    alt={`Sigil for ${selectedSigil.query}`}
-                                    width={1024}
-                                    height={576}
-                                    className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
-                                />
-                            )}
-                            {selectedSigil.html ? (
-                                <div
-                                    className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
-                                    dangerouslySetInnerHTML={{ __html: selectedSigil.html }}
-                                />
-                            ) : (
-                                <FocusLayer whyContent={selectedSigil.why} howContent={selectedSigil.how} />
-                            )}
-                        </div>
+                         <Annotator contentId={contentId} onAnnotate={handleAddAnnotation}>
+                            <div className="space-y-6">
+                                {selectedSigil.imageUrl && (
+                                    <Image 
+                                        src={selectedSigil.imageUrl}
+                                        alt={`Sigil for ${selectedSigil.query}`}
+                                        width={1024}
+                                        height={576}
+                                        className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
+                                    />
+                                )}
+                                {selectedSigil.html ? (
+                                    <div
+                                        className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
+                                        dangerouslySetInnerHTML={{ __html: selectedSigil.html }}
+                                    />
+                                ) : (
+                                    <FocusLayer whyContent={selectedSigil.why} howContent={selectedSigil.how} />
+                                )}
+                            </div>
+                         </Annotator>
                       </ScrollArea>
                     </CardContent>
                 </Card>
@@ -132,7 +177,7 @@ export default function ForgePage() {
 
        <div className="space-y-8">
         <div>
-          <h2 className="text-3xl sigil-obelisk mb-6 flex items-center gap-3"><ScribeGlyph className="h-8 w-8" /> My Scriptures</h2>
+          <h2 className="text-3xl sigil-obelisk mb-6 flex items-center gap-3"><NotebookText className="h-8 w-8" /> My Scriptures</h2>
            {sigilsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -222,7 +267,7 @@ export default function ForgePage() {
                         <CardHeader>
                              <CardTitle className="sigil-codex truncate">{doc.title}</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex-grow flex flex-col justify-end">
+                        <CardContent className="flex-grow flex-col justify-end">
                            <div className="w-full aspect-video bg-background/50 rounded-md flex items-center justify-center">
                                 <BookOpen className="h-16 w-16 text-muted-foreground/50"/>
                             </div>
