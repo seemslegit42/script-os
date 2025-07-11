@@ -6,7 +6,7 @@ import { AethericStreams } from "@/components/aetheric-streams";
 import { Header } from "@/components/header";
 import Head from "next/head";
 import { ConversationManager } from "@/components/conversation-manager";
-import { addDocument } from "@/app/forge/actions";
+import { addDocument } from "@/app/actions";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -30,12 +30,10 @@ export default function ScriptoriumPage() {
     startTransition(async () => {
       try {
         await addDocument({
-          userId: user.uid,
           query: sigil.query,
           why: sigil.why,
           how: sigil.how,
           imageUrl: sigil.imageUrl,
-          createdAt: new Date(),
         });
         toast({
           title: "Sigil Bound",

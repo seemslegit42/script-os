@@ -7,7 +7,7 @@ import { useFirestore } from '@/hooks/use-firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/header';
 import { UploadSigil } from './upload-sigil';
-import { getDocsAction, deleteSigilAction, addDocument } from './actions';
+import { getDocsAction } from '@/app/actions';
 import { Scripture } from '@/lib/types';
 import { Annotation, Annotator } from '@/components/annotator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -41,20 +41,6 @@ export default function ForgePage() {
     setAnnotations(prev => [...prev, newAnnotation]);
     toast({ title: "Annotation Saved", description: "Your insight has been recorded in the session ledger." });
     setIsLedgerOpen(true);
-  };
-
-  const handleDelete = async (docId: string) => {
-    startTransition(async () => {
-      const result = await deleteSigilAction(docId);
-      if (result.success) {
-        toast({ title: 'Scripture Unbound', description: 'The scripture has been returned to the aether.' });
-        if(selectedScripture?.id === docId) {
-            setSelectedScripture(null);
-        }
-      } else {
-        toast({ title: 'Unbinding Failed', description: result.error, variant: 'destructive' });
-      }
-    });
   };
 
   const handleSelectScripture = (scripture: Scripture | null) => {

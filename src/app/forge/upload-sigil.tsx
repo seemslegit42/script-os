@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { UploadCloud, FileText, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { uploadSigilAction } from './actions';
+import { uploadSigilAction } from '@/app/actions';
 
 const initialState = { success: false, error: null };
 
