@@ -7,9 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, User, Send, CircleDashed } from 'lucide-react';
-import { interrogationAction } from '@/app/scribe/actions';
+import { interrogationAction } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTypographicState } from '@/context/typographic-state-context';
 
 
 /**
@@ -54,6 +55,8 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isContextEmpty = !context || context.trim() === '';
+  const { applyState } = useTypographicState();
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -63,6 +66,14 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
         }
     }
   }, [state.conversation]);
+  
+  useEffect(() => {
+    if(isPending) {
+      applyState('active');
+    } else {
+      applyState('default');
+    }
+  }, [isPending, applyState]);
   
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,7 +102,7 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
               <div className="space-y-4">
                   {state.conversation.length === 0 && (
                     <div className="text-center text-muted-foreground sigil-codex pt-8">
-                        <p>{isContextEmpty ? "Forge a sigil to begin." : "The Oracle is silent. Pose a question to begin the interrogation."}</p>
+                        <p>{isContextEmpty ? "Forge or select a scripture to begin." : "The Oracle is silent. Pose a question to begin the interrogation."}</p>
                     </div>
                   )}
                   {state.conversation.map((msg, index) => (
@@ -128,6 +139,8 @@ export function InterrogationPanel({ context }: InterrogationPanelProps) {
             className="flex-grow sigil-glyph bg-background/50 focus:bg-background/80 resize-none"
             rows={1}
             disabled={isContextEmpty || isPending}
+            onFocus={() => applyState('active')}
+            onBlur={() => applyState('default')}
             onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
