@@ -101,7 +101,7 @@ export default function ScriptoriumLayout() {
           {loading ? (
             <Skeleton className="h-10 w-24 bg-muted/50" />
           ) : user ? (
-             <Button onClick={() => router.push('/api/auth/signout')} variant="outline">End Session</Button>
+             <Button onClick={() => signOut()} variant="outline">End Session</Button>
           ) : (
             <Button onClick={() => setAuthModalOpen(true)}>
               <LogIn className="mr-2" />

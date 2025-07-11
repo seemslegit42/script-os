@@ -28,7 +28,7 @@ type Doc = {
 }
 
 export default function ForgePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const router = useRouter();
   const [selectedSigil, setSelectedSigil] = useState<any>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
@@ -80,7 +80,7 @@ export default function ForgePage() {
   }
 
   if (selectedSigil) {
-    const sigilContext = selectedSigil.html || `${selectedSigil.why}\n\n${selectedSigil.how}`;
+    const sigilContext = selectedSigil.markdown || `${selectedSigil.why}\n\n${selectedSigil.how}`;
     const contentId = selectedSigil.id || selectedSigil.query;
     
     return (
@@ -166,7 +166,10 @@ export default function ForgePage() {
           <Swords className="h-10 w-10" />
           The Scriptorium
         </h1>
-        <Button onClick={() => router.push('/')}>Back to Scribe</Button>
+        <div className="flex items-center gap-4">
+            <Button onClick={() => router.push('/')}>Back to Scribe</Button>
+            <Button onClick={() => signOut()} variant="outline">End Session</Button>
+        </div>
       </header>
 
       <div className="mb-12">

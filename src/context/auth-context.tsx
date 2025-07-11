@@ -50,7 +50,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const idToken = await user.getIdToken();
+        // Send the token to your API route to set the session cookie
+        await fetch('/api/auth/signin', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${idToken}`
+            }
+        });
+      }
       setUser(user);
       setLoading(false);
     });
@@ -69,7 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await firebaseSignOut(auth);
     // After signing out from Firebase on the client, we need to clear the server-side session cookie.
     await fetch('/api/auth/signout');
-    router.push('/');
   };
 
   const signInWithGoogle = () => {
