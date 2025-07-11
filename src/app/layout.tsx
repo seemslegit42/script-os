@@ -32,14 +32,10 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Lexend:wght@100..900&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap" rel="stylesheet" />
-        {/* Söhne is a commercial font and cannot be linked from Google Fonts. This is a placeholder. */}
-        {/* In a real project, you would host the font files or use a font service. */}
         <style dangerouslySetInnerHTML={{ __html: `
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-          /* This is a fallback. For Söhne, you'd use @font-face rules. */
-          body { --font-body: 'Inter', sans-serif; } 
+          body { --font-body: 'Lexend', sans-serif; } 
         `}} />
       </head>
       <body className={cn('antialiased')}>
