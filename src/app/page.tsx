@@ -3,8 +3,8 @@
 
 import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
-import { ScribeSigil } from "@/components/icons";
-import { LogIn, Swords, Save } from "lucide-react";
+import { ScribeSigil, SaveSigil } from "@/components/icons";
+import { LogIn, Swords } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -152,7 +152,7 @@ export default function ScriptoriumLayout() {
                             <>
                               <div className="flex justify-end">
                                 <Button onClick={handleSaveToForge} variant="outline" size="sm">
-                                  <Save className="mr-2" />
+                                  <SaveSigil className="mr-2" />
                                   Bind to Scriptorium
                                 </Button>
                               </div>
