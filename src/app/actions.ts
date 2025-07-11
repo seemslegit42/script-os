@@ -1,3 +1,4 @@
+
 'use server';
 
 import { generateSigil, GenerateSigilOutput } from '@/ai/flows/generate-sigil';
@@ -7,6 +8,7 @@ type FormState = {
   sigil: GenerateSigilOutput | null;
   sigilImageUrl: string | null;
   error: string | null;
+  query: string;
 };
 
 export async function createSigilAction(
@@ -16,7 +18,7 @@ export async function createSigilAction(
   const query = formData.get('query') as string;
 
   if (!query) {
-    return { sigil: null, sigilImageUrl: null, error: 'Query is required.' };
+    return { sigil: null, sigilImageUrl: null, error: 'Query is required.', query: '' };
   }
 
   try {
@@ -29,11 +31,12 @@ export async function createSigilAction(
     return { 
       sigil: textOutput, 
       sigilImageUrl: imageOutput.imageUrl, 
-      error: null 
+      error: null,
+      query: query
     };
 
   } catch (e: any) {
     console.error(e);
-    return { sigil: null, sigilImageUrl: null, error: e.message || 'An unknown error occurred.' };
+    return { sigil: null, sigilImageUrl: null, error: e.message || 'An unknown error occurred.', query: query };
   }
 }

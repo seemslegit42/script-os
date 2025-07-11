@@ -4,7 +4,7 @@
 import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
-import { Bot, User, LogIn, Swords } from "lucide-react";
+import { Bot, User, LogIn, Swords, Save } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,16 +15,23 @@ import { FocusLayer } from "@/components/focus-layer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { AuthModal } from "@/components/auth-modal";
+import { useRouter } from 'next/navigation';
+import { useToast } from "@/hooks/use-toast";
+import { useFirestore } from "@/hooks/use-firestore";
 
-const initialState = { sigil: null, sigilImageUrl: null, error: null };
+
+const initialState = { sigil: null, sigilImageUrl: null, error: null, query: '' };
 
 export default function ScriptoriumLayout() {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
-  const { sigil, sigilImageUrl, error } = state;
+  const { sigil, sigilImageUrl, error, query } = state;
   const { applyState, currentState } = useTypographicState();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
+  const { addDocument } = useFirestore('sigils');
 
   useEffect(() => {
     if (isPending) {
@@ -34,6 +41,46 @@ export default function ScriptoriumLayout() {
     }
   }, [isPending, applyState, currentState]);
   
+  const handleMyForgeClick = () => {
+    if (user) {
+      router.push('/forge');
+    } else {
+      setAuthModalOpen(true);
+    }
+  }
+
+  const handleSaveToForge = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to save a sigil to your Forge.",
+        variant: "destructive",
+      });
+      setAuthModalOpen(true);
+      return;
+    }
+    if (!sigil || !sigilImageUrl || !query) {
+       toast({ title: "Error", description: "Cannot save an incomplete sigil.", variant: "destructive" });
+       return;
+    }
+    try {
+      await addDocument({
+        userId: user.uid,
+        query,
+        why: sigil.why,
+        how: sigil.how,
+        imageUrl: sigilImageUrl,
+        createdAt: new Date(),
+      });
+      toast({
+        title: "Sigil Saved",
+        description: "The scripture has been saved to your personal Forge.",
+      });
+    } catch(e: any) {
+       toast({ title: "Save Failed", description: e.message || "Could not save sigil.", variant: "destructive" });
+    }
+  };
+
   return (
     <>
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
@@ -47,21 +94,14 @@ export default function ScriptoriumLayout() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => {
-            if (user) {
-              // Navigate to forge, for now just an alert
-              alert("Entering The Forge...");
-            } else {
-              setAuthModalOpen(true);
-            }
-          }}>
+          <Button variant="ghost" onClick={handleMyForgeClick}>
             <Swords className="mr-2"/>
             My Forge
           </Button>
           {loading ? (
             <Skeleton className="h-10 w-24 bg-muted/50" />
           ) : user ? (
-             <Button onClick={signOut} variant="outline">Sign Out</Button>
+             <Button onClick={() => router.push('/api/auth/signout')} variant="outline">Sign Out</Button>
           ) : (
             <Button onClick={() => setAuthModalOpen(true)}>
               <LogIn className="mr-2" />
@@ -109,7 +149,15 @@ export default function ScriptoriumLayout() {
                             />
                           )}
                           {sigil && (
+                            <>
+                              <div className="flex justify-end">
+                                <Button onClick={handleSaveToForge} variant="outline" size="sm">
+                                  <Save className="mr-2" />
+                                  Save to Forge
+                                </Button>
+                              </div>
                               <FocusLayer whyContent={sigil.why} howContent={sigil.how} />
+                            </>
                           )}
                         </div>
                       )}

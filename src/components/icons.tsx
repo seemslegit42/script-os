@@ -33,5 +33,6 @@ export const AnnotationGlyph = (props: SVGProps<SVGSVGElement>) => (
     {...props}
   >
     <path d="m12 2 2.8 5.6L21 9l-4.2 4.1.9 5.9L12 16.1l-5.7 2.9.9-5.9L3 9l6.2-1.4z" />
+    <path d="M12 22v-2" />
   </svg>
 );
