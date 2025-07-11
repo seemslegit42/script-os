@@ -22,6 +22,7 @@ import { Annotator, Annotation } from '@/components/annotator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DeleteSigilDialog } from './delete-sigil-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Header } from '@/components/header';
 
 type Doc = {
     id: string;
@@ -31,7 +32,7 @@ type Doc = {
 }
 
 export default function ForgePage() {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [selectedSigil, setSelectedSigil] = useState<any>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
@@ -61,15 +62,15 @@ export default function ForgePage() {
     user ? [['userId', '==', user.uid]] : null
   );
 
-  const handleBack = () => {
-    if (selectedSigil) {
-      setSelectedSigil(null);
-      setAnnotations([]); // Clear annotations when leaving a document
-    } else {
-      router.push('/');
-    }
+  const handleBackToMain = () => {
+    router.push('/');
   }
 
+  const handleBackToScriptorium = () => {
+    setSelectedSigil(null);
+    setAnnotations([]); // Clear annotations when leaving a document
+  }
+  
   const handleAddAnnotation = (annotation: Omit<Annotation, 'id'>) => {
     const newAnnotation: Annotation = { ...annotation, id: `ann-${Date.now()}` };
     setAnnotations(prev => [...prev, newAnnotation]);
@@ -105,11 +106,8 @@ export default function ForgePage() {
     
     return (
         <main className="container mx-auto p-4 sm:p-8 h-screen flex flex-col">
-             <header className="flex justify-between items-center mb-4 flex-shrink-0 gap-4">
-                <h1 className="text-2xl md:text-4xl sigil-obelisk text-primary flex items-center gap-4 truncate">
-                    {selectedSigil.query || selectedSigil.fileName || selectedSigil.title}
-                </h1>
-                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <Header pageTitle={selectedSigil.query || selectedSigil.fileName || selectedSigil.title}>
+                 <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                   <Sheet>
                     <SheetTrigger asChild>
                       <Button variant="outline" size={isMobile ? 'icon' : 'sm'} disabled={annotations.length === 0}>
@@ -139,12 +137,12 @@ export default function ForgePage() {
                       </ScrollArea>
                     </SheetContent>
                   </Sheet>
-                  <Button onClick={handleBack} variant="outline" size={isMobile ? 'icon' : 'sm'}>
+                  <Button onClick={handleBackToScriptorium} variant="outline" size={isMobile ? 'icon' : 'sm'}>
                     <ArrowLeft />
-                    <span className="hidden sm:inline sm:ml-2">Back to Scriptorium</span>
+                    <span className="hidden sm:inline sm:ml-2">Scriptorium</span>
                   </Button>
                 </div>
-            </header>
+            </Header>
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
                 <Card className="bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 flex flex-col">
                     <CardContent className="p-6 flex-grow min-h-0">
@@ -182,18 +180,11 @@ export default function ForgePage() {
   
   return (
     <main className="container mx-auto p-4 sm:p-8">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl sm:text-4xl sigil-obelisk text-primary flex items-center gap-4">
-          <Swords className="h-8 w-8 sm:h-10 sm:w-10" />
-          The Scriptorium
-        </h1>
-        <div className="flex items-center gap-2 sm:gap-4">
-            <Button onClick={() => router.push('/')} size={isMobile ? 'sm' : 'default'}>Back to Scribe</Button>
-            <Button onClick={() => signOut()} variant="outline" size={isMobile ? 'sm' : 'default'}>End Session</Button>
-        </div>
-      </header>
+      <Header pageTitle="The Scriptorium">
+         <Button onClick={handleBackToMain} size={isMobile ? 'sm' : 'default'}>Back to Scribe</Button>
+      </Header>
 
-      <div className="mb-12">
+      <div className="mb-12 mt-8">
         <UploadSigil />
       </div>
 
@@ -322,5 +313,3 @@ export default function ForgePage() {
     </main>
   );
 }
-
-    

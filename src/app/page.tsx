@@ -3,8 +3,7 @@
 
 import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
-import { ScribeSigil, SaveSigil } from "@/components/icons";
-import { LogIn, Swords } from "lucide-react";
+import { SaveSigil } from "@/components/icons";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,10 +13,9 @@ import { useTypographicState } from "@/context/typographic-state-context";
 import { FocusLayer } from "@/components/focus-layer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
-import { AuthModal } from "@/components/auth-modal";
-import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast";
 import { useFirestore } from "@/hooks/use-firestore";
+import { Header } from "@/components/header";
 
 
 const initialState = { sigil: null, sigilImageUrl: null, error: null, query: '' };
@@ -27,9 +25,7 @@ export default function ScriptoriumLayout() {
   const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
   const { sigil, sigilImageUrl, error, query } = state;
   const { applyState, currentState } = useTypographicState();
-  const { user, loading, signOut } = useAuth();
-  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const router = useRouter();
+  const { user } = useAuth();
   const { toast } = useToast();
   const { addDocument } = useFirestore('sigils');
 
@@ -41,13 +37,6 @@ export default function ScriptoriumLayout() {
     }
   }, [isPending, applyState, currentState]);
   
-  const handleMyForgeClick = () => {
-    if (user) {
-      router.push('/forge');
-    } else {
-      setAuthModalOpen(true);
-    }
-  }
 
   const handleSaveToForge = async () => {
     if (!user) {
@@ -56,7 +45,6 @@ export default function ScriptoriumLayout() {
         description: "You must be an Initiate to bind a sigil to your Scriptorium.",
         variant: "destructive",
       });
-      setAuthModalOpen(true);
       return;
     }
     if (!sigil || !sigilImageUrl || !query) {
@@ -83,34 +71,9 @@ export default function ScriptoriumLayout() {
 
   return (
     <>
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
       <AethericStreams />
+      <Header />
       
-      <header className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
-        <div className="flex items-center gap-2">
-          <ScribeSigil className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-          <span className="text-lg sm:text-xl font-bold tracking-wider sigil-obelisk text-primary align-middle">
-            SIGILFORGE
-          </span>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Button variant="ghost" onClick={handleMyForgeClick}>
-            <Swords className="mr-0 sm:mr-2"/>
-            <span className="hidden sm:inline">My Scriptorium</span>
-          </Button>
-          {loading ? (
-            <Skeleton className="h-10 w-24 bg-muted/50" />
-          ) : user ? (
-             <Button onClick={() => signOut()} variant="outline">End Session</Button>
-          ) : (
-            <Button onClick={() => setAuthModalOpen(true)}>
-              <LogIn className="mr-0 sm:mr-2" />
-              <span className="hidden sm:inline">Login / Initiate</span>
-            </Button>
-          )}
-        </div>
-      </header>
-
       <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 pt-24">
         <div className="mx-auto max-w-3xl w-full space-y-8">
             <ScribeForm formAction={formAction} formRef={formRef} isPending={isPending} />
