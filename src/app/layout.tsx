@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { AethericStreams } from '@/components/aetheric-streams';
 import { TypographicStateProvider } from '@/context/typographic-state-context';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   title: 'The Scriptorium Cypher',
@@ -32,9 +32,10 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased')}>
         <TypographicStateProvider>
-          <AethericStreams />
-          <main>{children}</main>
-          <Toaster />
+          <SidebarProvider>
+            {children}
+            <Toaster />
+          </SidebarProvider>
         </TypographicStateProvider>
       </body>
     </html>
