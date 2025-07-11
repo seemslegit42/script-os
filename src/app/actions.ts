@@ -9,6 +9,7 @@ import {Scripture} from '@/lib/types';
 import {auth, db} from '@/lib/firebase-admin';
 import {cookies} from 'next/headers';
 import {revalidatePath} from 'next/cache';
+import { getDocs } from '@/lib/docs';
 
 export type ConversationMessage = {
   role: 'user' | 'agent';

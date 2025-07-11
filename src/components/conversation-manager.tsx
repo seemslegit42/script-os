@@ -12,14 +12,11 @@ import { FocusLayer } from './focus-layer';
 import Image from 'next/image';
 import { SaveSigil, ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
-import { Scripture } from '@/lib/types';
 
 type ConversationManagerProps = {
     isPending: boolean;
     setIsPending: (isPending: boolean) => void;
     onSaveToForge: (sigil: any) => void;
-    activeScripture: Scripture | null;
-    clearScripture: () => void;
 }
 
 const initialState: ConversationState = {
@@ -31,7 +28,7 @@ const initialState: ConversationState = {
 };
 
 
-export function ConversationManager({ setIsPending, isPending, onSaveToForge, activeScripture, clearScripture }: ConversationManagerProps) {
+export function ConversationManager({ setIsPending, isPending, onSaveToForge }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
@@ -59,47 +56,6 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge, ac
       applyState('default');
     }
   }, [isPending, applyState]);
-  
-  // Effect to reset conversation when active scripture changes
-  useEffect(() => {
-    if (activeScripture) {
-        // Reset the form and action state to start a new interrogation
-        const form = formRef.current;
-        if(form) form.reset();
-
-        const context = activeScripture.markdown || `${activeScripture.why}\n\n${activeScripture.how}`;
-        const imageUrl = activeScripture.imageUrl || null;
-        const query = activeScripture.query || activeScripture.title || "Untitled Scripture";
-
-        // This is a "hack" to reset the action state. `form.requestSubmit()` is not ideal here.
-        // A more robust solution might involve a key on the component or a dedicated reset function from a state management library.
-        const formData = new FormData();
-        formData.append('reset', 'true'); // a dummy value
-        formAction(formData); // This clears the conversation in the state
-
-        // Manually update the state for the new context
-        const newState: ConversationState = {
-          conversation: [],
-          context: context,
-          contextImageUrl: imageUrl,
-          contextQuery: query,
-          error: null,
-          isCreation: false,
-        };
-        // This is a direct mutation which is not ideal, but `useActionState` lacks a dedicated reset.
-        // For our purpose, re-rendering with this new context will be handled by the form action call.
-        Object.assign(state, newState);
-
-    } else {
-        // When clearing scripture, reset to the initial state
-        const form = formRef.current;
-        if(form) form.reset();
-        const formData = new FormData();
-        formData.append('reset', 'true');
-        formAction(formData);
-        Object.assign(state, initialState);
-    }
-  }, [activeScripture]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -124,10 +80,6 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge, ac
             });
         }
     }
-  }
-
-  const handleReturnToScribe = () => {
-    clearScripture();
   }
 
   return (
@@ -194,20 +146,12 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge, ac
         </div>
       </ScrollArea>
       <div className="p-4 border-t border-primary/20 bg-background/50 rounded-b-lg">
-         {(state.isCreation || state.context) && (
+         {state.isCreation && (
             <div className="flex justify-end gap-2 mb-2">
-                {state.context && !state.isCreation && (
-                    <Button onClick={handleReturnToScribe} variant="outline" size="sm">
-                        <RefreshCw className="mr-2" />
-                        Return to Scribe
-                    </Button>
-                )}
-                {state.isCreation && (
-                    <Button onClick={handleSaveClick} variant="outline" size="sm">
-                        <SaveSigil className="mr-2" />
-                        Bind to Scriptorium
-                    </Button>
-                )}
+                <Button onClick={handleSaveClick} variant="outline" size="sm">
+                    <SaveSigil className="mr-2" />
+                    Bind to Scriptorium
+                </Button>
             </div>
          )}
         <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-center gap-2">

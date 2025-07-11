@@ -59,9 +59,6 @@ export default function ScriptoriumPage() {
             setIsPending={startTransition} 
             isPending={isPending}
             onSaveToForge={handleSaveToForge}
-            // These props are no longer needed as the main page is only for creation
-            activeScripture={null} 
-            clearScripture={() => {}}
         />
       </main>
     </>

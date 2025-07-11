@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { deleteSigilAction } from './actions';
+import { deleteSigilAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 
 type DeleteSigilDialogProps = {
@@ -57,5 +57,3 @@ export function DeleteSigilDialog({ sigilId, sigilName, children, onDeleted }: D
     </AlertDialog>
   );
 }
-
-    

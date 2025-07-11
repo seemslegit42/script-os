@@ -6,17 +6,17 @@ import { useAuth } from '@/context/auth-context';
 import { useFirestore } from '@/hooks/use-firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/header';
-import { UploadSigil } from './upload-sigil';
 import { getDocsAction } from '@/app/actions';
 import { Scripture } from '@/lib/types';
 import { Annotation, Annotator } from '@/components/annotator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MessageSquareQuote, Trash2, X } from 'lucide-react';
+import { MessageSquareQuote, Trash2 } from 'lucide-react';
 import { DeleteSigilDialog } from './delete-sigil-dialog';
 import { FocusLayer } from '@/components/focus-layer';
 import { ConstellationCanvas } from '@/components/constellation-canvas';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyForge } from '@/components/empty-forge';
 
 export default function ForgePage() {
   const { user } = useAuth();
@@ -51,6 +51,7 @@ export default function ForgePage() {
   }
 
   const allScriptures = [...canonicalDocs, ...sigils];
+  const hasUserScriptures = sigils.length > 0;
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
@@ -58,14 +59,12 @@ export default function ForgePage() {
 
       <main className="flex-grow flex items-stretch pt-20">
         <div className="w-full h-full relative">
-            <div className="absolute top-4 right-4 z-10">
-                <UploadSigil />
-            </div>
-
             {sigilsLoading ? (
                 <div className="w-full h-full flex items-center justify-center">
                     <Skeleton className="w-3/4 h-3/4" />
                 </div>
+            ) : user && !hasUserScriptures ? (
+                <EmptyForge />
             ) : (
                 <ConstellationCanvas 
                     scriptures={allScriptures} 
