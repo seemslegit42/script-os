@@ -21,7 +21,7 @@ export function FocusLayer({ whyContent, howContent }: FocusLayerProps) {
     <Tabs defaultValue="why" className="w-full">
       <TabsList className="grid w-full grid-cols-2 bg-black/20">
         <TabsTrigger value="why">The 'Why'</TabsTrigger>
-        <TabsTrigger value="how">The 'How'</sTabsTrigger>
+        <TabsTrigger value="how">The 'How'</TabsTrigger>
       </TabsList>
       <TabsContent value="why" className="mt-4">
         <div
