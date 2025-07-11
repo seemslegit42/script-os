@@ -3,7 +3,7 @@
 
 import React, { useActionState, useRef, useEffect, useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
-import { ScribeGlyph, Bot, User } from "lucide-react";
+import { ScribeGlyph } from "@/components/icons";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
