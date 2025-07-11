@@ -1,8 +1,7 @@
 
 'use server';
 
-import { auth } from '@/lib/firebase-admin';
-import { db } from '@/lib/firebase-admin';
+import { auth, db } from '@/lib/firebase-admin';
 import { cookies } from 'next/headers';
 import { marked } from 'marked';
 import { getDocs } from '@/lib/docs';
@@ -111,7 +110,8 @@ export const addDocument = async (data: object) => {
       await collectionRef.add(data);
       revalidatePath('/');
       revalidatePath('/forge');
-    } catch (e: any) {
+    } catch (e: any)
+{
       console.error("Error adding document: ", e);
       throw new Error("Could not add document.");
     }

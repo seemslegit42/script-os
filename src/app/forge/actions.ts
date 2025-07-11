@@ -1,8 +1,7 @@
 
 'use server';
 
-import { auth } from '@/lib/firebase-admin';
-import { db } from '@/lib/firebase-admin';
+import { auth, db } from '@/lib/firebase-admin';
 import { cookies } from 'next/headers';
 import { marked } from 'marked';
 import { getDocs } from '@/lib/docs';
