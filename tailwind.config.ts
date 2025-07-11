@@ -20,7 +20,8 @@ const config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
-        body: ["Inter", "sans-serif"],
+        // Söhne is the conceptual choice. Inter is the practical fallback.
+        body: ["Inter", "sans-serif"], 
         headline: ["Orbitron", "sans-serif"],
         code: ["Recursive", "monospace"],
       },
@@ -71,7 +72,7 @@ const config = {
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
       },
       animation: {
