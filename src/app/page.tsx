@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import { AuthModal } from "@/components/auth-modal";
 import { PillarOfEternity } from "@/components/pillar-of-eternity";
-import { Badge } from "@/components/ui/badge";
+import { BlackCard } from "@/components/black-card";
 
 const initialState = { sigilContent: null, sigilImageUrl: null, error: null };
 
@@ -70,8 +70,9 @@ export default function ScriptoriumLayout() {
       </header>
 
       <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 pt-24">
-        <div className="mx-auto max-w-4xl w-full flex gap-8">
-            <div className="flex-grow space-y-8">
+        <div className="mx-auto max-w-6xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left and Center columns for content */}
+            <div className="lg:col-span-2 space-y-8">
               <ScribeForm formAction={formAction} formRef={formRef} isPending={isPending} />
 
               {(isPending || sigilContent || sigilImageUrl || error) && (
@@ -116,7 +117,14 @@ export default function ScriptoriumLayout() {
                 </Card>
               )}
             </div>
-            <aside className="w-1/4 flex-shrink-0">
+            
+            {/* Right column for status and aspirational elements */}
+            <aside className="space-y-8">
+                <BlackCard 
+                    isLocked={userProfile.sovereigntyClass !== 'Sovereign'} 
+                    userName={userProfile.displayName} 
+                    sovereigntyClass={userProfile.sovereigntyClass} 
+                />
                 <PillarOfEternity totalBurn={13378901} />
             </aside>
         </div>
