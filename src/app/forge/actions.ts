@@ -8,6 +8,7 @@ import { marked } from 'marked';
 import { interrogateSigil, InterrogateSigilOutput } from '@/ai/flows/interrogate-sigil-flow';
 import { getDocs } from '@/lib/docs';
 import { generateSpeech } from '@/ai/flows/generate-speech-flow';
+import { revalidatePath } from 'next/cache';
 
 /**
  * Represents the state of the sigil upload form.
@@ -62,6 +63,7 @@ export async function uploadSigilAction(
       createdAt: new Date(),
     });
 
+    revalidatePath('/forge');
     return { success: true, error: null };
   } catch (e: any) {
     console.error(e);
@@ -137,4 +139,39 @@ export async function interrogationAction(prevState: InterrogationFormState, for
  */
 export async function getDocsAction(): Promise<Array<{id: string, title: string, html: string, markdown: string}>> {
     return getDocs();
+}
+
+/**
+ * Server action to delete a sigil document from Firestore.
+ * It verifies the user is authenticated before performing the deletion.
+ * @param {string} docId - The ID of the Firestore document to delete.
+ * @returns {Promise<{success: boolean, error: string | null}>} An object indicating the outcome of the operation.
+ */
+export async function deleteSigilAction(docId: string): Promise<{success: boolean, error: string | null}> {
+    const sessionCookie = cookies().get('session')?.value;
+    if (!sessionCookie) {
+      return { success: false, error: 'You must be logged in to unbind a scripture.' };
+    }
+  
+    try {
+      const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+      const sigilRef = db.collection('sigils').doc(docId);
+      const sigilDoc = await sigilRef.get();
+
+      if (!sigilDoc.exists) {
+        return { success: false, error: "Scripture not found." };
+      }
+
+      if (sigilDoc.data()?.userId !== decodedClaims.uid) {
+        return { success: false, error: "You do not have permission to unbind this scripture." };
+      }
+
+      await sigilRef.delete();
+      revalidatePath('/forge');
+      return { success: true, error: null };
+
+    } catch (e: any) {
+      console.error('Deletion error:', e);
+      return { success: false, error: e.message || 'An unknown error occurred during unbinding.' };
+    }
 }

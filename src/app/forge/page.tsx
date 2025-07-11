@@ -5,9 +5,9 @@ import { useAuth } from '@/context/auth-context';
 import { useFirestore } from '@/hooks/use-firestore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Swords, ArrowLeft, BookOpen, NotebookText, MessageSquareQuote } from 'lucide-react';
+import { Swords, ArrowLeft, BookOpen, NotebookText, MessageSquareQuote, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { FocusLayer } from '@/components/focus-layer';
@@ -20,6 +20,8 @@ import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Annotator, Annotation } from '@/components/annotator';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { DeleteSigilDialog } from './delete-sigil-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 type Doc = {
     id: string;
@@ -36,6 +38,7 @@ export default function ForgePage() {
   const [docsLoading, setDocsLoading] = useState(true);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -70,6 +73,21 @@ export default function ForgePage() {
   const handleAddAnnotation = (annotation: Omit<Annotation, 'id'>) => {
     const newAnnotation: Annotation = { ...annotation, id: `ann-${Date.now()}` };
     setAnnotations(prev => [...prev, newAnnotation]);
+  }
+  
+  const onSigilDeleted = (result: {success: boolean, error: string | null}) => {
+    if(result.success) {
+      toast({
+        title: "Scripture Unbound",
+        description: "The sigil has been returned to the aether."
+      })
+    } else {
+      toast({
+        title: "Unbinding Failed",
+        description: result.error,
+        variant: "destructive"
+      })
+    }
   }
 
 
@@ -215,16 +233,21 @@ export default function ForgePage() {
               {sigils.map((sigil: any) => (
                 <Card 
                     key={sigil.id} 
-                    className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all cursor-pointer"
-                    onClick={() => setSelectedSigil(sigil)}
+                    className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all group"
                 >
-                    <CardHeader>
+                    <CardHeader 
+                      className="cursor-pointer"
+                      onClick={() => setSelectedSigil(sigil)}
+                    >
                         <CardTitle className="sigil-codex truncate">{sigil.query || sigil.fileName}</CardTitle>
                         <CardDescription>
                             {sigil.createdAt?.seconds ? new Date(sigil.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-grow flex flex-col justify-end">
+                    <CardContent 
+                      className="flex-grow flex flex-col justify-end cursor-pointer"
+                      onClick={() => setSelectedSigil(sigil)}
+                    >
                       {sigil.imageUrl ? (
                           <Image
                             src={sigil.imageUrl}
@@ -240,6 +263,17 @@ export default function ForgePage() {
                         </div>
                       )}
                     </CardContent>
+                     <CardFooter className="p-2 justify-end">
+                        <DeleteSigilDialog 
+                            sigilId={sigil.id} 
+                            sigilName={sigil.query || sigil.fileName}
+                            onDeleted={onSigilDeleted}
+                        >
+                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </DeleteSigilDialog>
+                     </CardFooter>
                 </Card>
               ))}
             </div>
@@ -269,12 +303,12 @@ export default function ForgePage() {
                     <Card 
                         key={doc.id}
                         className="flex flex-col bg-card/70 backdrop-blur-sm border-primary/20 overflow-hidden hover:border-accent hover:shadow-lg hover:shadow-accent/10 transition-all cursor-pointer"
-                        onClick={() => setSelectedSigil({ ...doc, html: doc.html, context: doc.markdown })}
+                        onClick={() => setSelectedSigil({ ...doc, html: doc.html, markdown: doc.markdown })}
                     >
                         <CardHeader>
                              <CardTitle className="sigil-codex truncate">{doc.title}</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex-grow flex-col justify-end">
+                        <CardContent className="flex-grow flex flex-col justify-end">
                            <div className="w-full aspect-video bg-background/50 rounded-md flex items-center justify-center">
                                 <BookOpen className="h-16 w-16 text-muted-foreground/50"/>
                             </div>
