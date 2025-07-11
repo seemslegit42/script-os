@@ -27,7 +27,7 @@ export default function ScriptoriumLayout() {
   const [state, formAction, isPending] = useActionState(createSigilAction, initialState);
   const { sigil, sigilImageUrl, error, query } = state;
   const { applyState, currentState } = useTypographicState();
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
