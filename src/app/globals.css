@@ -70,6 +70,31 @@
     transition: font-variation-settings 0.4s ease, letter-spacing 0.4s ease, transform 0.4s ease;
   }
 
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(ellipse 80% 80% at 50% -20%, hsl(var(--primary) / 0.3), transparent),
+      radial-gradient(ellipse 80% 80% at 50% 120%, hsl(var(--accent) / 0.1), transparent);
+    animation: background-shimmer 15s ease-in-out infinite alternate;
+    z-index: -20;
+    pointer-events: none;
+  }
+
+  @keyframes background-shimmer {
+    from {
+      transform: rotate(0deg) scale(1.5);
+    }
+    to {
+      transform: rotate(90deg) scale(1.2);
+    }
+  }
+
+
   /* Tier Classes */
   .sigil-obelisk {
     font-family: var(--font-headline);
