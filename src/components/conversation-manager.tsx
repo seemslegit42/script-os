@@ -11,7 +11,7 @@ import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, CircleDashed, Swords, Save } from 'lucide-react';
+import { Bot, User, Send, CircleDashed, Swords } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FocusLayer } from './focus-layer';
 import Image from 'next/image';
