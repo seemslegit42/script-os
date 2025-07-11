@@ -6,8 +6,6 @@
  * and converting it into a playable audio file in WAV format, returned as a data URI.
  *
  * @exports generateSpeech - The primary function to call this flow.
- * @exports GenerateSpeechInputSchema - The Zod schema for the flow's input.
- * @exports GenerateSpeechOutputSchema - The Zod schema for the flow's output.
  */
 
 import { ai } from '@/ai/genkit';
@@ -19,14 +17,14 @@ import { googleAI } from '@genkit-ai/googleai';
  * Defines the schema for the input to the generateSpeech flow.
  * @property {string} text - The text to be converted to speech.
  */
-export const GenerateSpeechInputSchema = z.string();
-export type GenerateSpeechInput = z.infer<typeof GenerateSpeechInputSchema>;
+const GenerateSpeechInputSchema = z.string();
+type GenerateSpeechInput = z.infer<typeof GenerateSpeechInputSchema>;
 
 /**
  * Defines the schema for the output of the generateSpeech flow.
  * @property {string} audioUrl - The data URI of the generated WAV audio file.
  */
-export const GenerateSpeechOutputSchema = z.object({
+const GenerateSpeechOutputSchema = z.object({
   audioUrl: z.string().describe("The data URI of the generated WAV audio file. Expected format: 'data:audio/wav;base64,<encoded_data>'."),
 });
 export type GenerateSpeechOutput = z.infer<typeof GenerateSpeechOutputSchema>;

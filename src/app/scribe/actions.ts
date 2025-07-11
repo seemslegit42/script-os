@@ -2,12 +2,12 @@
 'use server';
 
 import { interrogateSigil, InterrogateSigilOutput } from '@/ai/flows/interrogate-sigil-flow';
-import { generateSpeech } from '@/ai/flows/generate-speech-flow';
+import { generateSpeech, GenerateSpeechOutput } from '@/ai/flows/generate-speech-flow';
 
 /**
  * Represents a single message in the interrogation conversation.
  */
-export type ConversationMessage = {
+type ConversationMessage = {
     role: 'user' | 'agent';
     content: string;
     audioUrl?: string | null;
@@ -18,7 +18,7 @@ export type ConversationMessage = {
  * @property {Array<ConversationMessage>} conversation - A history of the conversation.
  * @property {string | null} error - An error message, if any occurred during the last turn.
  */
-export type InterrogationFormState = {
+type InterrogationFormState = {
     conversation: ConversationMessage[];
     error: string | null;
 }
@@ -50,7 +50,7 @@ export async function interrogationAction(prevState: InterrogationFormState, for
 
     try {
         const textResult: InterrogateSigilOutput = await interrogateSigil({ query, context });
-        const speechResult = await generateSpeech(textResult.answer);
+        const speechResult: GenerateSpeechOutput = await generateSpeech(textResult.answer);
 
         const agentMessage: ConversationMessage = { 
             role: 'agent' as const, 
