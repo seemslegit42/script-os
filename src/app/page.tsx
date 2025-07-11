@@ -6,7 +6,7 @@ import { AethericStreams } from "@/components/aetheric-streams";
 import { Header } from "@/components/header";
 import Head from "next/head";
 import { ConversationManager } from "@/components/conversation-manager";
-import { addDocument } from "./scriptorium/actions";
+import { addDocument } from "@/app/forge/actions";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";

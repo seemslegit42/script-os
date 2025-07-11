@@ -110,3 +110,17 @@ export async function deleteSigilAction(docId: string): Promise<{success: boolea
       return { success: false, error: e.message || 'An unknown error occurred during unbinding.' };
     }
 }
+
+
+export const addDocument = async (data: object) => {
+  try {
+    const collectionRef = db.collection('sigils');
+    await collectionRef.add(data);
+    revalidatePath('/');
+    revalidatePath('/forge');
+  } catch (e: any)
+{
+    console.error("Error adding document: ", e);
+    throw new Error("Could not add document.");
+  }
+};
