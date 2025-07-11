@@ -1,8 +1,14 @@
+"use client";
+
+import * as React from "react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator, SidebarTrigger } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Book, FileText, Settings, Shield } from "lucide-react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
+import { ScribeForm } from "@/components/scribe-form";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const mockScriptures = [
     { id: 'core-protocol', title: 'Core Protocol', icon: Shield },
@@ -16,6 +22,31 @@ const mockManuals = [
 ]
 
 export default function ScriptoriumLayout() {
+  const [sigilContent, setSigilContent] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  
+  // This effect simulates loading the initial scripture
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setSigilContent(`
+        <p>This is where the content of your selected markdown file will be rendered. The system is designed to parse and display the scriptures with the appropriate typographic sigils.</p>
+        <p>The Obelisk tier is used for headings, creating a monumental, authoritative feel. The Codex tier provides the core reading experience—clear, neutral, and unobtrusive. The Glyph tier is reserved for <code>code snippets</code>, offering a precise, monospaced view of raw data and commands.</p>
+        <pre><code class="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
+nexus.command({
+  action: "ACTIVATE_SENTIENCE",
+  target: "TYPOGRAPHY_ENGINE",
+  params: {
+    mode: "EXTREME"
+  }
+})
+        </code></pre>
+        <p>Select a different scripture from the sidebar to see the content change. The typographic state will adapt based on your interactions and the context of the information displayed.</p>
+      `);
+      setIsLoading(false);
+    }, 750);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <AethericStreams />
@@ -67,28 +98,26 @@ export default function ScriptoriumLayout() {
                 <SidebarTrigger />
                 <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary">Core Protocol</h1>
             </div>
-            <div className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded">
-                <p>
-                    This is where the content of your selected markdown file will be rendered. The system is designed to parse and display the scriptures with the appropriate typographic sigils.
-                </p>
-                <p>
-                    The Obelisk tier is used for headings, creating a monumental, authoritative feel.
-                    The Codex tier provides the core reading experience—clear, neutral, and unobtrusive.
-                    The Glyph tier is reserved for `code snippets`, offering a precise, monospaced view of raw data and commands.
-                </p>
-                <pre><code className="sigil-glyph text-sm text-accent whitespace-pre-wrap p-4 bg-black/30 rounded-lg border border-border block">
-                    {`nexus.command({
-  action: "ACTIVATE_SENTIENCE",
-  target: "TYPOGRAPHY_ENGINE",
-  params: {
-    mode: "EXTREME"
-  }
-})`}
-                </code></pre>
-                <p>
-                    Select a different scripture from the sidebar to see the content change. The typographic state will adapt based on your interactions and the context of the information displayed.
-                </p>
-            </div>
+            
+            <ScribeForm setSigilContent={setSigilContent} />
+
+            <Card className="mt-8 bg-card/50">
+                <CardContent className="p-6">
+                    {isLoading || !sigilContent ? (
+                        <div className="space-y-4">
+                            <Skeleton className="h-4 w-3/4" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-20 w-full" />
+                            <Skeleton className="h-4 w-1/2" />
+                        </div>
+                    ) : (
+                        <div 
+                            className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded"
+                            dangerouslySetInnerHTML={{ __html: sigilContent }}
+                        />
+                    )}
+                </CardContent>
+            </Card>
         </div>
       </SidebarInset>
     </>
