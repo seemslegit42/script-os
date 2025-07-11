@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useActionState, useRef, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { Header } from "@/components/header";
 import Head from "next/head";
@@ -10,8 +10,6 @@ import { addDocument } from "@/app/forge/actions";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-
 
 export default function ScriptoriumPage() {
   const [isPending, startTransition] = React.useTransition();
@@ -29,34 +27,31 @@ export default function ScriptoriumPage() {
       return;
     }
 
-    try {
-      await addDocument({
-        userId: user.uid,
-        query: sigil.query,
-        why: sigil.why,
-        how: sigil.how,
-        imageUrl: sigil.imageUrl,
-        createdAt: new Date(),
-      });
-      toast({
-        title: "Sigil Bound",
-        description: "The scripture has been bound to your personal Scriptorium.",
-        action: (
-          <Button onClick={() => router.push('/forge')} className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
-            View in Scriptorium
-          </Button>
-        )
-      });
-    } catch(e: any) {
-       toast({ title: "Binding Failed", description: e.message || "Could not bind sigil.", variant: "destructive" });
-    }
+    startTransition(async () => {
+      try {
+        await addDocument({
+          userId: user.uid,
+          query: sigil.query,
+          why: sigil.why,
+          how: sigil.how,
+          imageUrl: sigil.imageUrl,
+          createdAt: new Date(),
+        });
+        toast({
+          title: "Sigil Bound",
+          description: "The scripture has been bound and added to your Forge.",
+        });
+        router.push('/forge');
+      } catch(e: any) {
+         toast({ title: "Binding Failed", description: e.message || "Could not bind sigil.", variant: "destructive" });
+      }
+    });
   };
-
 
   return (
     <>
       <Head>
-        <title>Scriptorium | Scribe</title>
+        <title>Scribe - Scriptorium</title>
       </Head>
       <AethericStreams isThinking={isPending} />
       <Header />
@@ -66,6 +61,9 @@ export default function ScriptoriumPage() {
             setIsPending={startTransition} 
             isPending={isPending}
             onSaveToForge={handleSaveToForge}
+            // These props are no longer needed as the main page is only for creation
+            activeScripture={null} 
+            clearScripture={() => {}}
         />
       </main>
     </>

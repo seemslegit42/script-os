@@ -4,22 +4,22 @@
 import React, { useRef, useEffect, useActionState, useTransition } from 'react';
 import { unifiedConversationAction, ConversationState, ConversationMessage } from '@/app/actions';
 import { useTypographicState } from '@/context/typographic-state-context';
-
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, CircleDashed, Swords, ArrowLeft } from 'lucide-react';
+import { Bot, User, Send, CircleDashed, Swords, ArrowLeft, RefreshCw } from 'lucide-react';
 import { FocusLayer } from './focus-layer';
 import Image from 'next/image';
 import { SaveSigil, ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
 import { Scripture } from '@/lib/types';
 
-
 type ConversationManagerProps = {
     isPending: boolean;
     setIsPending: (isPending: boolean) => void;
     onSaveToForge: (sigil: any) => void;
+    activeScripture: Scripture | null;
+    clearScripture: () => void;
 }
 
 const initialState: ConversationState = {
@@ -31,7 +31,7 @@ const initialState: ConversationState = {
 };
 
 
-export function ConversationManager({ setIsPending, isPending, onSaveToForge }: ConversationManagerProps) {
+export function ConversationManager({ setIsPending, isPending, onSaveToForge, activeScripture, clearScripture }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
@@ -41,6 +41,7 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
     setIsPending(isActionPending);
   }, [isActionPending, setIsPending])
 
+  // Effect to scroll to the bottom of the conversation
   useEffect(() => {
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
@@ -50,6 +51,7 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
     }
   }, [state.conversation]);
   
+  // Effect to manage typographic state based on pending status
   useEffect(() => {
     if(isPending) {
       applyState('active');
@@ -58,6 +60,47 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
     }
   }, [isPending, applyState]);
   
+  // Effect to reset conversation when active scripture changes
+  useEffect(() => {
+    if (activeScripture) {
+        // Reset the form and action state to start a new interrogation
+        const form = formRef.current;
+        if(form) form.reset();
+
+        const context = activeScripture.markdown || `${activeScripture.why}\n\n${activeScripture.how}`;
+        const imageUrl = activeScripture.imageUrl || null;
+        const query = activeScripture.query || activeScripture.title || "Untitled Scripture";
+
+        // This is a "hack" to reset the action state. `form.requestSubmit()` is not ideal here.
+        // A more robust solution might involve a key on the component or a dedicated reset function from a state management library.
+        const formData = new FormData();
+        formData.append('reset', 'true'); // a dummy value
+        formAction(formData); // This clears the conversation in the state
+
+        // Manually update the state for the new context
+        const newState: ConversationState = {
+          conversation: [],
+          context: context,
+          contextImageUrl: imageUrl,
+          contextQuery: query,
+          error: null,
+          isCreation: false,
+        };
+        // This is a direct mutation which is not ideal, but `useActionState` lacks a dedicated reset.
+        // For our purpose, re-rendering with this new context will be handled by the form action call.
+        Object.assign(state, newState);
+
+    } else {
+        // When clearing scripture, reset to the initial state
+        const form = formRef.current;
+        if(form) form.reset();
+        const formData = new FormData();
+        formData.append('reset', 'true');
+        formAction(formData);
+        Object.assign(state, initialState);
+    }
+  }, [activeScripture]);
+
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -65,13 +108,12 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
     if (!query?.trim()) return;
 
     formAction(formData);
-    if (formRef.current) {
-      formRef.current.reset();
-    }
+    const textarea = e.currentTarget.querySelector('textarea');
+    if (textarea) textarea.value = '';
   };
   
   const handleSaveClick = () => {
-    if (state.context && state.isCreation) {
+    if (state.isCreation) {
         const creationMessage = state.conversation.find(m => m.isCreation);
         if (creationMessage && creationMessage.sigil) {
             onSaveToForge({
@@ -84,6 +126,9 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
     }
   }
 
+  const handleReturnToScribe = () => {
+    clearScripture();
+  }
 
   return (
     <div className="flex flex-col h-full bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 rounded-t-lg">
@@ -92,7 +137,17 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
           {state.conversation.length === 0 && (
             <div className="text-center text-muted-foreground sigil-codex pt-8 flex flex-col items-center gap-4">
               <ScribeSigil className="h-20 w-20 text-primary/70"/>
-              <p>The Oracle is silent. State your intent to forge a scripture.</p>
+              <p>{state.context ? `Interrogating scripture: "${state.contextQuery}"` : "The Oracle is silent. State your intent to forge a scripture."}</p>
+              {state.contextImageUrl && (
+                <Image 
+                    src={state.contextImageUrl}
+                    alt={`Sigil for ${state.contextQuery}`}
+                    width={512}
+                    height={288}
+                    className="w-full max-w-md h-auto rounded-lg border border-primary/30 aspect-video object-cover"
+                    data-ai-hint="abstract symbol"
+                />
+              )}
             </div>
           )}
           {state.conversation.map((msg, index) => (
@@ -139,18 +194,29 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
         </div>
       </ScrollArea>
       <div className="p-4 border-t border-primary/20 bg-background/50 rounded-b-lg">
-         {state.context && (
+         {(state.isCreation || state.context) && (
             <div className="flex justify-end gap-2 mb-2">
-                <Button onClick={handleSaveClick} variant="outline" size="sm">
-                    <SaveSigil className="mr-2" />
-                    Bind to Scriptorium
-                </Button>
+                {state.context && !state.isCreation && (
+                    <Button onClick={handleReturnToScribe} variant="outline" size="sm">
+                        <RefreshCw className="mr-2" />
+                        Return to Scribe
+                    </Button>
+                )}
+                {state.isCreation && (
+                    <Button onClick={handleSaveClick} variant="outline" size="sm">
+                        <SaveSigil className="mr-2" />
+                        Bind to Scriptorium
+                    </Button>
+                )}
             </div>
          )}
         <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-center gap-2">
+          <input type="hidden" name="context" value={state.context || ''} />
+          <input type="hidden" name="contextImageUrl" value={state.contextImageUrl || ''} />
+          <input type="hidden" name="contextQuery" value={state.contextQuery || ''} />
           <Textarea
             name="query"
-            placeholder={state.context ? 'Interrogate the scripture...' : 'State your intent...'}
+            placeholder={state.context ? `Interrogate "${state.contextQuery}"...` : 'State your intent...'}
             required
             className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
             rows={1}
