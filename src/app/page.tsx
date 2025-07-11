@@ -1,20 +1,19 @@
 
 "use client";
 
-import * as React from "react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator } from "@/components/ui/sidebar";
+import React, { useActionState } from "react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Book, FileText, Settings, Shield } from "lucide-react";
+import { FileText, Shield } from "lucide-react";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { ScribeGlyph } from "@/components/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScribeForm } from "@/components/scribe-form";
-import { useFormState } from "react-dom";
 import { createSigilAction } from "./actions";
 
 export default function ScriptoriumLayout() {
-  const [state, formAction] = useFormState(createSigilAction, { sigilContent: null, error: null });
+  const [state, formAction] = useActionState(createSigilAction, { sigilContent: null, error: null });
 
   const { sigilContent } = state;
   const [isLoading, setIsLoading] = React.useState(false);
@@ -88,8 +87,8 @@ export default function ScriptoriumLayout() {
           </SidebarContent>
         </ScrollArea>
       </Sidebar>
-      <SidebarInset>
-        <div className="p-4 sm:p-8">
+      <main className="flex-1 p-4 sm:p-8">
+        <div className="mx-auto max-w-4xl">
             <h1 className="text-2xl font-bold tracking-wider sigil-obelisk text-primary mb-8">
                 Summon the Scribe
             </h1>
@@ -116,7 +115,7 @@ export default function ScriptoriumLayout() {
               </Card>
             )}
         </div>
-      </SidebarInset>
+      </main>
     </>
   );
 }
