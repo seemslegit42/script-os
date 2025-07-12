@@ -1,5 +1,6 @@
-
+// src/lib/firebase-admin.ts
 import * as admin from 'firebase-admin';
+import { serviceAccount } from './service-account';
 
 // A type assertion is used to extend the global object for our singleton.
 declare global {
@@ -19,27 +20,20 @@ function initializeFirebaseAdmin(): admin.app.App {
   }
 
   // --- Absolute Validation ---
-  if (!process.env.FIREBASE_PROJECT_ID) {
-    throw new Error('Firebase admin initialization failed: Missing FIREBASE_PROJECT_ID from .env file.');
+  if (!serviceAccount.project_id) {
+    throw new Error('Firebase admin initialization failed: Missing project_id from service-account.ts');
   }
-  if (!process.env.FIREBASE_CLIENT_EMAIL) {
-    throw new Error('Firebase admin initialization failed: Missing FIREBASE_CLIENT_EMAIL from .env file.');
+  if (!serviceAccount.client_email) {
+    throw new Error('Firebase admin initialization failed: Missing client_email from service-account.ts');
   }
-  if (!process.env.FIREBASE_PRIVATE_KEY) {
-    throw new Error('Firebase admin initialization failed: Missing FIREBASE_PRIVATE_KEY from .env file.');
+  if (!serviceAccount.private_key) {
+    throw new Error('Firebase admin initialization failed: Missing private_key from service-account.ts');
   }
   // --- End Validation ---
 
   try {
-    const serviceAccount = {
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      // Restore newlines in the private key
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-    };
-    
     const app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+      credential: admin.credential.cert(serviceAccount),
     });
     
     globalThis.firebaseAdminApp = app;

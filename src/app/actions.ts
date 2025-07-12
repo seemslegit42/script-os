@@ -7,6 +7,7 @@ import {interrogateSigil} from '@/ai/flows/interrogate-sigil-flow';
 import {generateSpeech} from '@/ai/flows/generate-speech-flow';
 import {Scripture} from '@/lib/types';
 import { getAuth, getDb } from '@/lib/firebase-admin';
+import { awardCreditForBinding } from '@/lib/treasury';
 import {cookies} from 'next/headers';
 import {revalidatePath} from 'next/cache';
 import { getDocs } from '@/lib/docs';
@@ -154,6 +155,10 @@ export async function addDocument(data: Omit<Scripture, 'id' | 'createdAt'>) {
             userId,
             createdAt: new Date(),
         });
+
+        // Award credits for this sacred act
+        await awardCreditForBinding(userId);
+
         revalidatePath('/');
         revalidatePath('/forge');
     } catch (e: any) {
@@ -233,6 +238,9 @@ export async function uploadSigilAction(prevState: any, formData: FormData) {
       markdown,
       createdAt: new Date(),
     });
+
+    // Award credits for this sacred act
+    await awardCreditForBinding(userId);
 
     revalidatePath('/forge');
     return { success: true, error: null };

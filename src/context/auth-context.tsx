@@ -11,10 +11,11 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  UserCredential
 } from 'firebase/auth';
 import { app } from '@/lib/firebase';
-import { useRouter } from 'next/navigation';
+import { grantInitialEndowment } from '@/lib/treasury';
 
 /**
  * The context type for authentication-related data and functions.
@@ -30,10 +31,10 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   auth: Auth;
-  signUp: (email: string, password: string) => Promise<any>;
-  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
+  signIn: (email: string, password: string) => Promise<UserCredential>;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<any>;
+  signInWithGoogle: () => Promise<UserCredential>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth(app);
-  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -67,8 +67,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, [auth]);
 
-  const signUp = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const handleNewUser = async (userCredential: UserCredential) => {
+    const isNewUser = userCredential.user && (await userCredential.user.getIdTokenResult()).claims.auth_time === (await userCredential.user.getIdTokenResult()).claims.iat;
+
+    const user = userCredential.user;
+    if (user) {
+        // A simple check for new user creation, though metadata is more reliable.
+        // For Google Sign-In, we check if the user doc exists.
+        const userDocRef = (await import('firebase/firestore')).doc( (await import('@/lib/firebase')).db, 'users', user.uid);
+        const userDoc = await (await import('firebase/firestore')).getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+             await grantInitialEndowment(user.uid);
+        }
+    }
+  };
+
+  const signUp = async (email: string, password: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await grantInitialEndowment(userCredential.user.uid);
+    return userCredential;
   };
 
   const signIn = (email: string, password: string) => {
@@ -81,9 +99,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await fetch('/api/auth/signout');
   };
 
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    const userCredential = await signInWithPopup(auth, provider);
+    await handleNewUser(userCredential);
+    return userCredential;
   }
 
   const value = { user, loading, auth, signUp, signIn, signOut, signInWithGoogle };
