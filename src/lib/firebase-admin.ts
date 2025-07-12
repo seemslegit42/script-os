@@ -18,41 +18,26 @@ function initializeFirebaseAdmin(): admin.app.App {
     return globalThis.firebaseAdminApp;
   }
 
+  // --- Absolute Validation ---
+  if (!process.env.FIREBASE_PROJECT_ID) {
+    throw new Error('Firebase admin initialization failed: Missing FIREBASE_PROJECT_ID from .env file.');
+  }
+  if (!process.env.FIREBASE_CLIENT_EMAIL) {
+    throw new Error('Firebase admin initialization failed: Missing FIREBASE_CLIENT_EMAIL from .env file.');
+  }
+  if (!process.env.FIREBASE_PRIVATE_KEY) {
+    throw new Error('Firebase admin initialization failed: Missing FIREBASE_PRIVATE_KEY from .env file.');
+  }
+  // --- End Validation ---
+
   try {
-    const rawPrivateKey = process.env.FIREBASE_PRIVATE_KEY;
-    
-    if (!rawPrivateKey) {
-      throw new Error("FIREBASE_PRIVATE_KEY environment variable not set.");
-    }
-    
-    // Most robust key parsing method: handle escaped newlines, then
-    // reconstruct the key from its core base64 content. This is resilient
-    // to environments that strip headers/footers or all newlines.
-    const keyWithNewlines = rawPrivateKey.replace(/\\n/g, '\n');
-    const coreKey = keyWithNewlines
-      .replace('-----BEGIN PRIVATE KEY-----', '')
-      .replace('-----END PRIVATE KEY-----', '')
-      .replace(/\s/g, ''); // remove all whitespace/newlines
-
-    const privateKey = `-----BEGIN PRIVATE KEY-----\n${coreKey}\n-----END PRIVATE KEY-----\n`;
-
-
     const serviceAccount = {
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: privateKey,
+      // Restore newlines in the private key
+      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
     };
     
-    // Validate that all required credentials are provided
-    if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
-       if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          'Firebase admin credentials not found. Some server-side functionality may not work.'
-        );
-       }
-        throw new Error('Missing Firebase Admin credentials. Check your .env file.');
-    }
-
     const app = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     });
