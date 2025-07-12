@@ -19,16 +19,29 @@ function initializeFirebaseAdmin(): admin.app.App {
   }
 
   try {
-    // Construct the service account object from environment variables.
+    const rawPrivateKey = process.env.FIREBASE_PRIVATE_KEY;
+    
+    if (!rawPrivateKey) {
+      throw new Error("FIREBASE_PRIVATE_KEY environment variable not set.");
+    }
+    
+    // Most robust key parsing method: handle escaped newlines, then
+    // reconstruct the key from its core base64 content. This is resilient
+    // to environments that strip headers/footers or all newlines.
+    const keyWithNewlines = rawPrivateKey.replace(/\\n/g, '\n');
+    const coreKey = keyWithNewlines
+      .replace('-----BEGIN PRIVATE KEY-----', '')
+      .replace('-----END PRIVATE KEY-----', '')
+      .replace(/\s/g, ''); // remove all whitespace/newlines
+
+    const privateKey = `-----BEGIN PRIVATE KEY-----\n${coreKey}\n-----END PRIVATE KEY-----\n`;
+
+
     const serviceAccount = {
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      // The private key must be correctly formatted. Environment variables often
-      // store it as a single line with escaped newlines.
-      privateKey: process.env.FIREBASE_PRIVATE_KEY
-        ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY)
-        : undefined,
-    } as admin.ServiceAccount;
+      privateKey: privateKey,
+    };
     
     // Validate that all required credentials are provided
     if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
@@ -41,7 +54,7 @@ function initializeFirebaseAdmin(): admin.app.App {
     }
 
     const app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+      credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     });
     
     globalThis.firebaseAdminApp = app;
@@ -54,7 +67,7 @@ function initializeFirebaseAdmin(): admin.app.App {
   }
 }
 
-// Initialize the app on module load
+// Initialize the app on module load to ensure it's ready for use.
 initializeFirebaseAdmin();
 
 /**
