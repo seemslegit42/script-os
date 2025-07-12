@@ -2,7 +2,7 @@
 "use client";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import * as React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 type AethericStreamsProps = {
   isThinking: boolean;
@@ -10,14 +10,17 @@ type AethericStreamsProps = {
 
 export function AethericStreams({ isThinking }: AethericStreamsProps) {
   const isMobile = useIsMobile();
-  
-  const streamCount = React.useMemo(() => {
+  const [streams, setStreams] = useState<React.ReactNode[]>([]);
+
+  const streamCount = useMemo(() => {
+    if (isMobile === undefined) return 0; // Don't render on server or before mobile check
     const baseCount = isMobile ? 15 : 40;
     return isThinking ? baseCount * 3 : baseCount;
   }, [isMobile, isThinking]);
 
-  const streams = React.useMemo(() => {
-    return Array.from({ length: streamCount }).map((_, i) => {
+  useEffect(() => {
+    // Generate streams only on the client-side to avoid hydration mismatch
+    const generatedStreams = Array.from({ length: streamCount }).map((_, i) => {
       const duration = isThinking ? 3 + Math.random() * 5 : 10 + Math.random() * 10;
       return (
         <div
@@ -32,6 +35,7 @@ export function AethericStreams({ isThinking }: AethericStreamsProps) {
         />
       );
     });
+    setStreams(generatedStreams);
   }, [streamCount, isThinking]);
 
 
