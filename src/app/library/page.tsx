@@ -9,11 +9,14 @@ import { Scripture } from '@/lib/types';
 import { Annotation, Annotator } from '@/components/annotator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MessageSquareQuote } from 'lucide-react';
+import { MessageSquareQuote, List, Share2 } from 'lucide-react';
 import { FocusLayer } from '@/components/focus-layer';
 import { ConstellationCanvas } from '@/components/constellation-canvas';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyForge } from '@/components/empty-forge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+type ViewMode = 'constellation' | 'list';
 
 export default function LibraryPage() {
   const { toast } = useToast();
@@ -22,6 +25,7 @@ export default function LibraryPage() {
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [isLedgerOpen, setIsLedgerOpen] = useState(false);
   const [selectedScripture, setSelectedScripture] = useState<Scripture | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('constellation');
 
   useEffect(() => {
     async function fetchDocs() {
@@ -57,20 +61,45 @@ export default function LibraryPage() {
     <div className="flex flex-col h-screen bg-background text-foreground">
       <Header />
 
-      <main className="flex-grow flex items-stretch pt-20">
-        <div className="w-full h-full relative">
+      <main className="flex-grow flex flex-col items-stretch pt-20">
+         {hasScriptures && !loading && (
+            <div className="flex justify-end p-4">
+                <Button variant="outline" onClick={() => setViewMode(viewMode === 'constellation' ? 'list' : 'constellation')}>
+                    {viewMode === 'constellation' ? <List className="mr-2" /> : <Share2 className="mr-2" />}
+                    {viewMode === 'constellation' ? 'List View' : 'Constellation View'}
+                </Button>
+            </div>
+        )}
+        <div className="flex-grow relative">
             {loading ? (
                 <div className="w-full h-full flex items-center justify-center">
                     <Skeleton className="w-3/4 h-3/4" />
                 </div>
             ) : !hasScriptures ? (
                 <EmptyForge />
-            ) : (
+            ) : viewMode === 'constellation' ? (
                 <ConstellationCanvas 
                     scriptures={canonicalDocs} 
                     onNodeClick={handleSelectScripture}
                     selectedNodeId={selectedScripture?.id || null}
                 />
+            ) : (
+                <div className="container mx-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="sigil-obelisk">Scripture Title</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {canonicalDocs.map(doc => (
+                                <TableRow key={doc.id} onClick={() => handleSelectScripture(doc)} className="cursor-pointer">
+                                    <TableCell className="font-medium sigil-codex">{doc.title || doc.fileName}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             )}
         </div>
       </main>

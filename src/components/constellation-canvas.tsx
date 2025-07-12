@@ -5,7 +5,6 @@ import React, { useRef, useMemo } from 'react';
 import { motion, useDragControls } from 'framer-motion';
 import { ConstellationNode } from './constellation-node';
 import { Scripture } from '@/lib/types';
-import { ScribeSigil } from './icons';
 
 type ConstellationCanvasProps = {
   scriptures: Scripture[];
@@ -42,9 +41,6 @@ export function ConstellationCanvas({ scriptures, onNodeClick, selectedNodeId }:
   
   return (
     <div ref={constraintsRef} className="w-full h-full bg-background overflow-hidden cursor-grab active:cursor-grabbing relative">
-        <div className="absolute inset-0 z-0 flex items-center justify-center">
-            <ScribeSigil className="h-[80vh] w-[80vh] text-primary/5 opacity-50" />
-        </div>
         <motion.div
             drag
             dragConstraints={constraintsRef}

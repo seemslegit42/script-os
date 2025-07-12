@@ -18,7 +18,7 @@ export function Header() {
                 </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
                     <Link href="/library">
-                        <Button variant="outline"><Book /> Library</Button>
+                        <Button variant="outline"><Book className="mr-2" /> Library</Button>
                     </Link>
                 </div>
             </header>
