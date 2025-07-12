@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useRef, useEffect, useActionState, useTransition } from 'react';
+import React, { useRef, useEffect, useActionState } from 'react';
 import { unifiedConversationAction, ConversationState, ConversationMessage } from '@/app/actions';
 import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,8 +14,8 @@ import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
 
 type ConversationManagerProps = {
+    startTransition: React.TransitionStartFunction;
     isPending: boolean;
-    setIsPending: (isPending: boolean) => void;
 }
 
 const initialState: ConversationState = {
@@ -27,16 +27,12 @@ const initialState: ConversationState = {
 };
 
 
-export function ConversationManager({ setIsPending, isPending }: ConversationManagerProps) {
+export function ConversationManager({ startTransition, isPending }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
   
-  useEffect(() => {
-    setIsPending(isActionPending);
-  }, [isActionPending, setIsPending])
-
   // Effect to scroll to the bottom of the conversation
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -62,7 +58,10 @@ export function ConversationManager({ setIsPending, isPending }: ConversationMan
     const query = formData.get('query') as string;
     if (!query?.trim()) return;
 
-    formAction(formData);
+    startTransition(() => {
+        formAction(formData);
+    });
+
     const textarea = e.currentTarget.querySelector('textarea');
     if (textarea) textarea.value = '';
   };

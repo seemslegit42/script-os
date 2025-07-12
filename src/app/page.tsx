@@ -19,10 +19,7 @@ export default function ScriptoriumPage() {
       <Header />
       
       <main className="container mx-auto flex flex-col h-[calc(100vh-80px)] pt-20">
-        <ConversationManager 
-            setIsPending={startTransition} 
-            isPending={isPending}
-        />
+        <ConversationManager startTransition={startTransition} isPending={isPending} />
       </main>
     </>
   );
