@@ -7,16 +7,15 @@ import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, CircleDashed, Swords, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Bot, User, Send, CircleDashed } from 'lucide-react';
 import { FocusLayer } from './focus-layer';
 import Image from 'next/image';
-import { SaveSigil, ScribeSigil } from './icons';
+import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
 
 type ConversationManagerProps = {
     isPending: boolean;
     setIsPending: (isPending: boolean) => void;
-    onSaveToForge: (sigil: any) => void;
 }
 
 const initialState: ConversationState = {
@@ -28,7 +27,7 @@ const initialState: ConversationState = {
 };
 
 
-export function ConversationManager({ setIsPending, isPending, onSaveToForge }: ConversationManagerProps) {
+export function ConversationManager({ setIsPending, isPending }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
@@ -68,20 +67,6 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
     if (textarea) textarea.value = '';
   };
   
-  const handleSaveClick = () => {
-    if (state.isCreation) {
-        const creationMessage = state.conversation.find(m => m.isCreation);
-        if (creationMessage && creationMessage.sigil) {
-            onSaveToForge({
-                query: state.contextQuery,
-                why: creationMessage.sigil.why,
-                how: creationMessage.sigil.how,
-                imageUrl: state.contextImageUrl,
-            });
-        }
-    }
-  }
-
   return (
     <div className="flex flex-col h-full bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 rounded-t-lg">
       <ScrollArea className="flex-grow p-4 md:p-6" ref={scrollAreaRef}>
@@ -146,14 +131,6 @@ export function ConversationManager({ setIsPending, isPending, onSaveToForge }: 
         </div>
       </ScrollArea>
       <div className="p-4 border-t border-primary/20 bg-background/50 rounded-b-lg">
-         {state.isCreation && (
-            <div className="flex justify-end gap-2 mb-2">
-                <Button onClick={handleSaveClick} variant="outline" size="sm">
-                    <SaveSigil className="mr-2" />
-                    Bind to Scriptorium
-                </Button>
-            </div>
-         )}
         <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-center gap-2">
           <input type="hidden" name="context" value={state.context || ''} />
           <input type="hidden" name="contextImageUrl" value={state.contextImageUrl || ''} />

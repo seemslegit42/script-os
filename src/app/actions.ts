@@ -5,11 +5,6 @@ import {generateSigil, GenerateSigilOutput} from '@/ai/flows/generate-sigil';
 import {generateSigilImage} from '@/ai/flows/generate-sigil-image';
 import {interrogateSigil} from '@/ai/flows/interrogate-sigil-flow';
 import {generateSpeech} from '@/ai/flows/generate-speech-flow';
-import {Scripture} from '@/lib/types';
-import { getAuth, getDb } from '@/lib/firebase-admin';
-import { awardCreditForBinding } from '@/lib/treasury';
-import {cookies} from 'next/headers';
-import {revalidatePath} from 'next/cache';
 import { getDocs } from '@/lib/docs';
 
 export type ConversationMessage = {
@@ -77,7 +72,7 @@ export async function unifiedConversationAction(
       const sigilContext = `${textOutput.why}\n\n${textOutput.how}`;
       const agentResponseMessage: ConversationMessage = {
         role: 'agent',
-        content: `I have forged the scripture for "${query}". You may now interrogate it or bind it to your Scriptorium.`,
+        content: `I have forged the scripture for "${query}". You may now interrogate it.`,
         sigil: textOutput,
         imageUrl: imageOutput.imageUrl,
         query: query,
@@ -133,119 +128,7 @@ export async function unifiedConversationAction(
   }
 }
 
-export async function addDocument(data: Omit<Scripture, 'id' | 'createdAt'>) {
-    const sessionCookie = cookies().get('session')?.value;
-    if (!sessionCookie) {
-        throw new Error('Authentication required. You must be an Initiate to bind a sigil.');
-    }
-
-    let decodedClaims;
-    try {
-        decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true);
-    } catch (error) {
-        throw new Error('Invalid session. Please log in again.');
-    }
-
-    const userId = decodedClaims.uid;
-
-    try {
-        const collectionRef = getDb().collection('sigils');
-        await collectionRef.add({
-            ...data,
-            userId,
-            createdAt: new Date(),
-        });
-
-        // Award credits for this sacred act
-        await awardCreditForBinding(userId);
-
-        revalidatePath('/');
-        revalidatePath('/forge');
-    } catch (e: any) {
-        console.error('Error adding document: ', e);
-        throw new Error('Could not add document.');
-    }
-}
-
-
-export async function deleteSigilAction(
-  docId: string
-): Promise<{success: boolean; error: string | null}> {
-  const sessionCookie = cookies().get('session')?.value;
-  if (!sessionCookie) {
-    return {success: false, error: 'You must be logged in to unbind a scripture.'};
-  }
-
-  try {
-    const decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true);
-    const sigilRef = getDb().collection('sigils').doc(docId);
-    const sigilDoc = await sigilRef.get();
-
-    if (!sigilDoc.exists) {
-      return {success: false, error: 'Scripture not found.'};
-    }
-
-    if (sigilDoc.data()?.userId !== decodedClaims.uid) {
-      return {success: false, error: 'You do not have permission to unbind this scripture.'};
-    }
-
-    await sigilRef.delete();
-    revalidatePath('/forge');
-    return {success: true, error: null};
-  } catch (e: any) {
-    console.error('Deletion error:', e);
-    return {success: false, error: e.message || 'An unknown error occurred during unbinding.'};
-  }
-}
-
 export async function getDocsAction() {
     const docs = await getDocs();
     return docs;
-}
-
-
-export async function uploadSigilAction(prevState: any, formData: FormData) {
-  const sessionCookie = cookies().get('session')?.value;
-  if (!sessionCookie) {
-    return { success: false, error: 'You must be logged in to forge a scripture.' };
-  }
-
-  let decodedClaims;
-  try {
-    decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true);
-  } catch (error) {
-    return { success: false, error: 'Invalid session. Please log in again.' };
-  }
-
-  const userId = decodedClaims.uid;
-  const file = formData.get('markdownFile') as File | null;
-
-  if (!file) {
-    return { success: false, error: 'No file was uploaded.' };
-  }
-  
-  if (file.type !== 'text/markdown') {
-      return { success: false, error: 'Invalid file type. Only .md files are accepted.' };
-  }
-
-  try {
-    const markdown = await file.text();
-    const collectionRef = getDb().collection('sigils');
-
-    await collectionRef.add({
-      userId,
-      fileName: file.name,
-      markdown,
-      createdAt: new Date(),
-    });
-
-    // Award credits for this sacred act
-    await awardCreditForBinding(userId);
-
-    revalidatePath('/forge');
-    return { success: true, error: null };
-  } catch (e: any) {
-    console.error('Error uploading file:', e);
-    return { success: false, error: 'Failed to process and save the scripture.' };
-  }
 }
