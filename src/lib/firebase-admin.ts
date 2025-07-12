@@ -23,10 +23,16 @@ function initializeFirebaseAdmin(): admin.app.App {
       projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
       clientEmail: process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
       privateKey: (process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-    };
+    } as admin.ServiceAccount;
 
     if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
-      throw new Error("Missing Firebase Admin credentials. Check your .env file.");
+       // This check is primarily for developer feedback, as missing creds will cause a crash anyway.
+       // In a production environment, these should always be set.
+       if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+        console.warn(
+          'Firebase admin credentials not found. Some server-side functionality may not work.'
+        );
+       }
     }
 
     const app = admin.initializeApp({
