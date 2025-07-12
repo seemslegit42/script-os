@@ -1,3 +1,4 @@
+
 // src/components/icons.tsx
 'use client';
 
@@ -14,7 +15,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
     >
       <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
@@ -34,8 +35,8 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
         r="12"
         fill="url(#core-gradient)"
         filter="url(#glow)"
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
       />
       
       {/* Orbiting Elements */}
@@ -49,7 +50,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
           strokeWidth="1.5"
           initial={{ rotate: 0 }}
           animate={{ rotate: 360 }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
         />
         <motion.circle
           cx="80" // 50 + 30 * cos(0)
@@ -59,7 +60,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
           filter="url(#glow)"
           initial={{ transform: 'rotate(0deg) translateX(30px) rotate(0deg)' }}
           animate={{ transform: 'rotate(360deg) translateX(30px) rotate(-360deg)' }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
         />
       </g>
       
@@ -74,7 +75,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
           strokeDasharray="4 8"
            initial={{ rotate: 45 }}
           animate={{ rotate: -315 }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
         />
          <motion.circle
           cx="50"
@@ -83,7 +84,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
           fill="hsl(var(--secondary))"
           initial={{ transform: 'rotate(0deg) translateX(45px) rotate(0deg)' }}
           animate={{ transform: 'rotate(-360deg) translateX(45px) rotate(360deg)' }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear', delay: 1 }}
+          transition={{ duration: 40, repeat: Infinity, ease: 'linear', delay: 1 }}
         />
       </g>
     </svg>

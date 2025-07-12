@@ -7,7 +7,7 @@
   :root {
     --background: 0 0% 4%; /* Obsidian Black */
     --foreground: 0 0% 98%;
-    --card: 279 50% 12%; /* Darker purple, for depth */
+    --card: 279 50% 15%; /* Lightened for better contrast */
     --card-foreground: 0 0% 98%;
     --popover: 279 60% 8%;
     --popover-foreground: 0 0% 98%;
@@ -36,7 +36,7 @@
   .dark {
     --background: 0 0% 4%; /* Obsidian Black */
     --foreground: 0 0% 98%;
-    --card: 279 50% 12%; /* Darker purple, for depth */
+    --card: 279 50% 15%; /* Lightened for better contrast */
     --card-foreground: 0 0% 98%;
     --popover: 279 60% 8%;
     --popover-foreground: 0 0% 98%;
@@ -78,24 +78,13 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(ellipse 50% 40% at 20% 30%, hsl(var(--primary) / 0.15), transparent),
-      radial-gradient(ellipse 40% 30% at 80% 60%, hsl(var(--secondary) / 0.15), transparent),
-      radial-gradient(ellipse 50% 40% at 50% 95%, hsl(var(--accent) / 0.15), transparent);
-    animation: background-shimmer 20s ease-in-out infinite alternate;
+      radial-gradient(ellipse 80% 70% at 20% 30%, hsl(var(--primary) / 0.1), transparent),
+      radial-gradient(ellipse 70% 60% at 80% 60%, hsl(var(--secondary) / 0.1), transparent),
+      radial-gradient(ellipse 80% 70% at 50% 95%, hsl(var(--accent) / 0.1), transparent);
     z-index: -20;
     pointer-events: none;
     transform-origin: center;
   }
-
-  @keyframes background-shimmer {
-    from {
-      transform: rotate(0deg) scale(1.2);
-    }
-    to {
-      transform: rotate(180deg) scale(1.5);
-    }
-  }
-
 
   /* Tier Classes */
   .sigil-obelisk {
