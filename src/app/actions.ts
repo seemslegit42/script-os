@@ -6,7 +6,7 @@ import {generateSigilImage} from '@/ai/flows/generate-sigil-image';
 import {interrogateSigil} from '@/ai/flows/interrogate-sigil-flow';
 import {generateSpeech} from '@/ai/flows/generate-speech-flow';
 import {Scripture} from '@/lib/types';
-import {auth, db} from '@/lib/firebase-admin';
+import { getAuth, getDb } from '@/lib/firebase-admin';
 import {cookies} from 'next/headers';
 import {revalidatePath} from 'next/cache';
 import { getDocs } from '@/lib/docs';
@@ -140,7 +140,7 @@ export async function addDocument(data: Omit<Scripture, 'id' | 'createdAt'>) {
 
     let decodedClaims;
     try {
-        decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+        decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true);
     } catch (error) {
         throw new Error('Invalid session. Please log in again.');
     }
@@ -148,7 +148,7 @@ export async function addDocument(data: Omit<Scripture, 'id' | 'createdAt'>) {
     const userId = decodedClaims.uid;
 
     try {
-        const collectionRef = db.collection('sigils');
+        const collectionRef = getDb().collection('sigils');
         await collectionRef.add({
             ...data,
             userId,
@@ -172,8 +172,8 @@ export async function deleteSigilAction(
   }
 
   try {
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-    const sigilRef = db.collection('sigils').doc(docId);
+    const decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true);
+    const sigilRef = getDb().collection('sigils').doc(docId);
     const sigilDoc = await sigilRef.get();
 
     if (!sigilDoc.exists) {
@@ -207,7 +207,7 @@ export async function uploadSigilAction(prevState: any, formData: FormData) {
 
   let decodedClaims;
   try {
-    decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true);
   } catch (error) {
     return { success: false, error: 'Invalid session. Please log in again.' };
   }
@@ -225,7 +225,7 @@ export async function uploadSigilAction(prevState: any, formData: FormData) {
 
   try {
     const markdown = await file.text();
-    const collectionRef = db.collection('sigils');
+    const collectionRef = getDb().collection('sigils');
 
     await collectionRef.add({
       userId,
