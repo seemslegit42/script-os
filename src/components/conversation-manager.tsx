@@ -172,7 +172,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
                 )}
 
                 {msg.audioUrl && (
-                  <audio controls autoPlay src={msg.audioUrl} className="w-full mt-3 h-8" />
+                  <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
                 )}
               </div>
               {msg.role === 'user' && <User className="flex-shrink-0 text-accent mt-2" />}

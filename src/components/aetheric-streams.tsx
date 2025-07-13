@@ -14,15 +14,15 @@ export function AethericStreams({ isThinking }: AethericStreamsProps) {
 
   const streamCount = useMemo(() => {
     if (isMobile === undefined) return 0; // Don't render on server or before mobile check
-    const baseCount = isMobile ? 10 : 25; // Reduced count
-    return isThinking ? baseCount * 2 : baseCount;
+    const baseCount = isMobile ? 5 : 15; // Significantly reduced count
+    return isThinking ? baseCount * 1.5 : baseCount;
   }, [isMobile, isThinking]);
 
   useEffect(() => {
     // Generate streams only on the client-side to avoid hydration mismatch
     const generatedStreams = Array.from({ length: streamCount }).map((_, i) => {
-      // Significantly increased duration to slow down animation
-      const duration = isThinking ? 15 + Math.random() * 10 : 30 + Math.random() * 20;
+      // Significantly increased duration to slow down animation to a crawl
+      const duration = isThinking ? 40 + Math.random() * 20 : 80 + Math.random() * 40;
       return (
         <div
           key={i}
@@ -31,7 +31,7 @@ export function AethericStreams({ isThinking }: AethericStreamsProps) {
             left: `${Math.random() * 100}%`,
             '--delay': `${Math.random() * -duration}s`,
             '--duration': `${duration}s`,
-            filter: isThinking ? `drop-shadow(0 0 4px hsl(var(--accent)))` : `drop-shadow(0 0 2px hsl(var(--accent)))`,
+            filter: isThinking ? `drop-shadow(0 0 3px hsl(var(--accent)))` : `drop-shadow(0 0 1px hsl(var(--accent)))`,
           } as React.CSSProperties}
         />
       );

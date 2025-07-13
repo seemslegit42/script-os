@@ -7,7 +7,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
  * Defines the possible states for the application's typography.
  * Each state corresponds to a different typographic style.
  */
-type NexusState = 'active' | 'sanctuary' | 'contextSwitch' | 'echo' | 'default';
+type NexusState = 'active' | 'default';
 
 /**
  * Defines the CSS font-variation-settings for a typographic state.
@@ -40,10 +40,7 @@ const stableState: TypographicState = { wght: 400, slnt: 0, casl: 0, letterSpaci
 
 const stateMappings: Record<NexusState, TypographicState> = {
   default: stableState,
-  active: stableState,
-  sanctuary: stableState,
-  contextSwitch: stableState,
-  echo: stableState,
+  active: stableState, // All states map to the same stable configuration
 };
 
 /**

@@ -48,9 +48,9 @@ export function ConstellationNode({ scripture, position, onClick, isSelected, on
         <motion.div 
             className={cn(
                 "absolute inset-0 rounded-full transition-colors",
-                isSelected ? 'bg-accent/30 animate-pulse' : 'bg-primary/20 group-hover:bg-accent/20'
+                isSelected ? 'bg-accent/40' : 'bg-primary/20 group-hover:bg-accent/20'
             )}
-            style={{ filter: `blur(${isSelected ? '24px' : '16px'})` }}
+            style={{ filter: `blur(${isSelected ? '28px' : '16px'})` }}
         />
 
         {/* Delete Button */}
@@ -74,8 +74,8 @@ export function ConstellationNode({ scripture, position, onClick, isSelected, on
 
         {/* Core element */}
         <div className={cn(
-            "relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border flex items-center justify-center bg-card/80 backdrop-blur-sm transition-all duration-300",
-            isSelected ? "border-accent shadow-accent/40 shadow-lg" : "border-primary/50 group-hover:border-accent"
+            "relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 flex items-center justify-center bg-card/80 backdrop-blur-sm transition-all duration-300",
+            isSelected ? "border-accent shadow-accent/50 shadow-lg" : "border-primary/50 group-hover:border-accent"
         )}>
           {scripture.imageUrl ? (
             <Image
