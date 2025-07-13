@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useRef, useMemo } from 'react';
-import { motion, useDragControls } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ConstellationNode } from './constellation-node';
 import { Scripture } from '@/lib/types';
 
@@ -10,6 +10,7 @@ type ConstellationCanvasProps = {
   scriptures: Scripture[];
   onNodeClick: (scripture: Scripture) => void;
   selectedNodeId: string | null;
+  onDeleteRequest: (e: React.MouseEvent, scripture: Scripture) => void;
 };
 
 // A simple pseudo-random number generator for deterministic positioning
@@ -22,7 +23,7 @@ const mulberry32 = (seed: number) => {
   };
 };
 
-export function ConstellationCanvas({ scriptures, onNodeClick, selectedNodeId }: ConstellationCanvasProps) {
+export function ConstellationCanvas({ scriptures, onNodeClick, selectedNodeId, onDeleteRequest }: ConstellationCanvasProps) {
   const constraintsRef = useRef(null);
 
   const nodePositions = useMemo(() => {
@@ -59,6 +60,7 @@ export function ConstellationCanvas({ scriptures, onNodeClick, selectedNodeId }:
                             position={{ x: `${50 + position.x / 3}%`, y: `${50 + position.y / 3}%` }} // Convert to percentage for positioning
                             onClick={() => onNodeClick(scripture)}
                             isSelected={selectedNodeId === scripture.id}
+                            onDeleteRequest={(e) => onDeleteRequest(e, scripture)}
                         />
                     );
                 })}

@@ -5,18 +5,21 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Scripture } from '@/lib/types';
 import Image from 'next/image';
-import { BookOpen, FileText } from 'lucide-react';
+import { BookOpen, FileText, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from './ui/button';
 
 type ConstellationNodeProps = {
   scripture: Scripture;
   position: { x: string; y: string };
   onClick: () => void;
   isSelected: boolean;
+  onDeleteRequest: (e: React.MouseEvent) => void;
 };
 
-export function ConstellationNode({ scripture, position, onClick, isSelected }: ConstellationNodeProps) {
+export function ConstellationNode({ scripture, position, onClick, isSelected, onDeleteRequest }: ConstellationNodeProps) {
   const title = scripture.title || scripture.query || scripture.fileName || "Untitled";
+  const isCanonical = scripture.id.startsWith('canonical-');
 
   const variants = {
     initial: { scale: 0, opacity: 0 },
@@ -50,6 +53,25 @@ export function ConstellationNode({ scripture, position, onClick, isSelected }: 
             style={{ filter: `blur(${isSelected ? '24px' : '16px'})` }}
         />
 
+        {/* Delete Button */}
+        {!isCanonical && (
+          <motion.div
+            className="absolute -top-2 -right-2 z-30 opacity-0 group-hover:opacity-100"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+          >
+            <Button
+              variant="destructive"
+              size="icon"
+              className="rounded-full h-8 w-8 shadow-lg"
+              onClick={onDeleteRequest}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        )}
+
         {/* Core element */}
         <div className={cn(
             "relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border flex items-center justify-center bg-card/80 backdrop-blur-sm transition-all duration-300",
@@ -66,7 +88,7 @@ export function ConstellationNode({ scripture, position, onClick, isSelected }: 
             />
           ) : (
             <>
-                {scripture.id.startsWith('canonical-') ? 
+                {isCanonical ? 
                     <BookOpen className={cn("w-8 h-8 transition-colors", isSelected ? "text-accent" : "text-primary/70 group-hover:text-accent")} /> :
                     <FileText className={cn("w-8 h-8 transition-colors", isSelected ? "text-accent" : "text-primary/70 group-hover:text-accent")} />
                 }

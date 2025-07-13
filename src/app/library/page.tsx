@@ -15,18 +15,24 @@ import { ConstellationCanvas } from '@/components/constellation-canvas';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyForge } from '@/components/empty-forge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useScriptorium } from '@/context/scriptorium-context';
+import { DeleteSigilDialog } from './delete-sigil-dialog';
+import { cn } from '@/lib/utils';
 
 type ViewMode = 'constellation' | 'list';
 
-const STORAGE_KEY = 'scriptorium-annotations';
+const ANNOTATION_STORAGE_KEY = 'scriptorium-annotations';
 
 export default function LibraryPage() {
   const { toast } = useToast();
+  const { savedScriptures, deleteScripture } = useScriptorium();
   const [canonicalDocs, setCanonicalDocs] = useState<Scripture[]>([]);
+  const [allScriptures, setAllScriptures] = useState<Scripture[]>([]);
   const [loading, setLoading] = useState(true);
   const [allAnnotations, setAllAnnotations] = useState<Record<string, Annotation[]>>({});
   const [isLedgerOpen, setIsLedgerOpen] = useState(false);
   const [selectedScripture, setSelectedScripture] = useState<Scripture | null>(null);
+  const [scriptureToDelete, setScriptureToDelete] = useState<Scripture | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('constellation');
 
   useEffect(() => {
@@ -36,8 +42,7 @@ export default function LibraryPage() {
         const docs = await getDocsAction();
         setCanonicalDocs(docs.map(doc => ({ ...doc, id: `canonical-${doc.id}` })));
         
-        // Load annotations from localStorage
-        const savedAnnotations = localStorage.getItem(STORAGE_KEY);
+        const savedAnnotations = localStorage.getItem(ANNOTATION_STORAGE_KEY);
         if (savedAnnotations) {
           setAllAnnotations(JSON.parse(savedAnnotations));
         }
@@ -50,10 +55,14 @@ export default function LibraryPage() {
     }
     fetchDocs();
   }, [toast]);
+  
+  useEffect(() => {
+      setAllScriptures([...canonicalDocs, ...savedScriptures]);
+  }, [canonicalDocs, savedScriptures]);
 
   const saveAnnotations = (updatedAnnotations: Record<string, Annotation[]>) => {
     setAllAnnotations(updatedAnnotations);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAnnotations));
+    localStorage.setItem(ANNOTATION_STORAGE_KEY, JSON.stringify(updatedAnnotations));
   };
   
   const handleAnnotate = useCallback((annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => {
@@ -84,7 +93,23 @@ export default function LibraryPage() {
     }
   }
 
-  const hasScriptures = canonicalDocs.length > 0;
+  const handleDeleteRequest = (e: React.MouseEvent, scripture: Scripture) => {
+    e.stopPropagation(); // Prevent node selection when clicking delete
+    setScriptureToDelete(scripture);
+  };
+
+  const confirmDelete = () => {
+    if (scriptureToDelete) {
+      deleteScripture(scriptureToDelete.id);
+      toast({ title: "Scripture Deleted", description: `"${scriptureToDelete.query}" has been removed from your forge.`});
+      if (selectedScripture?.id === scriptureToDelete.id) {
+        handleSelectScripture(null);
+      }
+      setScriptureToDelete(null);
+    }
+  };
+
+  const hasScriptures = allScriptures.length > 0;
   const currentAnnotations = selectedScripture ? allAnnotations[selectedScripture.id] || [] : [];
 
   return (
@@ -110,22 +135,35 @@ export default function LibraryPage() {
                     <EmptyForge />
                 ) : viewMode === 'constellation' ? (
                     <ConstellationCanvas 
-                        scriptures={canonicalDocs} 
+                        scriptures={allScriptures} 
                         onNodeClick={handleSelectScripture}
                         selectedNodeId={selectedScripture?.id || null}
+                        onDeleteRequest={handleDeleteRequest}
                     />
                 ) : (
                     <div className="p-4">
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead className="sigil-obelisk">Type</TableHead>
                                     <TableHead className="sigil-obelisk">Scripture Title</TableHead>
+                                    <TableHead className="text-right"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {canonicalDocs.map(doc => (
+                                {allScriptures.map(doc => (
                                     <TableRow key={doc.id} onClick={() => handleSelectScripture(doc)} className="cursor-pointer">
-                                        <TableCell className="font-medium sigil-codex">{doc.title || doc.fileName}</TableCell>
+                                        <TableCell className={cn("font-medium", doc.id.startsWith('canonical-') ? 'text-primary' : 'text-accent')}>
+                                          {doc.id.startsWith('canonical-') ? 'Canonical' : 'Forged'}
+                                        </TableCell>
+                                        <TableCell className="font-medium sigil-codex">{doc.title || doc.query || doc.fileName}</TableCell>
+                                        <TableCell className="text-right">
+                                           {!doc.id.startsWith('canonical-') && (
+                                              <Button variant="ghost" size="icon" onClick={(e) => handleDeleteRequest(e, doc)}>
+                                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                              </Button>
+                                           )}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -143,7 +181,7 @@ export default function LibraryPage() {
               <SheetHeader className="pr-12">
                 <SheetTitle className="sigil-obelisk truncate">{selectedScripture.title || selectedScripture.query || selectedScripture.fileName}</SheetTitle>
                 <SheetDescription className="sigil-codex">
-                  Canonical scripture of the ΛΞVON OS. Annotations are saved locally.
+                  {selectedScripture.id.startsWith('canonical-') ? 'Canonical scripture of the ΛΞVON OS.' : 'User-forged scripture.'} Annotations are saved locally.
                 </SheetDescription>
               </SheetHeader>
 
@@ -195,6 +233,13 @@ export default function LibraryPage() {
               </div>
           </SheetContent>
       </Sheet>
+
+      <DeleteSigilDialog 
+        isOpen={!!scriptureToDelete} 
+        onClose={() => setScriptureToDelete(null)}
+        onConfirm={confirmDelete}
+        scriptureName={scriptureToDelete?.query || 'this scripture'}
+      />
     </div>
   );
 }
