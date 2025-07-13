@@ -61,47 +61,49 @@ export default function LibraryPage() {
     <div className="flex flex-col h-screen bg-background text-foreground">
       <Header />
 
-      <main className="flex-grow flex flex-col items-stretch pt-20">
-         {hasScriptures && !loading && (
-            <div className="flex justify-end p-4">
-                <Button variant="outline" onClick={() => setViewMode(viewMode === 'constellation' ? 'list' : 'constellation')}>
-                    {viewMode === 'constellation' ? <List className="mr-2" /> : <Share2 className="mr-2" />}
-                    {viewMode === 'constellation' ? 'List View' : 'Constellation View'}
-                </Button>
-            </div>
-        )}
-        <div className="flex-grow relative">
-            {loading ? (
-                <div className="w-full h-full flex items-center justify-center">
-                    <Skeleton className="w-3/4 h-3/4" />
-                </div>
-            ) : !hasScriptures ? (
-                <EmptyForge />
-            ) : viewMode === 'constellation' ? (
-                <ConstellationCanvas 
-                    scriptures={canonicalDocs} 
-                    onNodeClick={handleSelectScripture}
-                    selectedNodeId={selectedScripture?.id || null}
-                />
-            ) : (
-                <div className="container mx-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="sigil-obelisk">Scripture Title</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {canonicalDocs.map(doc => (
-                                <TableRow key={doc.id} onClick={() => handleSelectScripture(doc)} className="cursor-pointer">
-                                    <TableCell className="font-medium sigil-codex">{doc.title || doc.fileName}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+      <main className="flex-grow container mx-auto flex flex-col items-center justify-center p-4 pt-20">
+         <div className="w-full h-full max-w-7xl flex flex-col bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
+            {hasScriptures && !loading && (
+                <div className="flex justify-end p-4 border-b border-primary/20">
+                    <Button variant="outline" onClick={() => setViewMode(viewMode === 'constellation' ? 'list' : 'constellation')} className="bg-background/50">
+                        {viewMode === 'constellation' ? <List className="mr-2" /> : <Share2 className="mr-2" />}
+                        {viewMode === 'constellation' ? 'List View' : 'Constellation View'}
+                    </Button>
                 </div>
             )}
-        </div>
+            <div className="flex-grow relative">
+                {loading ? (
+                    <div className="w-full h-full flex items-center justify-center p-4">
+                        <Skeleton className="w-full h-full" />
+                    </div>
+                ) : !hasScriptures ? (
+                    <EmptyForge />
+                ) : viewMode === 'constellation' ? (
+                    <ConstellationCanvas 
+                        scriptures={canonicalDocs} 
+                        onNodeClick={handleSelectScripture}
+                        selectedNodeId={selectedScripture?.id || null}
+                    />
+                ) : (
+                    <div className="p-4">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="sigil-obelisk">Scripture Title</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {canonicalDocs.map(doc => (
+                                    <TableRow key={doc.id} onClick={() => handleSelectScripture(doc)} className="cursor-pointer">
+                                        <TableCell className="font-medium sigil-codex">{doc.title || doc.fileName}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
+            </div>
+         </div>
       </main>
 
       <Sheet open={!!selectedScripture} onOpenChange={(isOpen) => !isOpen && handleSelectScripture(null)}>

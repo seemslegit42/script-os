@@ -5,19 +5,19 @@
 
 @layer base {
   :root {
-    --background: 0 0% 4%; /* Obsidian Black */
+    --background: 240 10% 3.9%; /* Obsidian Black */
     --foreground: 0 0% 98%;
-    --card: 279 50% 15%; /* Lightened for better contrast */
+    --card: 279 40% 12%; /* Dark Purple Glass */
     --card-foreground: 0 0% 98%;
     --popover: 279 60% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 279 100% 34%; /* #6A0DAD Imperial Purple */
-    --primary-foreground: 279 20% 95%;
+    --primary: 279 80% 60%; /* #8A2BE2 Imperial Purple - brighter for glow */
+    --primary-foreground: 0 0% 98%;
     --secondary: 158 51% 55%; /* #3EB991 Patina Green */
     --secondary-foreground: 158 40% 10%;
-    --muted: 240 5% 15%;
+    --muted: 240 5% 25%;
     --muted-foreground: 240 5% 65%;
-    --accent: 177 70% 41%; /* #20B2AA Roman Aqua */
+    --accent: 177 80% 50%; /* #14D4C4 Roman Aqua - brighter for glow */
     --accent-foreground: 177 50% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -34,19 +34,19 @@
   }
 
   .dark {
-    --background: 0 0% 4%; /* Obsidian Black */
+    --background: 240 10% 3.9%; /* Obsidian Black */
     --foreground: 0 0% 98%;
-    --card: 279 50% 15%; /* Lightened for better contrast */
+    --card: 279 40% 12%; /* Dark Purple Glass */
     --card-foreground: 0 0% 98%;
     --popover: 279 60% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 279 100% 34%; /* #6A0DAD Imperial Purple */
-    --primary-foreground: 279 20% 95%;
+    --primary: 279 80% 60%; /* #8A2BE2 Imperial Purple - brighter for glow */
+    --primary-foreground: 0 0% 98%;
     --secondary: 158 51% 55%; /* #3EB991 Patina Green */
     --secondary-foreground: 158 40% 10%;
-    --muted: 240 5% 15%;
+    --muted: 240 5% 25%;
     --muted-foreground: 240 5% 65%;
-    --accent: 177 70% 41%; /* #20B2AA Roman Aqua */
+    --accent: 177 80% 50%; /* #14D4C4 Roman Aqua - brighter for glow */
     --accent-foreground: 177 50% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -85,7 +85,7 @@
     pointer-events: none;
     transform-origin: center;
   }
-
+  
   /* Tier Classes */
   .sigil-obelisk {
     font-family: var(--font-headline);

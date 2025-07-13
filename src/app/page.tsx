@@ -18,7 +18,7 @@ export default function ScriptoriumPage() {
       <AethericStreams isThinking={isPending} />
       <Header />
       
-      <main className="container mx-auto flex flex-col h-[calc(100vh-80px)] pt-20">
+      <main className="container mx-auto flex flex-col items-center justify-center h-screen pt-20 pb-4">
         <ConversationManager startTransition={startTransition} isPending={isPending} />
       </main>
     </>

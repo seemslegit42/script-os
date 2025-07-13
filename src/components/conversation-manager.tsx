@@ -33,6 +33,13 @@ export function ConversationManager({ startTransition, isPending }: Conversation
   const { applyState } = useTypographicState();
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
   
+  useEffect(() => {
+    startTransition(() => {
+      // This is a no-op, but it correctly links the parent's transition state
+      // to the action's pending state.
+    });
+  }, [isActionPending, startTransition]);
+
   // Effect to scroll to the bottom of the conversation
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -67,7 +74,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
   };
   
   return (
-    <div className="flex flex-col h-full bg-card/70 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 rounded-t-lg">
+    <div className="flex flex-col h-full w-full max-w-4xl bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
       <ScrollArea className="flex-grow p-4 md:p-6" ref={scrollAreaRef}>
         <div className="space-y-6">
           {state.conversation.length === 0 && (
@@ -91,7 +98,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
               {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary mt-2" />}
               <div className={cn(
                   "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex", 
-                  msg.role === 'user' ? 'bg-primary/20 text-primary-foreground' : 'bg-background/50',
+                  msg.role === 'user' ? 'bg-primary/30' : 'bg-background/50',
                   msg.isError && 'bg-destructive/20 text-destructive-foreground'
                 )}>
 
