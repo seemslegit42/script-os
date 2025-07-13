@@ -90,7 +90,7 @@ export function ConstellationNode({ scripture, position, onClick, isSelected, on
             <>
                 {isCanonical ? 
                     <BookOpen className={cn("w-8 h-8 transition-colors", isSelected ? "text-accent" : "text-primary/70 group-hover:text-accent")} /> :
-                    <FileText className={cn("w-8 h-8 transition-colors", isSelected ? "text-accent" : "text-primary/70 group-hover:text-accent")} />
+                    <FileText className={cn("w-8 h-8 transition-colors", isSelected ? "text-accent" : "text-accent/70 group-hover:text-accent")} />
                 }
             </>
           )}

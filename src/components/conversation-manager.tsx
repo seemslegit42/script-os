@@ -1,13 +1,15 @@
 
 'use client';
 
-import React, { useRef, useEffect, useActionState } from 'react';
+import React, { useRef, useEffect, useActionState, useState } from 'react';
 import { unifiedConversationAction, ConversationState, ConversationMessage } from '@/app/actions';
 import { useTypographicState } from '@/context/typographic-state-context';
+import { useScriptorium } from '@/context/scriptorium-context';
+import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, CircleDashed, RotateCcw } from 'lucide-react';
+import { Bot, User, Send, CircleDashed, RotateCcw, Sparkles } from 'lucide-react';
 import { FocusLayer } from './focus-layer';
 import Image from 'next/image';
 import { ScribeSigil } from './icons';
@@ -27,12 +29,14 @@ const initialState: ConversationState = {
   error: null,
 };
 
-
 export function ConversationManager({ startTransition, isPending }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
+  const { addScripture } = useScriptorium();
+  const { toast } = useToast();
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
+  const [hasSaved, setHasSaved] = useState(false);
   
   useEffect(() => {
     startTransition(() => {
@@ -40,6 +44,10 @@ export function ConversationManager({ startTransition, isPending }: Conversation
       // to the action's pending state.
     });
   }, [isActionPending, startTransition]);
+
+  useEffect(() => {
+    setHasSaved(false); // Reset save state when context changes
+  }, [state.context]);
 
   // Effect to scroll to the bottom of the conversation
   useEffect(() => {
@@ -82,6 +90,25 @@ export function ConversationManager({ startTransition, isPending }: Conversation
         formAction(formData);
     });
   }
+
+  const handleSaveToForge = (msg: ConversationMessage) => {
+    if (!msg.sigil || !msg.query) return;
+
+    const newScripture = {
+        id: `forged-${Date.now()}`,
+        query: msg.query,
+        why: msg.sigil.why,
+        how: msg.sigil.how,
+        imageUrl: msg.imageUrl,
+        createdAt: new Date().toISOString(),
+    };
+    addScripture(newScripture);
+    setHasSaved(true);
+    toast({
+        title: "Scripture Saved",
+        description: "It is now available in your Library.",
+    });
+  };
 
   return (
     <div className="flex flex-col h-full w-full max-w-4xl bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
@@ -132,6 +159,10 @@ export function ConversationManager({ startTransition, isPending }: Conversation
                           />
                         )}
                         <FocusLayer whyContent={msg.sigil.why} howContent={msg.sigil.how} />
+                        <Button onClick={() => handleSaveToForge(msg)} variant="outline" className="w-full" disabled={hasSaved}>
+                            <Sparkles className="mr-2" />
+                            {hasSaved ? 'Bound to Scriptorium' : 'Bind to Scriptorium'}
+                        </Button>
                     </div>
                 ) : (
                     <p className="m-0">{msg.content}</p>

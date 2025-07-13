@@ -4,6 +4,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { TypographicStateProvider } from '@/context/typographic-state-context';
+import { ScriptoriumProvider } from '@/context/scriptorium-context';
+import { ReactNode } from 'react';
 
 /**
  * Defines the metadata for the application, including the title and description.
@@ -13,6 +15,22 @@ export const metadata: Metadata = {
   title: 'Scriptorium',
   description: 'A sentient codex for personal myth.',
 };
+
+/**
+ * A client-side component that wraps all context providers.
+ * This isolates client-specific logic from the root server component layout.
+ */
+function Providers({ children }: { children: ReactNode }) {
+  'use client';
+  return (
+    <TypographicStateProvider>
+      <ScriptoriumProvider>
+        {children}
+        <Toaster />
+      </ScriptoriumProvider>
+    </TypographicStateProvider>
+  );
+}
 
 /**
  * The root layout component for the entire application.
@@ -42,10 +60,9 @@ export default function RootLayout({
         `}} />
       </head>
       <body className={cn('antialiased')}>
-        <TypographicStateProvider>
+        <Providers>
             {children}
-            <Toaster />
-        </TypographicStateProvider>
+        </Providers>
       </body>
     </html>
   );
