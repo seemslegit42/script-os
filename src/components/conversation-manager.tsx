@@ -7,11 +7,12 @@ import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, CircleDashed } from 'lucide-react';
+import { Bot, User, Send, CircleDashed, RotateCcw } from 'lucide-react';
 import { FocusLayer } from './focus-layer';
 import Image from 'next/image';
 import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 type ConversationManagerProps = {
     startTransition: React.TransitionStartFunction;
@@ -63,6 +64,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const query = formData.get('query') as string;
+
     if (!query?.trim()) return;
 
     startTransition(() => {
@@ -73,6 +75,14 @@ export function ConversationManager({ startTransition, isPending }: Conversation
     if (textarea) textarea.value = '';
   };
   
+  const handleReset = () => {
+    startTransition(() => {
+        const formData = new FormData();
+        formData.append('reset', 'true');
+        formAction(formData);
+    });
+  }
+
   return (
     <div className="flex flex-col h-full w-full max-w-4xl bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
       <ScrollArea className="flex-grow p-4 md:p-6" ref={scrollAreaRef}>
@@ -159,6 +169,20 @@ export function ConversationManager({ startTransition, isPending }: Conversation
               }
             }}
           />
+          {state.context && (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button type="button" variant="ghost" size="icon" onClick={handleReset} disabled={isPending}>
+                            <RotateCcw />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>New Scripture</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+          )}
           <Button type="submit" size="icon" disabled={isPending}>
             {isPending ? <CircleDashed className="animate-spin" /> : <Send />}
           </Button>

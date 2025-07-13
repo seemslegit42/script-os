@@ -28,6 +28,15 @@ export type ConversationState = {
   isCreation?: boolean;
 };
 
+const initialState: ConversationState = {
+    conversation: [],
+    context: null,
+    contextImageUrl: null,
+    contextQuery: null,
+    error: null,
+};
+
+
 export async function unifiedConversationAction(
   prevState: ConversationState,
   formData: FormData
@@ -36,7 +45,12 @@ export async function unifiedConversationAction(
   const context = formData.get('context') as string | null;
   const contextImageUrl = formData.get('contextImageUrl') as string | null;
   const contextQuery = formData.get('contextQuery') as string | null;
+  const reset = formData.get('reset') === 'true';
 
+  if (reset) {
+    return initialState;
+  }
+  
   if (!query) {
     return {...prevState, error: 'Query is required.'};
   }
