@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/header';
 import { getDocsAction } from '@/app/actions';
@@ -111,13 +112,34 @@ export default function LibraryPage() {
 
   const hasScriptures = allScriptures.length > 0;
   const currentAnnotations = selectedScripture ? allAnnotations[selectedScripture.id] || [] : [];
+  
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+      y: 20
+    },
+    in: {
+      opacity: 1,
+      y: 0
+    },
+    out: {
+      opacity: 0,
+      y: -20
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       <Header />
 
       <main className="flex-grow container mx-auto flex flex-col items-center justify-center p-4 pt-20">
-         <div className="w-full h-full max-w-7xl flex flex-col bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
+         <motion.div 
+            initial="initial"
+            animate="in"
+            exit="out"
+            variants={pageVariants}
+            transition={{ type: 'tween', ease: 'anticipate', duration: 0.5 }}
+            className="w-full h-full max-w-7xl flex flex-col bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
             {hasScriptures && !loading && (
                 <div className="flex justify-end p-4 border-b border-primary/20">
                     <Button variant="outline" onClick={() => setViewMode(viewMode === 'constellation' ? 'list' : 'constellation')} className="bg-background/50">
@@ -171,7 +193,7 @@ export default function LibraryPage() {
                     </div>
                 )}
             </div>
-         </div>
+         </motion.div>
       </main>
 
       <Sheet open={!!selectedScripture} onOpenChange={(isOpen) => !isOpen && handleSelectScripture(null)}>
