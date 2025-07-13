@@ -7,6 +7,18 @@ import {interrogateSigil} from '@/ai/flows/interrogate-sigil-flow';
 import {generateSpeech} from '@/ai/flows/generate-speech-flow';
 import { getDocs } from '@/lib/docs';
 
+/**
+ * Represents a single message in the conversation.
+ * @property {'user' | 'agent'} role - The speaker of the message.
+ * @property {string} content - The text content of the message.
+ * @property {GenerateSigilOutput} [sigil] - The generated 'Why' and 'How' content, if the message is a creation response.
+ * @property {string} [imageUrl] - The URL of the generated image for a new scripture.
+ * @property {string} [query] - The original user query that resulted in this message.
+ * @property {string | null} [audioUrl] - The data URI for the generated speech audio.
+ * @property {boolean} [isThinking] - True if this is a temporary message indicating the agent is processing.
+ * @property {boolean} [isCreation] - True if this message represents the creation of a new scripture.
+ * @property {boolean} [isError] - True if this message represents an error.
+ */
 export type ConversationMessage = {
   role: 'user' | 'agent';
   content: string;
@@ -19,6 +31,15 @@ export type ConversationMessage = {
   isError?: boolean;
 };
 
+/**
+ * Represents the entire state of the conversation.
+ * @property {ConversationMessage[]} conversation - The array of messages in the conversation history.
+ * @property {string | null} context - The full text of the current scripture being interrogated.
+ * @property {string | null} contextImageUrl - The image URL of the scripture being interrogated.
+ * @property {string | null} contextQuery - The original query for the scripture being interrogated.
+ * @property {string | null} error - An error message, if any occurred.
+ * @property {boolean} [isCreation] - True if the last action was a scripture creation.
+ */
 export type ConversationState = {
   conversation: ConversationMessage[];
   context: string | null;
@@ -37,6 +58,15 @@ const initialState: ConversationState = {
 };
 
 
+/**
+ * A unified server action to handle the entire conversation logic.
+ * It manages both the creation of new scriptures ("sigils") and the interrogation of existing ones.
+ * This function is designed to be used with `useActionState`.
+ * @param {ConversationState} prevState - The previous state of the conversation.
+ * @param {FormData} formData - The form data submitted by the user. Must contain a 'query' field.
+ *   Can also contain 'context', 'contextImageUrl', 'contextQuery', and 'reset'.
+ * @returns {Promise<ConversationState>} The new state of the conversation.
+ */
 export async function unifiedConversationAction(
   prevState: ConversationState,
   formData: FormData
@@ -142,6 +172,10 @@ export async function unifiedConversationAction(
   }
 }
 
+/**
+ * Fetches the canonical documents from the local filesystem.
+ * @returns {Promise<any[]>} A promise that resolves to an array of document objects.
+ */
 export async function getDocsAction() {
     const docs = await getDocs();
     return docs;

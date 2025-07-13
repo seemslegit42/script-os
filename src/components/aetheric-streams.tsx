@@ -4,10 +4,20 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import React, { useState, useEffect, useMemo } from "react";
 
+/**
+ * Props for the AethericStreams component.
+ * @property {boolean} isThinking - Whether the main process is active, which influences the stream animation.
+ */
 type AethericStreamsProps = {
   isThinking: boolean;
 };
 
+/**
+ * A component that renders an animated, ambient background of "aetheric streams".
+ * The animation speed and density change based on the `isThinking` prop.
+ * This is a purely decorative component to enhance the visual aesthetic.
+ * @param {AethericStreamsProps} props - The component's props.
+ */
 export function AethericStreams({ isThinking }: AethericStreamsProps) {
   const isMobile = useIsMobile();
   const [streams, setStreams] = useState<React.ReactNode[]>([]);

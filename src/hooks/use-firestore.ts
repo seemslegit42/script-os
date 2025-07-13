@@ -16,8 +16,9 @@ import {
 } from 'firebase/firestore';
 
 /**
- * A custom hook for interacting with a Firestore collection.
- * It provides real-time data fetching, loading and error states.
+ * A custom hook for interacting with a Firestore collection in real-time.
+ * It provides data fetching, loading state, and error handling.
+ * @deprecated This hook is no longer in active use.
  * @param {string} collectionName - The name of the Firestore collection to interact with.
  * @param {QueryConstraint[] | null} queryConstraints - An array of Firestore query constraints.
  * @returns {{

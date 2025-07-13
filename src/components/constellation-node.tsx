@@ -9,6 +9,14 @@ import { BookOpen, FileText, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 
+/**
+ * Props for the ConstellationNode component.
+ * @property {Scripture} scripture - The scripture data to represent.
+ * @property {{ x: string; y: string }} position - The absolute position of the node on the canvas.
+ * @property {() => void} onClick - Callback function when the node is clicked.
+ * @property {boolean} isSelected - Whether the node is currently selected.
+ * @property {(e: React.MouseEvent) => void} onDeleteRequest - Callback for when the delete button is clicked.
+ */
 type ConstellationNodeProps = {
   scripture: Scripture;
   position: { x: string; y: string };
@@ -17,6 +25,11 @@ type ConstellationNodeProps = {
   onDeleteRequest: (e: React.MouseEvent) => void;
 };
 
+/**
+ * A component representing a single, interactive node in the ConstellationCanvas.
+ * It displays a scripture's sigil or a fallback icon and handles selection and deletion states.
+ * @param {ConstellationNodeProps} props - The component's props.
+ */
 export function ConstellationNode({ scripture, position, onClick, isSelected, onDeleteRequest }: ConstellationNodeProps) {
   const title = scripture.title || scripture.query || scripture.fileName || "Untitled";
   const isCanonical = scripture.id.startsWith('canonical-');

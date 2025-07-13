@@ -8,6 +8,11 @@ import { Header } from "@/components/header";
 import Head from "next/head";
 import { ConversationManager } from "@/components/conversation-manager";
 
+/**
+ * The main page of the Scriptorium application.
+ * This page serves as the primary interface for conversing with the AI Scribe.
+ * It features a dynamic background and the central conversation manager component.
+ */
 export default function ScriptoriumPage() {
   const [isPending, startTransition] = React.useTransition();
 

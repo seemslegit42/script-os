@@ -8,12 +8,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { MessageSquareQuote } from 'lucide-react';
 import { Annotation } from '@/lib/types';
 
+/**
+ * Props for the Annotator component.
+ * @property {React.ReactNode} children - The content that can be annotated.
+ * @property {string} contentId - A unique identifier for the content being annotated.
+ * @property {(annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => void} onAnnotate - Callback function when a new annotation is created.
+ */
 type AnnotatorProps = {
   children: React.ReactNode;
   contentId: string;
   onAnnotate: (annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => void;
 };
 
+/**
+ * A component that wraps content and allows users to select text and create annotations.
+ * It displays a popover on text selection to add a comment.
+ * @param {AnnotatorProps} props - The component's props.
+ */
 export function Annotator({ children, contentId, onAnnotate }: AnnotatorProps) {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);

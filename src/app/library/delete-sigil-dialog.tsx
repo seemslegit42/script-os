@@ -12,6 +12,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+/**
+ * Props for the DeleteSigilDialog component.
+ * @property {boolean} isOpen - Whether the dialog is currently open.
+ * @property {() => void} onClose - Function to call when the dialog should be closed.
+ * @property {() => void} onConfirm - Function to call when the delete action is confirmed.
+ * @property {string} scriptureName - The name of the scripture being deleted, for display in the dialog.
+ */
 type DeleteSigilDialogProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +26,10 @@ type DeleteSigilDialogProps = {
   scriptureName: string;
 };
 
+/**
+ * A modal dialog component to confirm the deletion of a scripture.
+ * @param {DeleteSigilDialogProps} props - The component's props.
+ */
 export function DeleteSigilDialog({ isOpen, onClose, onConfirm, scriptureName }: DeleteSigilDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>

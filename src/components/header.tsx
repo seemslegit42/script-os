@@ -6,6 +6,10 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { Book } from 'lucide-react';
 
+/**
+ * The global header component for the application.
+ * It provides the main branding and navigation links.
+ */
 export function Header() {
     return (
         <>

@@ -7,6 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 
 const SCRIPTORIUM_STORAGE_KEY = 'scriptorium-saved-scriptures';
 
+/**
+ * Defines the shape of the Scriptorium context.
+ * @property {Scripture[]} savedScriptures - An array of scriptures saved by the user.
+ * @property {(scripture: Scripture) => void} addScripture - Function to add a new scripture to the collection.
+ * @property {(scriptureId: string) => void} deleteScripture - Function to delete a scripture from the collection.
+ */
 interface ScriptoriumContextType {
   savedScriptures: Scripture[];
   addScripture: (scripture: Scripture) => void;
@@ -15,6 +21,11 @@ interface ScriptoriumContextType {
 
 const ScriptoriumContext = createContext<ScriptoriumContextType | undefined>(undefined);
 
+/**
+ * A provider component that manages the state of user-saved scriptures.
+ * It handles loading from and saving to localStorage to persist the collection.
+ * @param {{ children: ReactNode }} props - The child components to be rendered within the provider.
+ */
 export const ScriptoriumProvider = ({ children }: { children: ReactNode }) => {
   const [savedScriptures, setSavedScriptures] = useState<Scripture[]>([]);
   const { toast } = useToast();
@@ -71,6 +82,12 @@ export const ScriptoriumProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+/**
+ * A custom hook to access the Scriptorium context.
+ * Provides an easy way to interact with the saved scriptures collection.
+ * @returns {ScriptoriumContextType} The Scriptorium context object.
+ * @throws {Error} If used outside of a `ScriptoriumProvider`.
+ */
 export const useScriptorium = () => {
   const context = useContext(ScriptoriumContext);
   if (context === undefined) {

@@ -185,7 +185,7 @@ function toast({ ...props }: Toast) {
 *   toasts: ToasterToast[],
 *   toast: (props: Toast) => { id: string, dismiss: () => void, update: (props: ToasterToast) => void },
 *   dismiss: (toastId?: string) => void
-* }}
+* }} An object containing the current toasts and functions to manipulate them.
 */
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)

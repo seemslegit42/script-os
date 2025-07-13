@@ -16,6 +16,11 @@ import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
+/**
+ * Props for the ConversationManager component.
+ * @property {React.TransitionStartFunction} startTransition - The startTransition function from `useTransition`.
+ * @property {boolean} isPending - The pending state from `useTransition`.
+ */
 type ConversationManagerProps = {
     startTransition: React.TransitionStartFunction;
     isPending: boolean;
@@ -29,6 +34,11 @@ const initialState: ConversationState = {
   error: null,
 };
 
+/**
+ * The main component for managing and displaying the conversation with the AI Scribe.
+ * It handles form submission, displays messages, and manages conversational state.
+ * @param {ConversationManagerProps} props - The component's props.
+ */
 export function ConversationManager({ startTransition, isPending }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);

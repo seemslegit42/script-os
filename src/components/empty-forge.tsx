@@ -6,6 +6,10 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sparkles } from 'lucide-react';
 
+/**
+ * A component displayed on the Library page when no scriptures are available.
+ * It provides a message and a clear call-to-action to guide the user.
+ */
 export function EmptyForge() {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center text-center p-8">

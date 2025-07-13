@@ -5,6 +5,11 @@
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
+/**
+ * A decorative, animated SVG icon representing the Scribe or Oracle.
+ * It's composed of several orbiting and glowing geometric shapes.
+ * @param {React.ComponentProps<'svg'>} props - Standard SVG component props.
+ */
 export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   return (
     <svg
@@ -91,7 +96,11 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
   );
 };
 
-
+/**
+ * A decorative, animated SVG icon used to provide feedback when saving a scripture.
+ * It features inward-spiraling lines that converge on a stable core.
+ * @param {React.ComponentProps<'svg'>} props - Standard SVG component props.
+ */
 export const SaveSigil = ({ className, ...props }: React.ComponentProps<'svg'>) => {
   return (
     <svg

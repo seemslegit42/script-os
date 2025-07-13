@@ -6,6 +6,13 @@ import { motion } from 'framer-motion';
 import { ConstellationNode } from './constellation-node';
 import { Scripture } from '@/lib/types';
 
+/**
+ * Props for the ConstellationCanvas component.
+ * @property {Scripture[]} scriptures - The array of scriptures to display as nodes.
+ * @property {(scripture: Scripture) => void} onNodeClick - Callback function when a node is clicked.
+ * @property {string | null} selectedNodeId - The ID of the currently selected scripture node.
+ * @property {(e: React.MouseEvent, scripture: Scripture) => void} onDeleteRequest - Callback function when a delete action is initiated on a node.
+ */
 type ConstellationCanvasProps = {
   scriptures: Scripture[];
   onNodeClick: (scripture: Scripture) => void;
@@ -13,7 +20,12 @@ type ConstellationCanvasProps = {
   onDeleteRequest: (e: React.MouseEvent, scripture: Scripture) => void;
 };
 
-// A simple pseudo-random number generator for deterministic positioning
+/**
+ * A simple pseudo-random number generator for deterministic positioning.
+ * This ensures that the constellation layout is the same every time for the same set of scriptures.
+ * @param {number} seed - The seed for the random number generator.
+ * @returns {() => number} A function that returns a pseudo-random number between 0 and 1.
+ */
 const mulberry32 = (seed: number) => {
   return () => {
     let t = (seed += 0x6d2b79f5);
@@ -23,6 +35,11 @@ const mulberry32 = (seed: number) => {
   };
 };
 
+/**
+ * A component that renders scriptures as an interactive, draggable constellation of nodes.
+ * The layout is deterministic based on the scripture IDs.
+ * @param {ConstellationCanvasProps} props - The component's props.
+ */
 export function ConstellationCanvas({ scriptures, onNodeClick, selectedNodeId, onDeleteRequest }: ConstellationCanvasProps) {
   const constraintsRef = useRef(null);
 

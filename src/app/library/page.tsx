@@ -24,6 +24,10 @@ type ViewMode = 'constellation' | 'list';
 
 const ANNOTATION_STORAGE_KEY = 'scriptorium-annotations';
 
+/**
+ * The main page for the Library, where users can view and interact with
+ * both canonical and user-forged scriptures.
+ */
 export default function LibraryPage() {
   const { toast } = useToast();
   const { savedScriptures, deleteScripture } = useScriptorium();
