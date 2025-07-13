@@ -81,6 +81,9 @@ export function ConversationManager({ startTransition, isPending }: Conversation
 
     const textarea = e.currentTarget.querySelector('textarea');
     if (textarea) textarea.value = '';
+    // Manually trigger resize after clearing
+    const event = new Event('input', { bubbles: true });
+    textarea?.dispatchEvent(event);
   };
   
   const handleReset = () => {
@@ -178,7 +181,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
         </div>
       </ScrollArea>
       <div className="p-4 border-t border-primary/20 bg-background/50 rounded-b-lg">
-        <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-center gap-2">
+        <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-start gap-2">
           <input type="hidden" name="context" value={state.context || ''} />
           <input type="hidden" name="contextImageUrl" value={state.contextImageUrl || ''} />
           <input type="hidden" name="contextQuery" value={state.contextQuery || ''} />
@@ -187,7 +190,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
             placeholder={state.context ? `Interrogate "${state.contextQuery}"...` : 'State your intent...'}
             required
             className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
-            rows={1}
             disabled={isPending}
             onFocus={() => applyState('active')}
             onBlur={() => applyState('default')}
