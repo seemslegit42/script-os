@@ -5,25 +5,34 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%; /* Obsidian Black */
+    --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 279 40% 12%; /* Dark Purple Glass */
+
+    --card: 240 4.8% 9.5%;
     --card-foreground: 0 0% 98%;
-    --popover: 279 60% 8%;
+ 
+    --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 279 80% 60%; /* #8A2BE2 Imperial Purple - brighter for glow */
+ 
+    --primary: 279 80% 60%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 158 51% 55%; /* #3EB991 Patina Green */
+ 
+    --secondary: 158 51% 55%;
     --secondary-foreground: 158 40% 10%;
-    --muted: 240 5% 25%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 177 80% 50%; /* #14D4C4 Roman Aqua - brighter for glow */
+ 
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+ 
+    --accent: 177 80% 50%;
     --accent-foreground: 177 50% 10%;
+ 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 279 50% 30%; /* Purple-tinted border */
-    --input: 279 30% 20%;
-    --ring: 177 80% 51%; /* Ring color from Roman Aqua */
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
     --radius: 0.5rem;
 
     /* Typographic Variables */
@@ -34,25 +43,33 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%; /* Obsidian Black */
+    --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 279 40% 12%; /* Dark Purple Glass */
+ 
+    --card: 240 4.8% 9.5%;
     --card-foreground: 0 0% 98%;
-    --popover: 279 60% 8%;
+ 
+    --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 279 80% 60%; /* #8A2BE2 Imperial Purple - brighter for glow */
+ 
+    --primary: 279 80% 60%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 158 51% 55%; /* #3EB991 Patina Green */
+ 
+    --secondary: 158 51% 55%;
     --secondary-foreground: 158 40% 10%;
-    --muted: 240 5% 25%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 177 80% 50%; /* #14D4C4 Roman Aqua - brighter for glow */
+ 
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+ 
+    --accent: 177 80% 50%;
     --accent-foreground: 177 50% 10%;
+ 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 279 50% 30%; /* Purple-tinted border */
-    --input: 279 30% 20%;
-    --ring: 177 80% 51%; /* Ring color from Roman Aqua */
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
