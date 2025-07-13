@@ -6,18 +6,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageSquareQuote } from 'lucide-react';
-
-export type Annotation = {
-  id: string;
-  selection: string;
-  comment: string;
-  targetId: string;
-};
+import { Annotation } from '@/lib/types';
 
 type AnnotatorProps = {
   children: React.ReactNode;
   contentId: string;
-  onAnnotate: (annotation: Omit<Annotation, 'id'>) => void;
+  onAnnotate: (annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => void;
 };
 
 export function Annotator({ children, contentId, onAnnotate }: AnnotatorProps) {
@@ -63,11 +57,13 @@ export function Annotator({ children, contentId, onAnnotate }: AnnotatorProps) {
 
   const handleAnnotate = () => {
     if (!selection || !comment.trim()) return;
-    onAnnotate({
-      selection: selection.toString(),
-      comment: comment,
-      targetId: contentId,
-    });
+    onAnnotate(
+      {
+        selection: selection.toString(),
+        comment: comment,
+      },
+      contentId
+    );
     setComment('');
     setPopoverOpen(false);
     selection.removeAllRanges();

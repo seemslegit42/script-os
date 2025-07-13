@@ -1,4 +1,12 @@
 
+
+export type Annotation = {
+  id: string;
+  selection: string;
+  comment: string;
+  targetId: string;
+};
+
 export type Scripture = {
     id: string;
     title?: string;
@@ -10,4 +18,5 @@ export type Scripture = {
     how?: string;
     imageUrl?: string;
     createdAt?: any;
+    annotations?: Annotation[];
 };

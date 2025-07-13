@@ -1,15 +1,15 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Header } from '@/components/header';
 import { getDocsAction } from '@/app/actions';
-import { Scripture } from '@/lib/types';
-import { Annotation, Annotator } from '@/components/annotator';
+import { Scripture, Annotation } from '@/lib/types';
+import { Annotator } from '@/components/annotator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MessageSquareQuote, List, Share2 } from 'lucide-react';
+import { MessageSquareQuote, List, Share2, Trash2 } from 'lucide-react';
 import { FocusLayer } from '@/components/focus-layer';
 import { ConstellationCanvas } from '@/components/constellation-canvas';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,11 +18,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 type ViewMode = 'constellation' | 'list';
 
+const STORAGE_KEY = 'scriptorium-annotations';
+
 export default function LibraryPage() {
   const { toast } = useToast();
   const [canonicalDocs, setCanonicalDocs] = useState<Scripture[]>([]);
   const [loading, setLoading] = useState(true);
-  const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const [allAnnotations, setAllAnnotations] = useState<Record<string, Annotation[]>>({});
   const [isLedgerOpen, setIsLedgerOpen] = useState(false);
   const [selectedScripture, setSelectedScripture] = useState<Scripture | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('constellation');
@@ -33,6 +35,13 @@ export default function LibraryPage() {
         setLoading(true);
         const docs = await getDocsAction();
         setCanonicalDocs(docs.map(doc => ({ ...doc, id: `canonical-${doc.id}` })));
+        
+        // Load annotations from localStorage
+        const savedAnnotations = localStorage.getItem(STORAGE_KEY);
+        if (savedAnnotations) {
+          setAllAnnotations(JSON.parse(savedAnnotations));
+        }
+
       } catch (error) {
         toast({ title: "Error", description: "Could not load canonical scriptures.", variant: "destructive" });
       } finally {
@@ -42,20 +51,41 @@ export default function LibraryPage() {
     fetchDocs();
   }, [toast]);
 
-  const handleAnnotate = (annotation: Omit<Annotation, 'id'>) => {
-    const newAnnotation = { ...annotation, id: `ann-${Date.now()}` };
-    setAnnotations(prev => [...prev, newAnnotation]);
-    toast({ title: "Annotation Saved", description: "Your insight has been recorded in the session ledger." });
+  const saveAnnotations = (updatedAnnotations: Record<string, Annotation[]>) => {
+    setAllAnnotations(updatedAnnotations);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedAnnotations));
+  };
+  
+  const handleAnnotate = useCallback((annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => {
+    const newAnnotation: Annotation = { ...annotation, id: `ann-${Date.now()}`, targetId: contentId };
+    
+    const updatedAnnotations = { ...allAnnotations };
+    const currentScriptureAnnotations = updatedAnnotations[contentId] || [];
+    updatedAnnotations[contentId] = [...currentScriptureAnnotations, newAnnotation];
+
+    saveAnnotations(updatedAnnotations);
+    toast({ title: "Annotation Saved", description: "Your insight has been recorded." });
     setIsLedgerOpen(true);
+  }, [allAnnotations, toast]);
+
+  const handleDeleteAnnotation = (annotationId: string, contentId: string) => {
+    const updatedAnnotations = { ...allAnnotations };
+    const currentScriptureAnnotations = updatedAnnotations[contentId] || [];
+    updatedAnnotations[contentId] = currentScriptureAnnotations.filter(ann => ann.id !== annotationId);
+
+    saveAnnotations(updatedAnnotations);
+    toast({ title: "Annotation Deleted", description: "Your insight has been removed." });
   };
 
   const handleSelectScripture = (scripture: Scripture | null) => {
     setSelectedScripture(scripture);
-    setAnnotations([]);
-    setIsLedgerOpen(false);
+    if (!scripture) {
+      setIsLedgerOpen(false);
+    }
   }
 
   const hasScriptures = canonicalDocs.length > 0;
+  const currentAnnotations = selectedScripture ? allAnnotations[selectedScripture.id] || [] : [];
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
@@ -113,7 +143,7 @@ export default function LibraryPage() {
               <SheetHeader className="pr-12">
                 <SheetTitle className="sigil-obelisk truncate">{selectedScripture.title || selectedScripture.query || selectedScripture.fileName}</SheetTitle>
                 <SheetDescription className="sigil-codex">
-                  Canonical scripture of the ΛΞVON OS.
+                  Canonical scripture of the ΛΞVON OS. Annotations are saved locally.
                 </SheetDescription>
               </SheetHeader>
 
@@ -129,7 +159,7 @@ export default function LibraryPage() {
               <div className="flex justify-between items-center pt-4 border-t border-primary/20">
                 <Button variant="outline" size="sm" onClick={() => setIsLedgerOpen(true)}>
                   <MessageSquareQuote className="mr-2" />
-                  Ledger ({annotations.length})
+                  Ledger ({currentAnnotations.length})
                 </Button>
               </div>
             </>
@@ -138,19 +168,27 @@ export default function LibraryPage() {
       </Sheet>
 
       <Sheet open={isLedgerOpen} onOpenChange={setIsLedgerOpen}>
-          <SheetContent side="bottom" className="h-[40vh] bg-card/90 backdrop-blur-lg border-primary/30">
+          <SheetContent side="bottom" className="h-[40vh] bg-card/90 backdrop-blur-lg border-primary/30 flex flex-col">
               <SheetHeader>
                   <SheetTitle className="sigil-obelisk">Annotation Ledger</SheetTitle>
-                  <SheetDescription>Insights recorded during this session for "{selectedScripture?.title || selectedScripture?.query}". These are not persisted.</SheetDescription>
+                  <SheetDescription>Insights recorded for "{selectedScripture?.title || selectedScripture?.query}".</SheetDescription>
               </SheetHeader>
-              <div className="mt-4 overflow-y-auto h-[calc(100%-4rem)] space-y-4">
-                  {annotations.length === 0 ? (
-                      <p className="text-muted-foreground italic text-center pt-8">No annotations recorded in this session.</p>
+              <div className="mt-4 overflow-y-auto flex-grow space-y-4">
+                  {currentAnnotations.length === 0 ? (
+                      <p className="text-muted-foreground italic text-center pt-8">No annotations recorded for this scripture.</p>
                   ) : (
-                      annotations.map(ann => (
-                          <div key={ann.id} className="border-l-2 border-accent pl-4 py-2">
+                      currentAnnotations.map(ann => (
+                          <div key={ann.id} className="border-l-2 border-accent pl-4 py-2 group relative">
                               <blockquote className="italic text-accent-foreground/80 sigil-codex">&ldquo;{ann.selection}&rdquo;</blockquote>
                               <p className="mt-2 sigil-glyph">{ann.comment}</p>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100"
+                                onClick={() => handleDeleteAnnotation(ann.id, selectedScripture!.id)}
+                              >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
                           </div>
                       ))
                   )}
