@@ -2,6 +2,7 @@
 import { getDocs } from '@/lib/docs';
 import { notFound } from 'next/navigation';
 import { Header } from '@/components/header';
+import { Annotator } from '@/components/annotator';
 
 /**
  * Defines the props for the DocPage component.
@@ -45,8 +46,10 @@ export default async function DocPage({ params }: DocPageProps) {
       <Header />
       <main className="container mx-auto max-w-4xl py-24 px-4">
         <article className="prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded">
-          <h1>{doc.title}</h1>
-          <div dangerouslySetInnerHTML={{ __html: doc.html || '' }} />
+          <Annotator contentId={doc.id}>
+            <h1>{doc.title}</h1>
+            <div dangerouslySetInnerHTML={{ __html: doc.html || '' }} />
+          </Annotator>
         </article>
       </main>
     </>
