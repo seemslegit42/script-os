@@ -34,33 +34,47 @@ export function Annotator({ children, contentId }: AnnotatorProps) {
 
   const handleSelection = useCallback(() => {
     const currentSelection = window.getSelection();
-    if (currentSelection && currentSelection.toString().trim().length > 2 && contentRef.current?.contains(currentSelection.anchorNode)) {
+    if (
+      currentSelection &&
+      currentSelection.toString().trim().length > 2 &&
+      contentRef.current?.contains(currentSelection.anchorNode)
+    ) {
       setSelection(currentSelection);
       setPopoverOpen(true);
     } else {
-      // If popover is not being interacted with, close it.
-      if (!popoverOpen) {
-          setSelection(null);
-      }
+      // Don't close if the popover is the target
+      if (popoverOpen) return;
+      setSelection(null);
+      setPopoverOpen(false);
     }
   }, [popoverOpen]);
 
+
   useEffect(() => {
-    document.addEventListener('mouseup', handleSelection);
+    const handleMouseUp = (event: MouseEvent) => {
+      // Check if the mouseup event is inside the popover content
+      const popoverContent = document.querySelector('[data-radix-popover-content-wrapper]');
+      if (popoverContent?.contains(event.target as Node)) {
+        return;
+      }
+      handleSelection();
+    };
+    
+    document.addEventListener('mouseup', handleMouseUp);
     return () => {
-      document.removeEventListener('mouseup', handleSelection);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [handleSelection]);
   
   const getPopoverStyle = (): React.CSSProperties => {
-    if (!selection || selection.rangeCount === 0) {
+    if (!selection || selection.rangeCount === 0 || !popoverOpen) {
       return { display: 'none' };
     }
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
     return {
       position: 'absolute',
-      top: `${rect.top + window.scrollY - 40}px`,
+      top: `${rect.top + window.scrollY - 45}px`,
       left: `${rect.left + window.scrollX + rect.width / 2}px`,
       transform: 'translateX(-50%)',
       zIndex: 50,
@@ -85,10 +99,10 @@ export function Annotator({ children, contentId }: AnnotatorProps) {
   
   return (
     <div ref={contentRef} className="relative">
-      {selection && (
+      {selection && popoverOpen && (
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild style={getPopoverStyle()}>
-                <Button variant="outline" size="icon" className="rounded-full shadow-lg shadow-primary/20 bg-card border-primary">
+                <Button variant="outline" size="icon" className="rounded-full shadow-lg shadow-primary/20 bg-card border-primary" data-ai-hint="quote comment">
                     <MessageSquareQuote className="h-5 w-5 text-primary" />
                 </Button>
             </PopoverTrigger>
