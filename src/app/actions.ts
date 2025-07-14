@@ -44,6 +44,7 @@ const initialState: ConversationState = {
 /**
  * A unified server action to handle the entire conversation logic.
  * It sends the user's query to the canon and returns the scripture's response.
+ * This version uses streaming on the backend to improve performance.
  * @param {ConversationState} prevState - The previous state of the conversation.
  * @param {FormData} formData - The form data submitted by the user. Must contain a 'query' field.
  * @returns {Promise<ConversationState>} The new state of the conversation.
@@ -74,14 +75,26 @@ export async function unifiedConversationAction(
   };
 
   try {
-    const canonResult = await interrogateCanon({query});
-    const speechResult = await generateSpeech(canonResult.answer);
+    const stream = interrogateCanon({query});
+    let finalCanonResult: InterrogateCanonOutput | null = null;
+
+    // Consume the stream from the AI flow to get the final, complete answer.
+    for await (const chunk of stream) {
+      finalCanonResult = chunk;
+    }
+
+    if (!finalCanonResult) {
+      throw new Error("The Oracle's stream yielded no response.");
+    }
+    
+    // Now that we have the full text, generate speech.
+    const speechResult = await generateSpeech(finalCanonResult.answer);
 
     const agentResponseMessage: ConversationMessage = {
       role: 'agent',
-      content: marked.parse(canonResult.answer), // Parse markdown for rich content
-      sourceTitle: canonResult.source,
-      sourceMarkdown: canonResult.sourceMarkdown,
+      content: marked.parse(finalCanonResult.answer), // Parse markdown for rich content
+      sourceTitle: finalCanonResult.source,
+      sourceMarkdown: finalCanonResult.sourceMarkdown,
       audioUrl: speechResult.audioUrl,
     };
 
