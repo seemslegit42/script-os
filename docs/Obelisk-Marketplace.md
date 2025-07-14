@@ -34,3 +34,5 @@ This is not a simple store. It is a sanctum of power, accessible only to those w
 - **Economic End-Game**: The Marketplace provides a crucial end-game for the ΞCredit economy, giving true, tangible value to the in-system currency and rewarding the most dedicated users.
 - **Sovereignty Class**: Access is strictly tied to the user's plan and status, reinforcing the hierarchical and aspirational nature of the OS's society.
 - **Architectural Role**: It serves as the bridge between the digital and physical worlds, proving the core doctrine that ΞCredits can command real-world value
+
+[CMD: "BEEP, show me the Sovereign's Arsenal" | "launch_armory"]

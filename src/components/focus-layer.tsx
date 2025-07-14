@@ -5,6 +5,8 @@ import { marked } from 'marked';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';
 import React from 'react';
+import { Button } from './ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Props for the FocusLayer component.
@@ -28,62 +30,78 @@ const glossaryTerms: Record<string, { definition: string, id: string }> = {
   'Rite of Invocation': { definition: 'The narrative-driven onboarding process that establishes a user\'s identity and Vow.', id: 'rite-of-invocation' },
   'Folly Instruments': { definition: 'Gamified productivity tools and economic rituals where users can spend ΞCredits.', id: 'chaos-cards' },
   'Sovereignty Class': { definition: 'A user\'s rank within the system, granting access to deeper capabilities.', id: 'master-blueprint' },
+  'Obelisk Marketplace': { definition: 'A privileged, end-game utility for transmuting ΞCredits into real-world assets.', id: 'obelisk-marketplace' },
 };
 
 /**
  * A component that displays a single block of markdown content,
- * parsed into HTML for rich rendering. It also implements the "Crystalline Glossary"
- * by finding and replacing key terms with interactive, linked tooltips.
+ * parsed into HTML for rich rendering. It implements the "Crystalline Glossary"
+ * by linking key terms and the "Forged Command" by injecting interactive buttons.
  * @param {FocusLayerProps} props - The component props.
  */
 export function FocusLayer({ content }: FocusLayerProps) {
+  const { toast } = useToast();
   const proseClasses = "prose prose-sm prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded";
 
-  // The Nexus Weave Protocol: Now with linking.
-  const parsedHtmlWithGlossary = () => {
-    let processedContent = content || '';
+  const handleCommandClick = (command: string) => {
+    toast({
+      title: "Command Forged",
+      description: `Action triggered: "${command}" (This is a demonstration).`,
+    });
+  };
+
+  const renderContentWithCommands = () => {
+    const commandRegex = /\[CMD: "([^"]+)"\s*\|\s*"([^"]+)"\]/g;
+    const parts = content.split(commandRegex);
+    
+    const elements = [];
+    let textIndex = 0;
+
+    for (let i = 0; i < parts.length; i++) {
+        if (i % 3 === 0) {
+            elements.push(<div key={`text-${textIndex++}`} dangerouslySetInnerHTML={{ __html: parseMarkdownWithGlossary(parts[i]) }} />);
+        } else if (i % 3 === 1) {
+            const buttonText = parts[i];
+            const command = parts[i+1];
+            elements.push(
+                <div key={`cmd-${textIndex}`} className="flex justify-center my-4">
+                    <Button onClick={() => handleCommandClick(command)} variant="outline" className="shadow-lg shadow-primary/10 border-primary hover:bg-primary/10 hover:shadow-primary/20">
+                        {buttonText}
+                    </Button>
+                </div>
+            );
+            i++; // Skip next part as it's the command
+        }
+    }
+    return elements;
+  };
+  
+  const parseMarkdownWithGlossary = (markdown: string): string => {
+    let processedContent = markdown || '';
     const sortedTerms = Object.keys(glossaryTerms).sort((a, b) => b.length - a.length);
     
     sortedTerms.forEach(term => {
       const termData = glossaryTerms[term];
-      const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+      const regex = new RegExp(`\\b(${term})(?![^<]*>|[^<>]*<\\/a>)\\b`, 'gi');
       
-      const linkHtml = `
-        <span class="nexus-link-wrapper">
-          <a href="/library/${termData.id}" class="nexus-link text-accent border-b border-accent/50 hover:bg-accent/10 transition-colors">${term}</a>
-        </span>
-      `;
-      // Note: This simple regex replace doesn't support tooltips easily.
-      // We are prioritizing the hyperlink functionality as the primary mandate.
-      processedContent = processedContent.replace(regex, linkHtml);
+      const replacement = `<a href="/library/${termData.id}" class="nexus-link text-accent border-b border-accent/50 hover:bg-accent/10 transition-colors">${term}</a>`;
+      
+      processedContent = processedContent.replace(regex, (match, p1) => {
+        // A simple check to avoid replacing inside existing links.
+        // This is not foolproof but handles many cases.
+        return replacement;
+      });
     });
 
     return marked.parse(processedContent);
   };
   
-  // Custom renderer to add target="_blank" to external links but not our internal glossary links
-  const renderer = new marked.Renderer();
-  const linkRenderer = renderer.link;
-  renderer.link = (href, title, text) => {
-    const html = linkRenderer.call(renderer, href, title, text);
-    if (href && !href.startsWith('/') && !href.startsWith('#')) {
-      return html.replace(/^<a /, '<a target="_blank" rel="noopener noreferrer" ');
-    }
-    // internal links (glossary or others)
-    return html;
-  };
+  marked.setOptions({
+    renderer: new marked.Renderer(),
+    gfm: true,
+    breaks: false,
+    pedantic: false,
+  });
 
-  marked.setOptions({ renderer });
-
-
-  // This is a simplified approach. A more robust solution would parse the HTML
-  // and recursively replace text nodes to avoid breaking HTML tags.
-  // For this implementation, we'll apply it to the whole block.
-  // This is a limitation but demonstrates the principle.
-  return (
-    <div
-      className={proseClasses}
-      dangerouslySetInnerHTML={{ __html: parsedHtmlWithGlossary() }}
-    />
-  );
+  return <div className={proseClasses}>{renderContentWithCommands()}</div>;
 }
