@@ -1,4 +1,3 @@
-
 // src/components/icons.tsx
 'use client';
 
@@ -6,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 /**
- * A decorative, animated SVG icon representing the Scribe or Oracle.
- * It's composed of several orbiting and glowing geometric shapes.
+ * A decorative, animated SVG icon representing The Sovereign's Ledger.
+ * It's a complex, multi-layered armillary sphere that embodies the project's philosophy.
  * @param {React.ComponentProps<'svg'>} props - Standard SVG component props.
  */
 export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>) => {
@@ -15,83 +14,90 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
     <svg
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn('w-8 h-8', className)}
+      className={cn('w-10 h-10', className)}
       {...props}
     >
       <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
         <radialGradient id="core-gradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(var(--primary-foreground))" />
-            <stop offset="70%" stopColor="hsl(var(--primary))" />
+            <stop offset="0%" stopColor="hsl(var(--accent) / 0.8)" />
+            <stop offset="50%" stopColor="hsl(var(--secondary) / 0.7)" />
             <stop offset="100%" stopColor="hsl(var(--primary) / 0)" />
         </radialGradient>
+        <linearGradient id="crest-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary-foreground) / 0.9)" />
+            <stop offset="100%" stopColor="hsl(var(--primary-foreground) / 0.6)" />
+        </linearGradient>
       </defs>
+
+      <g id="rings">
+        {/* Ring 1 - Outer */}
+        <motion.circle
+          cx="50" cy="50" r="45"
+          fill="none" stroke="hsl(var(--primary) / 0.3)" strokeWidth="0.5"
+          initial={{ rotate: 0 }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+        />
+        {/* Ring 2 - Inner Dashed */}
+        <motion.circle
+          cx="50" cy="50" r="38"
+          fill="none" stroke="hsl(var(--accent) / 0.4)" strokeWidth="1" strokeDasharray="5 10"
+          initial={{ rotate: 90 }}
+          animate={{ rotate: -270 }}
+          transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
+        />
+         {/* Ring 3 - Vertical Ellipse */}
+        <motion.ellipse
+            cx="50" cy="50" rx="28" ry="42"
+            fill="none" stroke="hsl(var(--secondary) / 0.3)" strokeWidth="0.75"
+            initial={{ rotate: -20 }}
+            animate={{ rotate: 340 }}
+            transition={{ duration: 55, repeat: Infinity, ease: 'linear' }}
+        />
+         {/* Ring 4 - Horizontal Ellipse */}
+         <motion.ellipse
+            cx="50" cy="50" rx="42" ry="28"
+            fill="none" stroke="hsl(var(--secondary) / 0.3)" strokeWidth="0.75"
+            initial={{ rotate: 20 }}
+            animate={{ rotate: -340 }}
+            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+        />
+      </g>
 
       {/* Central Core */}
       <motion.circle
         cx="50"
         cy="50"
-        r="12"
+        r="15"
         fill="url(#core-gradient)"
         filter="url(#glow)"
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        animate={{ 
+            scale: [1, 1.03, 1],
+            opacity: [0.9, 1, 0.9]
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
       
-      {/* Orbiting Elements */}
-      <g>
-        <motion.circle
-          cx="50"
-          cy="50"
-          r="30"
-          fill="none"
-          stroke="hsl(var(--accent) / 0.5)"
-          strokeWidth="1.5"
-          initial={{ rotate: 0 }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.circle
-          cx="80" // 50 + 30 * cos(0)
-          cy="50" // 50 + 30 * sin(0)
-          r="4"
-          fill="hsl(var(--accent))"
-          filter="url(#glow)"
-          initial={{ transform: 'rotate(0deg) translateX(30px) rotate(0deg)' }}
-          animate={{ transform: 'rotate(360deg) translateX(30px) rotate(-360deg)' }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+       {/* Winged Crest */}
+       <g transform="translate(50 50) scale(0.3)">
+        <motion.path
+          d="M-35,2 L-15,2 L-15,10 C-15,10 -5,15 0,25 C5,15 15,10 15,10 L15,2 L35,2 L35,12 C35,12 25,20 10,35 L-10,35 C-25,20 -35,12 -35,12Z M0,0 L10,15 L-10,15Z"
+          fill="url(#crest-gradient)"
+          stroke="hsl(var(--primary-foreground) / 0.5)"
+          strokeWidth="2"
+          initial={{ y: 2, opacity: 0.8 }}
+          animate={{ y: [2, 0, 2], opacity: [0.8, 0.95, 0.8] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
       </g>
-      
-      <g>
-        <motion.circle
-          cx="50"
-          cy="50"
-          r="45"
-          fill="none"
-          stroke="hsl(var(--secondary) / 0.3)"
-          strokeWidth="1"
-          strokeDasharray="4 8"
-           initial={{ rotate: 45 }}
-          animate={{ rotate: -315 }}
-          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-        />
-         <motion.circle
-          cx="50"
-          cy="5.5" // 50 - 45.5 * cos(0)
-          r="3"
-          fill="hsl(var(--secondary))"
-          initial={{ transform: 'rotate(0deg) translateX(45px) rotate(0deg)' }}
-          animate={{ transform: 'rotate(-360deg) translateX(45px) rotate(360deg)' }}
-          transition={{ duration: 40, repeat: Infinity, ease: 'linear', delay: 1 }}
-        />
-      </g>
+
     </svg>
   );
 };
