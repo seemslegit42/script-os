@@ -3,12 +3,11 @@
 
 import { ScribeSigil } from './icons';
 import Link from 'next/link';
-import { Button } from './ui/button';
-import { Book } from 'lucide-react';
 
 /**
  * The global header component for the application.
- * It provides the main branding and navigation links.
+ * It provides the main branding. The Library link has been removed
+ * as its functionality is now merged into the main page.
  */
 export function Header() {
     return (
@@ -21,9 +20,7 @@ export function Header() {
                     </span>
                 </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
-                    <Link href="/library">
-                        <Button variant="outline" className="bg-card/50 backdrop-blur-sm"><Book className="mr-2" /> Library</Button>
-                    </Link>
+                    {/* The Library link is intentionally removed as this functionality is now on the main page. */}
                 </div>
             </header>
         </>

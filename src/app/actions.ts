@@ -6,6 +6,7 @@ import {generateSigilImage} from '@/ai/flows/generate-sigil-image';
 import {interrogateSigil} from '@/ai/flows/interrogate-sigil-flow';
 import {generateSpeech} from '@/ai/flows/generate-speech-flow';
 import { getDocs } from '@/lib/docs';
+import { marked } from 'marked';
 
 /**
  * Represents a single message in the conversation.
@@ -77,8 +78,19 @@ export async function unifiedConversationAction(
   const contextQuery = formData.get('contextQuery') as string | null;
   const reset = formData.get('reset') === 'true';
 
+  // This handles switching from an interrogated doc back to a clean slate
   if (reset) {
     return initialState;
+  }
+  
+  // This handles loading a new document into the context for interrogation
+  if (!query && context) {
+    return {
+        ...initialState,
+        context,
+        contextImageUrl,
+        contextQuery
+    };
   }
   
   if (!query) {
@@ -86,14 +98,15 @@ export async function unifiedConversationAction(
   }
 
   const userMessage: ConversationMessage = {role: 'user', content: query};
-  let newConversation = [...prevState.conversation, userMessage];
+  let newConversation = [...(prevState?.conversation || []), userMessage];
 
-  const baseState = {
-    ...prevState,
+  const baseState: ConversationState = {
+    conversation: newConversation,
     isCreation: false,
     context: context,
     contextImageUrl: contextImageUrl,
     contextQuery: contextQuery,
+    error: null,
   };
 
   const agentThinkingMessage: ConversationMessage = {
@@ -135,12 +148,13 @@ export async function unifiedConversationAction(
       };
     } else {
       // If there is context, this is an interrogation query
+      agentThinkingMessage.content = `Interrogating scripture for "${query}"...`;
       const textResult = await interrogateSigil({query, context});
       const speechResult = await generateSpeech(textResult.answer);
 
       const agentResponseMessage: ConversationMessage = {
         role: 'agent',
-        content: textResult.answer,
+        content: marked.parse(textResult.answer), // Parse markdown for rich content
         audioUrl: speechResult.audioUrl,
       };
 

@@ -15,15 +15,20 @@ import Image from 'next/image';
 import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Scripture } from '@/lib/types';
 
 /**
  * Props for the ConversationManager component.
  * @property {React.TransitionStartFunction} startTransition - The startTransition function from `useTransition`.
  * @property {boolean} isPending - The pending state from `useTransition`.
+ * @property {Scripture | null} selectedDoc - The currently selected canonical document for interrogation.
+ * @property {() => void} onReset - Callback function to reset the selected document context.
  */
 type ConversationManagerProps = {
     startTransition: React.TransitionStartFunction;
     isPending: boolean;
+    selectedDoc: Scripture | null;
+    onReset: () => void;
 }
 
 const initialState: ConversationState = {
@@ -36,10 +41,11 @@ const initialState: ConversationState = {
 
 /**
  * The main component for managing and displaying the conversation with the AI Scribe.
- * It handles form submission, displays messages, and manages conversational state.
+ * It handles form submission, displays messages, and manages conversational state,
+ * including the context of a selected document for interrogation.
  * @param {ConversationManagerProps} props - The component's props.
  */
-export function ConversationManager({ startTransition, isPending }: ConversationManagerProps) {
+export function ConversationManager({ startTransition, isPending, selectedDoc, onReset }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
@@ -48,16 +54,34 @@ export function ConversationManager({ startTransition, isPending }: Conversation
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
   const [hasSaved, setHasSaved] = useState(false);
   
+  // Effect to sync the action's pending state with the parent's transition
   useEffect(() => {
-    startTransition(() => {
-      // This is a no-op, but it correctly links the parent's transition state
-      // to the action's pending state.
-    });
+    startTransition(() => {});
   }, [isActionPending, startTransition]);
 
+  // Effect to reset conversation state when the selected document changes
   useEffect(() => {
-    setHasSaved(false); // Reset save state when context changes
-  }, [state.context]);
+    if (selectedDoc) {
+      const formData = new FormData();
+      formData.append('context', selectedDoc.markdown || selectedDoc.html || '');
+      formData.append('contextImageUrl', ''); // Canonical docs don't have images
+      formData.append('contextQuery', selectedDoc.title || 'selected document');
+      startTransition(() => {
+          formAction(formData);
+      });
+    } else {
+        // This handles deselecting a doc
+        handleReset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDoc]);
+
+  // Effect to reset the save state when a new scripture is created
+  useEffect(() => {
+    if (state.isCreation) {
+      setHasSaved(false);
+    }
+  }, [state.isCreation]);
 
   // Effect to scroll to the bottom of the conversation
   useEffect(() => {
@@ -91,7 +115,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
 
     const textarea = e.currentTarget.querySelector('textarea');
     if (textarea) textarea.value = '';
-    // Manually trigger resize after clearing
     const event = new Event('input', { bubbles: true });
     textarea?.dispatchEvent(event);
   };
@@ -102,6 +125,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
         formData.append('reset', 'true');
         formAction(formData);
     });
+    onReset(); // Also notify parent to clear selection
   }
 
   const handleSaveToForge = (msg: ConversationMessage) => {
@@ -119,7 +143,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
     setHasSaved(true);
     toast({
         title: "Scripture Saved",
-        description: "It is now available in your Library.",
+        description: "It is now available in your personal forge.",
     });
   };
 
@@ -131,16 +155,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
             <div className="text-center text-muted-foreground sigil-codex pt-8 flex flex-col items-center gap-4">
               <ScribeSigil className="h-20 w-20 text-primary/70"/>
               <p>{state.context ? `Interrogating scripture: "${state.contextQuery}"` : "The Oracle is silent. State your intent to forge a scripture."}</p>
-              {state.contextImageUrl && (
-                <Image 
-                    src={state.contextImageUrl}
-                    alt={`Sigil for ${state.contextQuery}`}
-                    width={512}
-                    height={288}
-                    className="w-full max-w-md h-auto rounded-lg border border-primary/30 aspect-video object-cover"
-                    data-ai-hint="abstract symbol"
-                />
-              )}
             </div>
           )}
           {state.conversation.map((msg, index) => (
@@ -178,7 +192,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
                         </Button>
                     </div>
                 ) : (
-                    <p className="m-0">{msg.content}</p>
+                    <div className="prose prose-sm prose-invert" dangerouslySetInnerHTML={{ __html: msg.content }} />
                 )}
 
                 {msg.audioUrl && (
