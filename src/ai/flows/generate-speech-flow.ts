@@ -4,6 +4,7 @@
  *
  * This file defines the Genkit flow responsible for taking a string of text
  * and converting it into a playable audio file in WAV format, returned as a data URI.
+ * It now includes persona-based voice selection.
  *
  * @exports generateSpeech - The primary function to call this flow.
  */
@@ -16,9 +17,13 @@ import { googleAI } from '@genkit-ai/googleai';
 /**
  * Defines the schema for the input to the generateSpeech flow.
  * @property {string} text - The text to be converted to speech.
+ * @property {string} context - The source of the text (e.g., a scripture title) to determine the voice persona.
  */
-const GenerateSpeechInputSchema = z.string();
-type GenerateSpeechInput = z.infer<typeof GenerateSpeechInputSchema>;
+const GenerateSpeechInputSchema = z.object({
+  text: z.string().describe('The text to be converted to speech.'),
+  context: z.string().describe("The source of the text (e.g., a scripture title) to determine the voice persona."),
+});
+export type GenerateSpeechInput = z.infer<typeof GenerateSpeechInputSchema>;
 
 /**
  * Defines the schema for the output of the generateSpeech flow.
@@ -29,9 +34,51 @@ const GenerateSpeechOutputSchema = z.object({
 });
 export type GenerateSpeechOutput = z.infer<typeof GenerateSpeechOutputSchema>;
 
+
+/**
+ * A mapping of keywords to specific voice personas.
+ * The key is a lowercase keyword expected to be in a scripture's title.
+ * The value is the Google Cloud TTS voice name.
+ */
+const personaVoiceMap: Record<string, string> = {
+    'aegis': 'en-US-Wavenet-J', // Sentinel: Strong, direct, authoritative
+    'phalanx': 'en-US-Wavenet-J',
+    'security': 'en-US-Wavenet-J',
+    'threat': 'en-US-Wavenet-J',
+    'obelisk': 'en-AU-Studio-B', // Priest: Deep, resonant, solemn for economic rituals
+    'klepsydra': 'en-AU-Studio-B',
+    'economy': 'en-AU-Studio-B',
+    'tribute': 'en-AU-Studio-B',
+    'oracle': 'en-GB-Studio-C', // Oracle: Mature, enigmatic, wise
+    'prophecy': 'en-GB-Studio-C',
+    'architect': 'en-US-Studio-Q', // Architect: Clear, precise, professional
+    'protocol': 'en-US-Studio-Q',
+    'blueprint': 'en-US-Studio-Q',
+    'doctrine': 'en-GB-Wavenet-D', // Mentor: Firm, mature, academic
+    'guide': 'en-GB-Wavenet-D',
+};
+
+const DEFAULT_VOICE = 'en-US-Studio-O'; // Steward: Warm, calm, reassuring
+
+/**
+ * Selects a voice based on the context (scripture title).
+ * @param {string} context - The context to analyze for keywords.
+ * @returns {string} The selected voice name.
+ */
+function selectVoice(context: string): string {
+    const lowerContext = context.toLowerCase();
+    for (const keyword in personaVoiceMap) {
+        if (lowerContext.includes(keyword)) {
+            return personaVoiceMap[keyword];
+        }
+    }
+    return DEFAULT_VOICE;
+}
+
+
 /**
  * Converts text to speech and returns a WAV audio data URI.
- * @param {GenerateSpeechInput} input - The text to convert.
+ * @param {GenerateSpeechInput} input - The text to convert and its context.
  * @returns {Promise<GenerateSpeechOutput>} A promise that resolves to the object containing the audio URL.
  */
 export async function generateSpeech(input: GenerateSpeechInput): Promise<GenerateSpeechOutput> {
@@ -45,14 +92,17 @@ const generateSpeechFlow = ai.defineFlow(
     inputSchema: GenerateSpeechInputSchema,
     outputSchema: GenerateSpeechOutputSchema,
   },
-  async (text) => {
+  async ({ text, context }) => {
+
+    const voiceName = selectVoice(context);
+
     const { media } = await ai.generate({
       model: googleAI.model('gemini-2.5-flash-preview-tts'),
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Algenib' },
+            prebuiltVoiceConfig: { voiceName },
           },
         },
       },

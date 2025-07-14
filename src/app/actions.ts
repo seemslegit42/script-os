@@ -1,4 +1,3 @@
-
 'use server';
 
 import { interrogateCanon, InterrogateCanonOutput } from '@/ai/flows/interrogate-canon-flow';
@@ -87,8 +86,11 @@ export async function unifiedConversationAction(
       throw new Error("The Oracle's stream yielded no response.");
     }
     
-    // Now that we have the full text, generate speech.
-    const speechResult = await generateSpeech(finalCanonResult.answer);
+    // Now that we have the full text, generate speech using the scripture's title as context.
+    const speechResult = await generateSpeech({
+        text: finalCanonResult.answer,
+        context: finalCanonResult.source,
+    });
 
     const agentResponseMessage: ConversationMessage = {
       role: 'agent',
