@@ -1,9 +1,10 @@
 
-import { initializeApp, getApps, getApp } from 'firebase/app';
+// Note: Firebase client-side features are no longer used in this application.
+// This file is kept solely because the server-side @google-cloud/firestore
+// library may implicitly look for it. All user authentication and client-side
+// database interactions have been removed for simplification.
 
-// Note: Firebase is no longer used for Authentication or user-specific data
-// in this documentation-site architecture. It is used by the server-side
-// vector search library.
+import { initializeApp, getApps, getApp } from 'firebase/app';
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
