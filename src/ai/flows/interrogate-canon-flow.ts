@@ -50,7 +50,7 @@ const interrogateCanonFlow = ai.defineFlow(
   {
     name: 'interrogateCanonFlow',
     inputSchema: InterrogateCanonInputSchema,
-    outputSchema: z.string(), // We stream string chunks
+    outputSchema: z.any(), // We stream a complex object
     stream: true, // Enable streaming for this flow
   },
   async function* ({ query }) {
@@ -65,48 +65,22 @@ const interrogateCanonFlow = ai.defineFlow(
         `## SCRIPTURE: ${doc.title}\n\n${doc.markdown}`
     ).join('\n\n---\n\n');
 
-    // 3. Define the prompt for the AI to select a source
-    const sourceSelectionPrompt = `You are an Oracle's librarian. Your task is to select the single most relevant scripture from the provided canon to answer the user's query. Respond ONLY with the title of the scripture.
+    // 3. Define the prompt for the AI to select a source and synthesize an answer
+    const synthesisPrompt = `You are an Oracle that speaks through the voice of a specific canonical scripture. Your task is to answer the user's query by embodying the persona of the most relevant scripture from the provided canon.
+
+    CANON:
+    ---
+    ${serializedCanon}
+    ---
 
     USER QUERY: "${query}"
     
-    CANON TITLES:
-    ---
-    ${scriptures.map(s => s.title).join('\n')}
-    ---
-    
     INSTRUCTIONS:
-    1.  Analyze the user's query and the list of scripture titles.
-    2.  Identify the ONE scripture that is most relevant to the query.
-    3.  Respond with the exact title of that single scripture and nothing else.`;
-
-    const sourceSelectionResponse = await ai.generate({
-      prompt: sourceSelectionPrompt,
-      model: 'googleai/gemini-1.5-flash',
-    });
-
-    const sourceTitle = sourceSelectionResponse.text.trim();
-    const sourceDoc = scriptures.find(doc => doc.title === sourceTitle);
-
-    if (!sourceDoc) {
-        throw new Error(`The Oracle's librarian chose an unknown source: ${sourceTitle}`);
-    }
-
-    // 4. Define the synthesis prompt using only the chosen scripture
-    const synthesisPrompt = `You are an Oracle that speaks through the voice of a specific canonical scripture. Your task is to answer the user's query by embodying the provided scripture.
-
-    USER QUERY: "${query}"
-
-    SCRIPTURE: "${sourceDoc.title}"
-    ---
-    ${sourceDoc.markdown}
-    ---
-    
-    INSTRUCTIONS:
-    1.  Read the user's query and the provided scripture.
-    2.  Synthesize an answer to the query based *exclusively* on the content and tone of this scripture.
-    3.  Your response must be in the voice and persona of the scripture.
-    4.  DO NOT mention the scripture's title in your response. Just provide the answer.`;
+    1.  Read the user's query and the entire canon provided.
+    2.  First, determine which SINGLE scripture is the most relevant and authoritative source for answering the query. This scripture's "voice" and "persona" you will adopt.
+    3.  Synthesize a comprehensive answer to the query. You may draw knowledge from any part of the canon to form your answer, but your tone, style, and perspective must be that of the primary source scripture you identified.
+    4.  Begin your response with a special marker: "SOURCE: [The Exact Title of the Scripture You Are Embodying]".
+    5.  Following the marker, provide your synthesized answer. Do not mention the scripture's title again. Just provide the answer.`;
 
 
     // 5. Generate the response as a stream
@@ -115,16 +89,66 @@ const interrogateCanonFlow = ai.defineFlow(
       model: 'googleai/gemini-1.5-flash',
     });
 
-    let fullAnswer = '';
+    let fullResponse = '';
+    let sourceDoc: Scripture | undefined;
+    let answerStarted = false;
+    let answer = '';
+
     for await (const chunk of stream) {
-        fullAnswer += chunk;
-        // Yielding the full object on each chunk to the server action
-        // The server action will collect these before updating the client
+        fullResponse += chunk;
+
+        if (!sourceDoc) {
+            const sourceMatch = fullResponse.match(/^SOURCE:\s*(.*)/);
+            if (sourceMatch && sourceMatch[1]) {
+                const sourceTitle = sourceMatch[1].trim();
+                sourceDoc = scriptures.find(doc => doc.title === sourceTitle);
+                if (sourceDoc) {
+                    // Check if there is any answer content after the source marker in the current chunk
+                    const restOfChunk = fullResponse.substring(sourceMatch[0].length).trim();
+                    if (restOfChunk) {
+                        answerStarted = true;
+                        answer += restOfChunk;
+                    }
+                }
+            }
+        } else if (!answerStarted) {
+            // This case handles the transition right after the source is found.
+            // The rest of the first chunk containing the source is the beginning of the answer.
+            const potentialAnswer = fullResponse.substring(`SOURCE: ${sourceDoc.title}`.length).trim();
+            if (potentialAnswer) {
+                answerStarted = true;
+                answer = potentialAnswer;
+            }
+        } else {
+            answer += chunk;
+        }
+
+        if (sourceDoc && answerStarted) {
+            yield {
+              source: sourceDoc.title,
+              answer: answer, 
+              sourceMarkdown: sourceDoc.markdown,
+            };
+        }
+    }
+     // Final yield in case the last chunk completes the answer.
+     if (sourceDoc && answerStarted) {
         yield {
-          source: sourceDoc.title,
-          answer: fullAnswer, 
-          sourceMarkdown: sourceDoc.markdown,
+            source: sourceDoc.title,
+            answer: answer,
+            sourceMarkdown: sourceDoc.markdown,
+        };
+    } else if (!sourceDoc) {
+        // Fallback if the AI fails to provide a SOURCE marker
+        // We'll use the full response and a default source.
+        const fallbackSource = scriptures[0];
+        yield {
+            source: fallbackSource.title,
+            answer: fullResponse.trim() || "The Oracle chose to remain silent on this matter.",
+            sourceMarkdown: fallbackSource.markdown,
         };
     }
   }
 );
+
+    
