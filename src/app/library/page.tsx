@@ -6,12 +6,34 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { Header } from '@/components/header';
 import { Sigil } from '@/components/sigil';
-import { ScribeSigil } from '@/components/icons';
 import useSWR from 'swr';
 import { Scripture } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Html } from '@react-three/drei';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+function LoadingPlaceholders() {
+    // Render simple spheres as placeholders during loading
+    return <>
+        {Array.from({ length: 15 }).map((_, i) => {
+            const angle = (i / 15) * Math.PI * 2;
+            const radius = 12;
+            const x = radius * Math.cos(angle);
+            const z = radius * Math.sin(angle);
+            const y = (Math.random() - 0.5) * 4;
+            return (
+                <mesh key={i} position={[x, y, z]}>
+                    <sphereGeometry args={[0.3, 16, 16]} />
+                    <meshBasicMaterial color="hsl(var(--muted))" transparent opacity={0.5} />
+                </mesh>
+            )
+        })}
+        <Html center>
+            <div className="text-muted-foreground sigil-glyph">Loading Canon...</div>
+        </Html>
+    </>
+}
 
 /**
  * The main library page, envisioned as the "Grand Hall" or "Pantheon."
@@ -45,11 +67,13 @@ export default function LibraryPage() {
           <pointLight position={[15, 5, -15]} intensity={1} color="#3EB991" />
           <pointLight position={[-15, -5, 15]} intensity={1} color="#20B2AA" />
           
-          <Suspense fallback={null}>
-            {error && <p className="text-destructive">Failed to load scriptures.</p>}
-            {!docs && !error && Array.from({ length: 15 }).map((_, i) => (
-                <Skeleton key={i} className="h-4 w-4 rounded-full" />
-            ))}
+          <Suspense fallback={<LoadingPlaceholders />}>
+            {error && (
+                <Html center>
+                    <p className="text-destructive">Failed to load scriptures.</p>
+                </Html>
+            )}
+            {!docs && !error && <LoadingPlaceholders />}
             {docs && sigilPositions.map(({ position, doc }) => (
               <Sigil key={doc.id} position={position} doc={doc} />
             ))}
@@ -67,7 +91,7 @@ export default function LibraryPage() {
         </Canvas>
       </div>
        <main className="container mx-auto max-w-6xl py-24 px-4 h-screen flex flex-col justify-end items-center pointer-events-none">
-        <div className="text-center mb-12 bg-background/30 backdrop-blur-sm p-6 rounded-lg border border-primary/20 pointer-events-auto">
+        <div className="text-center mb-12 bg-background/50 backdrop-blur-sm p-6 rounded-lg border border-primary/20 pointer-events-auto shadow-lg shadow-primary/10">
             <h1 className="text-4xl font-bold sigil-obelisk text-primary-foreground">The Scriptorium</h1>
             <p className="text-lg text-muted-foreground sigil-codex mt-2">A constellation of self-contained truths from the Nexus canon.</p>
             <p className="text-sm text-muted-foreground/70 sigil-glyph mt-4">Click and drag to explore the canon. Scroll to zoom.</p>

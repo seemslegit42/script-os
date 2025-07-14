@@ -52,8 +52,8 @@ export function Sigil({ position, doc }: SigilProps) {
   // Assign color based on keywords in title
   const getColor = () => {
     const title = doc.title?.toLowerCase() || '';
-    if (title.includes('aegis') || title.includes('security') || title.includes('threat')) return '#3EB991'; // Patina Green
-    if (title.includes('obelisk') || title.includes('economy') || title.includes('klepsydra')) return '#20B2AA'; // Roman Aqua
+    if (title.includes('aegis') || title.includes('security') || title.includes('threat') || title.includes('phalanx')) return '#3EB991'; // Patina Green
+    if (title.includes('obelisk') || title.includes('economy') || title.includes('klepsydra') || title.includes('tribute')) return '#20B2AA'; // Roman Aqua
     return '#6A0DAD'; // Imperial Purple
   }
 
@@ -71,8 +71,8 @@ export function Sigil({ position, doc }: SigilProps) {
         color={getColor()}
         emissive={getColor()}
         emissiveIntensity={hovered ? 0.7 : 0.2}
-        metalness={0.8}
-        roughness={0.2}
+        metalness={0.9}
+        roughness={0.1}
         transparent
         opacity={hovered ? 1 : 0.8}
       />
