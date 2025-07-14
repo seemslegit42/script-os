@@ -3,7 +3,7 @@ import { getDocs } from '@/lib/docs';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookMarked } from 'lucide-react';
+import { BookCopy } from 'lucide-react';
 
 /**
  * A server component that serves as the main library page.
@@ -19,7 +19,7 @@ export default async function LibraryPage() {
   return (
     <>
       <Header />
-      <main className="container mx-auto max-w-4xl py-24 px-4">
+      <main className="container mx-auto max-w-6xl py-24 px-4">
         <div className="text-center mb-12">
             <h1 className="text-4xl font-bold sigil-obelisk text-primary-foreground">The Scriptorium Library</h1>
             <p className="text-lg text-muted-foreground mt-2 sigil-codex">The complete canon of foundational scriptures.</p>
@@ -27,10 +27,10 @@ export default async function LibraryPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedDocs.map((doc) => (
                 <Link href={`/library/${doc.id}`} key={doc.id} passHref>
-                    <Card className="h-full bg-card/70 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 flex flex-col">
+                    <Card className="h-full bg-card/70 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 flex flex-col group">
                         <CardHeader>
-                            <CardTitle className="sigil-obelisk text-lg flex items-center gap-3 text-primary-foreground">
-                                <BookMarked className="text-primary h-5 w-5"/>
+                            <CardTitle className="sigil-obelisk text-lg flex items-center gap-3 text-primary-foreground group-hover:text-primary transition-colors">
+                                <BookCopy className="text-primary h-5 w-5"/>
                                 {doc.title}
                             </CardTitle>
                         </CardHeader>

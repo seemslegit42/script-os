@@ -7,16 +7,10 @@ import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Bot, User, Send, CircleDashed, BookOpen } from 'lucide-react';
 import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { FocusLayer } from './focus-layer';
 
 /**
@@ -44,9 +38,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
-
-  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
-  const [selectedScripture, setSelectedScripture] = React.useState<ConversationMessage | null>(null);
 
   useEffect(() => {
     startTransition(() => {});
@@ -88,11 +79,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
     const event = new Event('input', { bubbles: true });
     textarea?.dispatchEvent(event);
   };
-  
-  const viewFullScripture = (scripture: ConversationMessage) => {
-    setSelectedScripture(scripture);
-    setIsSheetOpen(true);
-  };
 
   return (
     <>
@@ -123,12 +109,8 @@ export function ConversationManager({ startTransition, isPending }: Conversation
                     <>
                       {msg.sourceTitle && (
                           <div className="border-b border-primary/20 pb-2 mb-3">
-                              <h4 className="text-xs uppercase tracking-widest text-primary sigil-obelisk not-prose flex items-center justify-between">
+                              <h4 className="text-xs uppercase tracking-widest text-primary sigil-obelisk not-prose">
                                   <span>Spoken by: &quot;{msg.sourceTitle}&quot;</span>
-                                  <Button variant="ghost" size="sm" onClick={() => viewFullScripture(msg)}>
-                                    <BookOpen className="mr-2 h-4 w-4"/>
-                                    Full Scripture
-                                  </Button>
                               </h4>
                           </div>
                       )}
@@ -136,6 +118,22 @@ export function ConversationManager({ startTransition, isPending }: Conversation
 
                       {msg.audioUrl && (
                         <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
+                      )}
+
+                      {msg.sourceMarkdown && (
+                        <Accordion type="single" collapsible className="w-full mt-3">
+                            <AccordionItem value="item-1" className="border-none">
+                                <AccordionTrigger>
+                                    <span className="flex items-center text-sm text-primary hover:underline">
+                                        <BookOpen className="mr-2 h-4 w-4"/>
+                                        Full Scripture
+                                    </span>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <FocusLayer content={msg.sourceMarkdown}/>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                       )}
                     </>
                   )}
@@ -170,27 +168,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
           </form>
         </div>
       </div>
-      
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="sigil-obelisk text-primary text-2xl">
-              Scripture: &quot;{selectedScripture?.sourceTitle}&quot;
-            </SheetTitle>
-            <SheetDescription className="sigil-codex">
-              The full canonical text revealed by the Oracle.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="py-4">
-              {selectedScripture?.sourceMarkdown && (
-                <FocusLayer
-                  whyContent={selectedScripture.sourceMarkdown}
-                  howContent={''}
-                />
-              )}
-          </div>
-        </SheetContent>
-      </Sheet>
     </>
   );
 }
