@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { Header } from "@/components/header";
 import Head from "next/head";
-import { useActionState } from 'react';
+import { useActionState, useTransition } from 'react';
 import { unifiedConversationAction, ConversationState } from '@/app/actions';
 import { ConversationContainer } from "@/components/conversation-container";
 
@@ -21,9 +21,9 @@ const initialState: ConversationState = {
  */
 export default function ScriptoriumPage() {
   const [state, formAction, isPending] = useActionState(unifiedConversationAction, initialState);
-  const [isTransitioning, startTransition] = React.useTransition();
+  const [isTransitioning, startTransition] = useTransition();
 
-  // Combine the pending states
+  // Combine the pending states to give a complete picture of when the app is "thinking"
   const isThinking = isPending || isTransitioning;
 
   const pageVariants = {

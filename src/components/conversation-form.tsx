@@ -48,7 +48,11 @@ export function ConversationForm({ formAction, isPending, startTransition }: Con
     if(isPending) {
       applyState('active');
     } else {
-      applyState('default');
+      // Revert to default only if the textarea isn't focused
+      const textarea = formRef.current?.querySelector('textarea');
+      if (document.activeElement !== textarea) {
+        applyState('default');
+      }
     }
   }, [isPending, applyState]);
 
@@ -61,6 +65,12 @@ export function ConversationForm({ formAction, isPending, startTransition }: Con
         required
         className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
         disabled={isPending}
+        onFocus={() => applyState('active')}
+        onBlur={() => {
+            if (!isPending) {
+              applyState('default');
+            }
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -72,6 +82,7 @@ export function ConversationForm({ formAction, isPending, startTransition }: Con
       />
       <Button type="submit" size="icon" disabled={isPending}>
         {isPending ? <CircleDashed className="animate-spin" /> : <Send />}
+        <span className="sr-only">Submit Query</span>
       </Button>
     </form>
   );

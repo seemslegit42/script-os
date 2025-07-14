@@ -35,12 +35,9 @@ interface TypographicStateContextType {
 
 const TypographicStateContext = createContext<TypographicStateContextType | undefined>(undefined);
 
-// A single, stable typographic state for maximum readability and accessibility.
-const stableState: TypographicState = { wght: 400, slnt: 0, casl: 0, letterSpacing: 0 };
-
 const stateMappings: Record<NexusState, TypographicState> = {
-  default: stableState,
-  active: stableState, // All states map to the same stable configuration
+  default: { wght: 400, slnt: 0, casl: 0, letterSpacing: 0 },
+  active: { wght: 450, slnt: -2, casl: 0.5, letterSpacing: -0.5 },
 };
 
 /**
@@ -52,8 +49,6 @@ export const TypographicStateProvider = ({ children }: { children: ReactNode }) 
   const [typographicState, setTypographicState] = useState<TypographicState>(stateMappings.default);
   const [currentState, setCurrentState] = useState<NexusState>('default');
 
-  // This function now sets a consistent, stable state regardless of the input,
-  // to prevent distracting typographic shifts.
   const applyState = (nexusState: NexusState) => {
     setTypographicState(stateMappings[nexusState]);
     setCurrentState(nexusState);
