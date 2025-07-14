@@ -6,7 +6,7 @@ import { marked } from 'marked';
 
 /**
  * Props for the FocusLayer component.
- * @property {string} whyContent - The markdown or HTML content for the 'Why' tab.
+ * @property {string} whyContent - The markdown or HTML content for the 'Why' tab, or the only tab if 'How' is not present.
  * @property {string} howContent - The markdown or HTML content for the 'How' tab.
  */
 type FocusLayerProps = {
@@ -15,17 +15,27 @@ type FocusLayerProps = {
 };
 
 /**
- * A component that displays content in two tabs: 'Why' (conceptual) and 'How' (technical).
+ * A component that displays content in tabs. If only 'whyContent' is provided,
+ * it displays it in a single, non-tabbed view. Otherwise, it creates 'Why' and 'How' tabs.
  * It parses Markdown content into HTML for rich rendering.
  * @param {FocusLayerProps} props - The component props.
  */
 export function FocusLayer({ whyContent, howContent }: FocusLayerProps) {
   const proseClasses = "prose prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded";
 
-  // The content might already be HTML if it's from the AI, but we run it through marked to be safe
-  // and to handle any raw markdown that might be passed in.
-  const parsedWhy = marked.parse(whyContent);
-  const parsedHow = marked.parse(howContent);
+  const parsedWhy = marked.parse(whyContent || '');
+  const parsedHow = marked.parse(howContent || '');
+  
+  const hasTwoTabs = whyContent && howContent;
+
+  if (!hasTwoTabs) {
+    return (
+        <div
+          className={proseClasses}
+          dangerouslySetInnerHTML={{ __html: parsedWhy }}
+        />
+    );
+  }
 
   return (
     <Tabs defaultValue="why" className="w-full">

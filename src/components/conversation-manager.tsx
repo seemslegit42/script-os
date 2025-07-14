@@ -4,86 +4,49 @@
 import React, { useRef, useEffect, useActionState, useState } from 'react';
 import { unifiedConversationAction, ConversationState, ConversationMessage } from '@/app/actions';
 import { useTypographicState } from '@/context/typographic-state-context';
-import { useScriptorium } from '@/context/scriptorium-context';
-import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, User, Send, CircleDashed, RotateCcw, Sparkles } from 'lucide-react';
-import { FocusLayer } from './focus-layer';
-import Image from 'next/image';
+import { Bot, User, Send, CircleDashed, BookOpen } from 'lucide-react';
 import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { Scripture } from '@/lib/types';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { FocusLayer } from './focus-layer';
 
 /**
  * Props for the ConversationManager component.
  * @property {React.TransitionStartFunction} startTransition - The startTransition function from `useTransition`.
  * @property {boolean} isPending - The pending state from `useTransition`.
- * @property {Scripture | null} selectedDoc - The currently selected canonical document for interrogation.
- * @property {() => void} onReset - Callback function to reset the selected document context.
  */
 type ConversationManagerProps = {
     startTransition: React.TransitionStartFunction;
     isPending: boolean;
-    selectedDoc: Scripture | null;
-    onReset: () => void;
 }
 
 const initialState: ConversationState = {
   conversation: [],
-  context: null,
-  contextImageUrl: null,
-  contextQuery: null,
   error: null,
 };
 
 /**
  * The main component for managing and displaying the conversation with the AI Scribe.
- * It handles form submission, displays messages, and manages conversational state,
- * including the context of a selected document for interrogation.
+ * It handles form submission and displays messages revealed from the canon.
  * @param {ConversationManagerProps} props - The component's props.
  */
-export function ConversationManager({ startTransition, isPending, selectedDoc, onReset }: ConversationManagerProps) {
+export function ConversationManager({ startTransition, isPending }: ConversationManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
-  const { addScripture } = useScriptorium();
-  const { toast } = useToast();
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
-  const [hasSaved, setHasSaved] = useState(false);
-  
-  // Effect to sync the action's pending state with the parent's transition
+
+  // State for showing the full scripture text
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedScripture, setSelectedScripture] = useState<{title: string; markdown: string} | null>(null);
+
   useEffect(() => {
     startTransition(() => {});
   }, [isActionPending, startTransition]);
 
-  // Effect to reset conversation state when the selected document changes
-  useEffect(() => {
-    if (selectedDoc) {
-      const formData = new FormData();
-      formData.append('context', selectedDoc.markdown || selectedDoc.html || '');
-      formData.append('contextImageUrl', ''); // Canonical docs don't have images
-      formData.append('contextQuery', selectedDoc.title || 'selected document');
-      startTransition(() => {
-          formAction(formData);
-      });
-    } else {
-        // This handles deselecting a doc
-        handleReset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDoc]);
-
-  // Effect to reset the save state when a new scripture is created
-  useEffect(() => {
-    if (state.isCreation) {
-      setHasSaved(false);
-    }
-  }, [state.isCreation]);
-
-  // Effect to scroll to the bottom of the conversation
   useEffect(() => {
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
@@ -93,7 +56,6 @@ export function ConversationManager({ startTransition, isPending, selectedDoc, o
     }
   }, [state.conversation]);
   
-  // Effect to manage typographic state based on pending status
   useEffect(() => {
     if(isPending) {
       applyState('active');
@@ -106,7 +68,6 @@ export function ConversationManager({ startTransition, isPending, selectedDoc, o
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const query = formData.get('query') as string;
-
     if (!query?.trim()) return;
 
     startTransition(() => {
@@ -119,132 +80,110 @@ export function ConversationManager({ startTransition, isPending, selectedDoc, o
     textarea?.dispatchEvent(event);
   };
   
-  const handleReset = () => {
-    startTransition(() => {
-        const formData = new FormData();
-        formData.append('reset', 'true');
-        formAction(formData);
-    });
-    onReset(); // Also notify parent to clear selection
-  }
-
-  const handleSaveToForge = (msg: ConversationMessage) => {
-    if (!msg.sigil || !msg.query) return;
-
-    const newScripture = {
-        id: `forged-${Date.now()}`,
-        query: msg.query,
-        why: msg.sigil.why,
-        how: msg.sigil.how,
-        imageUrl: msg.imageUrl,
-        createdAt: new Date().toISOString(),
-    };
-    addScripture(newScripture);
-    setHasSaved(true);
-    toast({
-        title: "Scripture Saved",
-        description: "It is now available in your personal forge.",
-    });
+  const viewFullScripture = (msg: ConversationMessage) => {
+    if (msg.sourceTitle && msg.sourceMarkdown) {
+        setSelectedScripture({ title: msg.sourceTitle, markdown: msg.sourceMarkdown });
+        setIsSheetOpen(true);
+    }
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
-      <ScrollArea className="flex-grow p-4 md:p-6" ref={scrollAreaRef}>
-        <div className="space-y-6">
-          {state.conversation.length === 0 && (
-            <div className="text-center text-muted-foreground sigil-codex pt-8 flex flex-col items-center gap-4">
-              <ScribeSigil className="h-20 w-20 text-primary/70"/>
-              <p>{state.context ? `Interrogating scripture: "${state.contextQuery}"` : "The Oracle is silent. State your intent to forge a scripture."}</p>
-            </div>
-          )}
-          {state.conversation.map((msg, index) => (
-            <div key={index} className={cn("flex items-start gap-3 w-full", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-              {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary mt-2" />}
-              <div className={cn(
-                  "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex", 
-                  msg.role === 'user' ? 'bg-primary/30' : 'bg-background/50',
-                  msg.isError && 'bg-destructive/20 text-destructive-foreground'
-                )}>
-
-                {msg.isThinking ? (
-                     <div className="flex items-center gap-2">
-                        <CircleDashed className="animate-spin h-4 w-4" />
-                        <p className="m-0">{msg.content}</p>
-                     </div>
-                ) : msg.isCreation && msg.sigil ? (
-                    <div className="space-y-4">
-                        <p>{msg.content}</p>
-                         {msg.imageUrl && (
-                          <Image 
-                            src={msg.imageUrl}
-                            alt={`Generated Sigil for ${msg.query}`}
-                            width={1024}
-                            height={576}
-                            className="w-full h-auto rounded-lg border border-primary/30 aspect-video object-cover"
-                            priority
-                            data-ai-hint="abstract spiritual"
-                          />
-                        )}
-                        <FocusLayer whyContent={msg.sigil.why} howContent={msg.sigil.how} />
-                        <Button onClick={() => handleSaveToForge(msg)} variant="outline" className="w-full" disabled={hasSaved}>
-                            <Sparkles className="mr-2" />
-                            {hasSaved ? 'Bound to Scriptorium' : 'Bind to Scriptorium'}
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="prose prose-sm prose-invert" dangerouslySetInnerHTML={{ __html: msg.content }} />
-                )}
-
-                {msg.audioUrl && (
-                  <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
-                )}
+    <>
+      <div className="flex flex-col h-full w-full max-w-4xl bg-card/70 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg">
+        <ScrollArea className="flex-grow p-4 md:p-6" ref={scrollAreaRef}>
+          <div className="space-y-6">
+            {state.conversation.length === 0 && (
+              <div className="text-center text-muted-foreground sigil-codex pt-8 flex flex-col items-center gap-4">
+                <ScribeSigil className="h-20 w-20 text-primary/70"/>
+                <p>The Oracle is silent. Pose your query to the canon.</p>
               </div>
-              {msg.role === 'user' && <User className="flex-shrink-0 text-accent mt-2" />}
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-      <div className="p-4 border-t border-primary/20 bg-background/50 rounded-b-lg">
-        <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-start gap-2">
-          <input type="hidden" name="context" value={state.context || ''} />
-          <input type="hidden" name="contextImageUrl" value={state.contextImageUrl || ''} />
-          <input type="hidden" name="contextQuery" value={state.contextQuery || ''} />
-          <Textarea
-            name="query"
-            placeholder={state.context ? `Interrogate "${state.contextQuery}"...` : 'State your intent...'}
-            required
-            className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
-            disabled={isPending}
-            onFocus={() => applyState('active')}
-            onBlur={() => applyState('default')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (!isPending) {
-                  formRef.current?.requestSubmit();
+            )}
+            {state.conversation.map((msg, index) => (
+              <div key={index} className={cn("flex items-start gap-3 w-full", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary mt-2" />}
+                <div className={cn(
+                    "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex", 
+                    msg.role === 'user' ? 'bg-primary/30' : 'bg-background/50',
+                    msg.isError && 'bg-destructive/20 text-destructive-foreground'
+                  )}>
+
+                  {msg.isThinking ? (
+                       <div className="flex items-center gap-2">
+                          <CircleDashed className="animate-spin h-4 w-4" />
+                          <p className="m-0">{msg.content}</p>
+                       </div>
+                  ) : (
+                    <>
+                      {msg.sourceTitle && (
+                          <div className="border-b border-primary/20 pb-2 mb-3">
+                              <h4 className="text-xs uppercase tracking-widest text-primary sigil-obelisk not-prose flex items-center justify-between">
+                                  <span>Spoken by: &quot;{msg.sourceTitle}&quot;</span>
+                                  <Button variant="ghost" size="sm" onClick={() => viewFullScripture(msg)}>
+                                    <BookOpen className="mr-2 h-4 w-4"/>
+                                    Full Scripture
+                                  </Button>
+                              </h4>
+                          </div>
+                      )}
+                      <div className="prose prose-sm prose-invert" dangerouslySetInnerHTML={{ __html: msg.content }} />
+                    </>
+                  )}
+
+                  {msg.audioUrl && (
+                    <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
+                  )}
+                </div>
+                {msg.role === 'user' && <User className="flex-shrink-0 text-accent mt-2" />}
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+        <div className="p-4 border-t border-primary/20 bg-background/50 rounded-b-lg">
+          <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-start gap-2">
+            <Textarea
+              name="query"
+              placeholder={'Pose your query to the canon...'}
+              required
+              className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
+              disabled={isPending}
+              onFocus={() => applyState('active')}
+              onBlur={() => applyState('default')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (!isPending) {
+                    formRef.current?.requestSubmit();
+                  }
                 }
-              }
-            }}
-          />
-          {state.context && (
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button type="button" variant="ghost" size="icon" onClick={handleReset} disabled={isPending}>
-                            <RotateCcw />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>New Scripture</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
-          )}
-          <Button type="submit" size="icon" disabled={isPending}>
-            {isPending ? <CircleDashed className="animate-spin" /> : <Send />}
-          </Button>
-        </form>
+              }}
+            />
+            <Button type="submit" size="icon" disabled={isPending}>
+              {isPending ? <CircleDashed className="animate-spin" /> : <Send />}
+            </Button>
+          </form>
+        </div>
       </div>
-    </div>
+
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent className="w-full md:w-[60vw] lg:w-[40vw] xl:w-[33vw] bg-card/90 backdrop-blur-lg border-primary/30 flex flex-col">
+          {selectedScripture && (
+            <>
+              <SheetHeader>
+                <SheetTitle className="sigil-obelisk truncate">{selectedScripture.title}</SheetTitle>
+                <SheetDescription className="sigil-codex">
+                  The full text of the canonical scripture.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex-grow overflow-y-auto pr-6 -mr-6 pl-6 -ml-6 mt-4">
+                  <FocusLayer
+                    whyContent={selectedScripture.markdown}
+                    howContent={''}
+                  />
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

@@ -6,8 +6,8 @@ import Link from 'next/link';
 
 /**
  * The global header component for the application.
- * It provides the main branding. The Library link has been removed
- * as its functionality is now merged into the main page.
+ * It provides the main branding. All other links have been removed
+ * to focus on the single, unified Scriptorium experience.
  */
 export function Header() {
     return (
@@ -20,7 +20,7 @@ export function Header() {
                     </span>
                 </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
-                    {/* The Library link is intentionally removed as this functionality is now on the main page. */}
+                    {/* All navigation links removed for a focused experience. */}
                 </div>
             </header>
         </>
