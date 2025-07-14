@@ -20,7 +20,8 @@ export default function ScriptoriumPage() {
     'unifiedConversationAction',
     {
       onSuccess: (result) => {
-        // Speech generation will happen here, once the final text is available.
+        // This is called after the stream is fully complete.
+        // The final message with the audioUrl is handled by the `value` effect.
       },
       onError: (err) => {
         const agentErrorMessage: ConversationMessage = {

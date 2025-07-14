@@ -141,7 +141,7 @@ const interrogateCanonFlow = ai.defineFlow(
     } else if (!sourceDoc) {
         // Fallback if the AI fails to provide a SOURCE marker
         // We'll use the full response and a default source.
-        const fallbackSource = scriptures[0];
+        const fallbackSource = scriptures[0] || { title: 'Unknown Scripture', markdown: 'No content available.' };
         yield {
             source: fallbackSource.title,
             answer: fullResponse.trim() || "The Oracle chose to remain silent on this matter.",
@@ -150,5 +150,3 @@ const interrogateCanonFlow = ai.defineFlow(
     }
   }
 );
-
-    

@@ -70,9 +70,18 @@ export const unifiedConversationAction = ai.defineFlow(
         throw new Error("The Oracle's stream yielded no response.");
       }
       
-      // TODO: Implement a way to send the final audioUrl back to the client
-      // after the text stream is complete. This might require a separate action/flow.
-      // For now, audio generation is paused to enable text streaming.
+      // Now that the text stream is complete, generate the audio
+      const speech = await generateSpeech({ text: finalResult.answer, context: finalResult.source });
+
+      // Yield a final message with the audioUrl
+      yield {
+        role: 'agent',
+        content: marked.parse(finalResult.answer),
+        sourceTitle: finalResult.source,
+        sourceMarkdown: finalResult.sourceMarkdown,
+        audioUrl: speech.audioUrl,
+      };
+
 
     } catch (e: any) {
       console.error(e);
