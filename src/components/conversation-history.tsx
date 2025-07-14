@@ -1,13 +1,14 @@
 
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ConversationMessage } from '@/app/actions';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Bot, User, BookOpen, CircleDashed } from 'lucide-react';
+import { Bot, User, BookOpen, CircleDashed, Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FocusLayer } from './focus-layer';
+import { Button } from './ui/button';
 
 /**
  * Props for the ConversationHistory component.
@@ -17,12 +18,16 @@ type ConversationHistoryProps = {
 }
 
 /**
- * A component that displays the history of the conversation.
+ * A component that displays the history of the conversation, now with audio control.
  * @param {ConversationHistoryProps} props - The component's props.
  */
 export function ConversationHistory({ conversation }: ConversationHistoryProps) {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const [activeAudio, setActiveAudio] = useState<HTMLAudioElement | null>(null);
+    const [activeAudioIndex, setActiveAudioIndex] = useState<number | null>(null);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
+    // Effect to scroll to the bottom of the conversation
     useEffect(() => {
         if (scrollAreaRef.current) {
             const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
@@ -32,6 +37,59 @@ export function ConversationHistory({ conversation }: ConversationHistoryProps) 
         }
     }, [conversation]);
 
+    // Effect to auto-play the latest audio message
+    useEffect(() => {
+        const lastMessage = conversation[conversation.length - 1];
+        if (lastMessage?.role === 'agent' && lastMessage.audioUrl) {
+            // Stop any currently playing audio
+            if (activeAudio) {
+                activeAudio.pause();
+            }
+
+            const audio = new Audio(lastMessage.audioUrl);
+            setActiveAudio(audio);
+            setActiveAudioIndex(conversation.length - 1);
+
+            audio.play().catch(e => console.error("Audio autoplay failed:", e));
+
+            audio.onplay = () => setIsPlaying(true);
+            audio.onpause = () => setIsPlaying(false);
+            audio.onended = () => {
+                setIsPlaying(false);
+                setActiveAudioIndex(null);
+            };
+        }
+    }, [conversation, activeAudio]);
+    
+    const handlePlayPause = (index: number, audioUrl?: string) => {
+        if (activeAudioIndex === index) {
+            // It's the currently active audio, so toggle it
+            if (isPlaying) {
+                activeAudio?.pause();
+            } else {
+                activeAudio?.play();
+            }
+        } else {
+            // A different audio is requested
+            if (activeAudio) {
+                activeAudio.pause();
+            }
+            if (audioUrl) {
+                const newAudio = new Audio(audioUrl);
+                setActiveAudio(newAudio);
+                setActiveAudioIndex(index);
+                newAudio.play().catch(e => console.error("Audio play failed:", e));
+                newAudio.onplay = () => setIsPlaying(true);
+                newAudio.onpause = () => setIsPlaying(false);
+                newAudio.onended = () => {
+                    setIsPlaying(false);
+                    setActiveAudioIndex(null);
+                };
+            }
+        }
+    };
+
+
     return (
         <ScrollArea className="flex-grow p-4 md:p-6" ref={scrollAreaRef}>
             <div className="space-y-6">
@@ -39,9 +97,10 @@ export function ConversationHistory({ conversation }: ConversationHistoryProps) 
                     <div key={index} className={cn("flex items-start gap-3 w-full", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                         {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary mt-2" />}
                         <div className={cn(
-                            "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex", 
+                            "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex transition-all duration-500", 
                             msg.role === 'user' ? 'bg-primary/30' : 'bg-background/50',
-                            msg.isError && 'bg-destructive/20 text-destructive-foreground'
+                            msg.isError && 'bg-destructive/20 text-destructive-foreground',
+                            activeAudioIndex === index && isPlaying && 'shadow-lg shadow-accent/20 ring-1 ring-accent/50'
                         )}>
 
                         {msg.isThinking ? (
@@ -61,7 +120,16 @@ export function ConversationHistory({ conversation }: ConversationHistoryProps) 
                             <div className="prose prose-sm prose-invert" dangerouslySetInnerHTML={{ __html: msg.content }} />
 
                             {msg.audioUrl && (
-                                <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
+                                <div className="mt-3">
+                                    <Button variant="outline" size="sm" onClick={() => handlePlayPause(index, msg.audioUrl)}>
+                                        {activeAudioIndex === index && isPlaying ? (
+                                            <Pause className="mr-2 h-4 w-4" />
+                                        ) : (
+                                            <Play className="mr-2 h-4 w-4" />
+                                        )}
+                                        {activeAudioIndex === index && isPlaying ? 'Pause' : 'Play'} Oracle
+                                    </Button>
+                                </div>
                             )}
 
                             {msg.sourceMarkdown && (
