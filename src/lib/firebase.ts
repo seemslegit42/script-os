@@ -1,10 +1,9 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
 
 // Note: Firebase is no longer used for Authentication or user-specific data
-// in this documentation-site architecture. It might be used for other
-// services in the future, so the basic client initialization is kept.
+// in this documentation-site architecture. It is used by the server-side
+// vector search library.
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,6 +16,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
 
-export { app, db };
+export { app };

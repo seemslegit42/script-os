@@ -1,18 +1,53 @@
 
 'use server';
 /**
- * @fileOverview A flow for interrogating the entire canon of scriptures.
+ * @fileOverview A flow for interrogating the canon using Retrieval-Augmented Generation (RAG).
  *
  * This file defines the Genkit flow that takes a user's query, finds the most
- * relevant canonical scripture, and synthesizes a response in the voice of
- * that scripture.
+ * relevant canonical scriptures from a vector database, and synthesizes a response.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
-import { getDocs } from '@/lib/docs';
-import { Scripture } from '@/lib/types';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
+import { embed } from 'genkit/ai';
+import { textEmbedding004 } from '@genkit-ai/googleai';
+import { Firestore, FieldValue } from '@google-cloud/firestore';
 
+
+// Define the structure of a document in our vector collection
+const ScriptureVectorSchema = z.object({
+    text: z.string(),
+    title: z.string(),
+    docId: z.string(),
+  });
+type ScriptureVector = z.infer<typeof ScriptureVectorSchema>;
+  
+let db: Firestore;
+
+function getDb() {
+    if (!db) {
+        // Check for emulator environment
+        if (process.env.FIRESTORE_EMULATOR_HOST) {
+            console.log(`Connecting to Firestore emulator at ${process.env.FIRESTORE_EMULATOR_HOST}`);
+            db = new Firestore({
+                host: process.env.FIRESTORE_EMULATOR_HOST,
+                projectId: process.env.GCP_PROJECT_ID || 'demo-project', // Default project for emulator
+                ssl: false,
+            });
+        } else {
+            console.log('Connecting to production Firestore.');
+            db = new Firestore({
+                projectId: process.env.GCP_PROJECT_ID!,
+                credentials: {
+                  client_email: process.env.GCP_CLIENT_EMAIL!,
+                  private_key: process.env.GCP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+                },
+            });
+        }
+    }
+    return db;
+}
+  
 
 /**
  * Defines the schema for the input to the interrogateCanon flow.
@@ -54,31 +89,46 @@ const interrogateCanonFlow = ai.defineFlow(
     stream: true, // Enable streaming for this flow
   },
   async function* ({ query }) {
-    // 1. Fetch all canonical documents
-    const scriptures = await getDocs();
-    if (!scriptures || scriptures.length === 0) {
-      throw new Error("The canonical scriptures could not be found or are empty.");
+    // 1. Generate an embedding for the user's query
+    const queryEmbedding = await embed({
+        embedder: textEmbedding004,
+        content: query,
+    });
+    
+    // 2. Perform a vector search to find the most relevant documents
+    const firestoreDb = getDb();
+    const scripturesCollection = firestoreDb.collection('scriptures');
+    const vectorQuery = scripturesCollection.findNearest('embedding', FieldValue.vector(queryEmbedding), {
+        limit: 5,
+        distanceMeasure: 'COSINE',
+    });
+    const searchResult = await vectorQuery.get();
+
+    const relevantDocs = searchResult.docs.map(doc => doc.data() as ScriptureVector);
+    
+    if (!relevantDocs || relevantDocs.length === 0) {
+      throw new Error("The Oracle's memory found nothing relevant to your query.");
     }
     
-    // 2. Create a serialized version of the canon for the AI to read.
-    const serializedCanon = scriptures.map(doc => 
-        `## SCRIPTURE: ${doc.title}\n\n${doc.markdown}`
+    // 3. Create a serialized version of the retrieved context for the AI.
+    const serializedContext = relevantDocs.map(doc => 
+        `## SCRIPTURE: ${doc.title}\n\n${doc.text}`
     ).join('\n\n---\n\n');
 
-    // 3. Define the prompt for the AI to select a source and synthesize an answer
-    const synthesisPrompt = `You are an Oracle that speaks through the voice of a specific canonical scripture. Your task is to answer the user's query by embodying the persona of the most relevant scripture from the provided canon.
+    // 4. Define the prompt for the AI to select a source and synthesize an answer
+    const synthesisPrompt = `You are an Oracle that speaks through the voice of a specific canonical scripture. Your task is to answer the user's query by embodying the persona of the most relevant scripture from the provided context.
 
-    CANON:
+    CONTEXT:
     ---
-    ${serializedCanon}
+    ${serializedContext}
     ---
 
     USER QUERY: "${query}"
     
     INSTRUCTIONS:
-    1.  Read the user's query and the entire canon provided.
-    2.  First, determine which SINGLE scripture is the most relevant and authoritative source for answering the query. This scripture's "voice" and "persona" you will adopt.
-    3.  Synthesize a comprehensive answer to the query. You may draw knowledge from any part of the canon to form your answer, but your tone, style, and perspective must be that of the primary source scripture you identified.
+    1.  Read the user's query and the entire context provided.
+    2.  First, determine which SINGLE scripture from the context is the most relevant and authoritative source for answering the query. This scripture's "voice" and "persona" you will adopt.
+    3.  Synthesize a comprehensive answer to the query. You may draw knowledge from any part of the provided context to form your answer, but your tone, style, and perspective must be that of the primary source scripture you identified.
     4.  Begin your response with a special marker: "SOURCE: [The Exact Title of the Scripture You Are Embodying]".
     5.  Following the marker, provide your synthesized answer. Do not mention the scripture's title again. Just provide the answer.`;
 
@@ -90,7 +140,7 @@ const interrogateCanonFlow = ai.defineFlow(
     });
 
     let fullResponse = '';
-    let sourceDoc: Scripture | undefined;
+    let sourceDoc: ScriptureVector | undefined;
     let answerStarted = false;
     let answer = '';
 
@@ -101,9 +151,8 @@ const interrogateCanonFlow = ai.defineFlow(
             const sourceMatch = fullResponse.match(/^SOURCE:\s*(.*)/);
             if (sourceMatch && sourceMatch[1]) {
                 const sourceTitle = sourceMatch[1].trim();
-                sourceDoc = scriptures.find(doc => doc.title === sourceTitle);
+                sourceDoc = relevantDocs.find(doc => doc.title === sourceTitle);
                 if (sourceDoc) {
-                    // Check if there is any answer content after the source marker in the current chunk
                     const restOfChunk = fullResponse.substring(sourceMatch[0].length).trim();
                     if (restOfChunk) {
                         answerStarted = true;
@@ -112,8 +161,6 @@ const interrogateCanonFlow = ai.defineFlow(
                 }
             }
         } else if (!answerStarted) {
-            // This case handles the transition right after the source is found.
-            // The rest of the first chunk containing the source is the beginning of the answer.
             const potentialAnswer = fullResponse.substring(`SOURCE: ${sourceDoc.title}`.length).trim();
             if (potentialAnswer) {
                 answerStarted = true;
@@ -127,7 +174,7 @@ const interrogateCanonFlow = ai.defineFlow(
             yield {
               source: sourceDoc.title,
               answer: answer, 
-              sourceMarkdown: sourceDoc.markdown,
+              sourceMarkdown: sourceDoc.text,
             };
         }
     }
@@ -136,16 +183,15 @@ const interrogateCanonFlow = ai.defineFlow(
         yield {
             source: sourceDoc.title,
             answer: answer,
-            sourceMarkdown: sourceDoc.markdown,
+            sourceMarkdown: sourceDoc.text,
         };
     } else if (!sourceDoc) {
         // Fallback if the AI fails to provide a SOURCE marker
-        // We'll use the full response and a default source.
-        const fallbackSource = scriptures[0] || { title: 'Unknown Scripture', markdown: 'No content available.' };
+        const fallbackSource = relevantDocs[0] || { title: 'Unknown Scripture', text: 'No content available.' };
         yield {
             source: fallbackSource.title,
             answer: fullResponse.trim() || "The Oracle chose to remain silent on this matter.",
-            sourceMarkdown: fallbackSource.markdown,
+            sourceMarkdown: fallbackSource.text,
         };
     }
   }
