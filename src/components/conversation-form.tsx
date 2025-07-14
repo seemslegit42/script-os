@@ -6,6 +6,7 @@ import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send, CircleDashed } from 'lucide-react';
+import { ExampleQuestions } from './example-questions';
 
 /**
  * Props for the ConversationForm component.
@@ -13,13 +14,14 @@ import { Send, CircleDashed } from 'lucide-react';
 type ConversationFormProps = {
     formAction: (query: string) => void;
     isPending: boolean;
+    onQuestionSelect?: (query: string) => void;
 }
 
 /**
  * A form component for submitting queries to the Oracle.
  * @param {ConversationFormProps} props - The component's props.
  */
-export function ConversationForm({ formAction, isPending }: ConversationFormProps) {
+export function ConversationForm({ formAction, isPending, onQuestionSelect }: ConversationFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { applyState } = useTypographicState();
@@ -51,33 +53,36 @@ export function ConversationForm({ formAction, isPending }: ConversationFormProp
 
 
   return (
-    <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-start gap-2">
-      <Textarea
-        ref={textareaRef}
-        name="query"
-        placeholder={'Pose your query to the canon...'}
-        required
-        className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
-        disabled={isPending}
-        onFocus={() => applyState('active')}
-        onBlur={() => {
-            if (!isPending) {
-              applyState('default');
+    <div className="flex flex-col gap-4">
+      {onQuestionSelect && <ExampleQuestions onQuestionSelect={onQuestionSelect} />}
+      <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-start gap-2">
+        <Textarea
+          ref={textareaRef}
+          name="query"
+          placeholder={'Pose your query to the canon...'}
+          required
+          className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
+          disabled={isPending}
+          onFocus={() => applyState('active')}
+          onBlur={() => {
+              if (!isPending) {
+                applyState('default');
+              }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (!isPending) {
+                formRef.current?.requestSubmit();
+              }
             }
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if (!isPending) {
-              formRef.current?.requestSubmit();
-            }
-          }
-        }}
-      />
-      <Button type="submit" size="icon" disabled={isPending}>
-        {isPending ? <CircleDashed className="animate-spin" /> : <Send />}
-        <span className="sr-only">Submit Query</span>
-      </Button>
-    </form>
+          }}
+        />
+        <Button type="submit" size="icon" disabled={isPending}>
+          {isPending ? <CircleDashed className="animate-spin" /> : <Send />}
+          <span className="sr-only">Submit Query</span>
+        </Button>
+      </form>
+    </div>
   );
 }

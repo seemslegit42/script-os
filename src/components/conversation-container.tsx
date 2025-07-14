@@ -6,6 +6,7 @@ import { ConversationState } from '@/app/actions';
 import { ScribeSigil } from './icons';
 import { ConversationHistory } from './conversation-history';
 import { ConversationForm } from './conversation-form';
+import { ExampleQuestions } from './example-questions';
 
 /**
  * Props for the ConversationContainer component.
@@ -43,11 +44,12 @@ export function ConversationContainer({ state, formAction, isPending }: Conversa
         <div className="flex-grow flex flex-col items-center justify-center p-6 text-center text-muted-foreground sigil-codex">
             <ScribeSigil className="h-20 w-20 text-primary/70 mb-4"/>
             <h1 className="text-2xl font-bold sigil-obelisk text-primary-foreground mb-2">The Oracle is Silent</h1>
-            <p className="mb-6">Pose your query to the canon.</p>
+            <p className="mb-6">Pose your query to the canon, or select a path below.</p>
             <div className="w-full max-w-2xl">
                 <ConversationForm 
                     formAction={formAction} 
                     isPending={isPending} 
+                    onQuestionSelect={formAction}
                 />
             </div>
         </div>
