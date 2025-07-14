@@ -12,28 +12,30 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'tex
     const internalRef = React.useRef<HTMLTextAreaElement>(null);
     const combinedRef = (ref as React.RefObject<HTMLTextAreaElement>) || internalRef;
 
+    const adjustHeight = React.useCallback(() => {
+        if (combinedRef.current) {
+            combinedRef.current.style.height = 'auto'; // Reset height to recalculate scrollHeight correctly
+            combinedRef.current.style.height = `${combinedRef.current.scrollHeight}px`;
+        }
+    }, [combinedRef]);
+    
     const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (combinedRef.current) {
-        combinedRef.current.style.height = 'auto'; // Reset height to recalculate
-        combinedRef.current.style.height = `${combinedRef.current.scrollHeight}px`;
-      }
+      adjustHeight();
       if (onChange) {
         onChange(event);
       }
     };
 
     React.useEffect(() => {
-        if (combinedRef.current) {
-            combinedRef.current.style.height = 'auto';
-            combinedRef.current.style.height = `${combinedRef.current.scrollHeight}px`;
-        }
-    }, [props.value, combinedRef]);
+        // Adjust height when the component mounts or the value changes externally
+        adjustHeight();
+    }, [props.value, adjustHeight]);
 
 
     return (
       <textarea
         className={cn(
-          'flex min-h-[40px] max-h-48 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-auto',
+          'flex min-h-[40px] max-h-48 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm overflow-y-auto resize-none',
           className
         )}
         ref={combinedRef}
