@@ -1,8 +1,11 @@
+
 'use server';
 
 import { interrogateCanon, InterrogateCanonOutput } from '@/ai/flows/interrogate-canon-flow';
 import { generateSpeech } from '@/ai/flows/generate-speech-flow';
 import { marked } from 'marked';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
 
 /**
  * Represents a single message in the conversation.
@@ -34,97 +37,51 @@ export type ConversationState = {
   error: string | null;
 };
 
-const initialState: ConversationState = {
-    conversation: [],
-    error: null,
-};
-
-
 /**
- * A unified server action to handle the entire conversation logic.
- * It sends the user's query to the canon and returns the scripture's response.
- * This version uses streaming on the backend to improve performance.
- * @param {ConversationState} prevState - The previous state of the conversation.
- * @param {FormData} formData - The form data submitted by the user. Must contain a 'query' field.
- * @returns {Promise<ConversationState>} The new state of the conversation.
+ * A Genkit flow that replaces the server action to handle streaming.
+ * It streams the AI's response back to the client.
+ * @param {string} query - The user's query.
+ * @returns {AsyncGenerator<ConversationMessage>} A stream of conversation messages.
  */
-export async function unifiedConversationAction(
-  prevState: ConversationState,
-  formData: FormData
-): Promise<ConversationState> {
-  const query = formData.get('query') as string;
+export const unifiedConversationAction = ai.defineFlow(
+  {
+    name: 'unifiedConversationAction',
+    inputSchema: z.string(),
+    outputSchema: z.any(),
+    stream: true,
+  },
+  async function* (query) {
+    try {
+      const stream = interrogateCanon({ query });
+      let finalResult: InterrogateCanonOutput | null = null;
+      
+      for await (const chunk of stream) {
+        finalResult = chunk;
+        yield {
+          role: 'agent',
+          content: marked.parse(chunk.answer),
+          sourceTitle: chunk.source,
+          sourceMarkdown: chunk.sourceMarkdown,
+          audioUrl: null, // Audio will be generated after the stream is complete
+        };
+      }
 
-  if (!query) {
-    return {...prevState, error: 'Query is required.'};
-  }
+      if (!finalResult) {
+        throw new Error("The Oracle's stream yielded no response.");
+      }
+      
+      // TODO: Implement a way to send the final audioUrl back to the client
+      // after the text stream is complete. This might require a separate action/flow.
+      // For now, audio generation is paused to enable text streaming.
 
-  const userMessage: ConversationMessage = {role: 'user', content: query};
-  let newConversation = [...(prevState?.conversation || []), userMessage];
-
-  const agentThinkingMessage: ConversationMessage = {
-    role: 'agent',
-    content: 'The Oracle is contemplating...',
-    isThinking: true,
-  };
-  newConversation.push(agentThinkingMessage);
-
-  const baseState: ConversationState = {
-    conversation: newConversation,
-    error: null,
-  };
-
-  try {
-    const stream = interrogateCanon({query});
-    let finalCanonResult: InterrogateCanonOutput | null = null;
-
-    // Consume the stream from the AI flow to get the final, complete answer.
-    for await (const chunk of stream) {
-      finalCanonResult = chunk;
+    } catch (e: any) {
+      console.error(e);
+      const errorMessage = e.message || 'An unknown error occurred.';
+      yield {
+        role: 'agent',
+        content: `An error occurred: ${errorMessage}`,
+        isError: true,
+      };
     }
-
-    if (!finalCanonResult) {
-      throw new Error("The Oracle's stream yielded no response.");
-    }
-    
-    // Now that we have the full text, generate speech using the scripture's title as context.
-    const speechResult = await generateSpeech({
-        text: finalCanonResult.answer,
-        context: finalCanonResult.source,
-    });
-
-    const agentResponseMessage: ConversationMessage = {
-      role: 'agent',
-      content: marked.parse(finalCanonResult.answer), // Parse markdown for rich content
-      sourceTitle: finalCanonResult.source,
-      sourceMarkdown: finalCanonResult.sourceMarkdown,
-      audioUrl: speechResult.audioUrl,
-    };
-
-    // Replace the "thinking" message with the final response
-    newConversation[newConversation.length - 1] = agentResponseMessage;
-
-    return {
-      ...baseState,
-      conversation: newConversation,
-      error: null,
-    };
-
-  } catch (e: any) {
-    console.error(e);
-    const errorMessage = e.message || 'An unknown error occurred.';
-    const agentErrorMessage: ConversationMessage = {
-      role: 'agent',
-      content: `An error occurred: ${errorMessage}`,
-      isError: true,
-    };
-
-    // Replace thinking message with error
-    newConversation[newConversation.length - 1] = agentErrorMessage;
-
-    return {
-      ...baseState,
-      conversation: newConversation,
-      error: errorMessage,
-    };
   }
-}
+);

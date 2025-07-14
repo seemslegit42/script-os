@@ -11,36 +11,30 @@ import { Send, CircleDashed } from 'lucide-react';
  * Props for the ConversationForm component.
  */
 type ConversationFormProps = {
-    formAction: (payload: FormData) => void;
+    formAction: (query: string) => void;
     isPending: boolean;
-    startTransition: React.TransitionStartFunction;
 }
 
 /**
  * A form component for submitting queries to the Oracle.
  * @param {ConversationFormProps} props - The component's props.
  */
-export function ConversationForm({ formAction, isPending, startTransition }: ConversationFormProps) {
+export function ConversationForm({ formAction, isPending }: ConversationFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { applyState } = useTypographicState();
   
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const query = formData.get('query') as string;
+    const query = textareaRef.current?.value;
     if (!query?.trim()) return;
+    
+    formAction(query);
 
-    startTransition(() => {
-        formAction(formData);
-    });
-
-    const textarea = e.currentTarget.querySelector('textarea');
-    if (textarea) {
-      textarea.value = '';
+    if (textareaRef.current) {
+      textareaRef.current.value = '';
       // Manually trigger resize after clearing
-      textarea.style.height = 'auto';
-      const event = new Event('input', { bubbles: true });
-      textarea?.dispatchEvent(event);
+      textareaRef.current.style.height = 'auto';
     }
   };
   
@@ -49,8 +43,7 @@ export function ConversationForm({ formAction, isPending, startTransition }: Con
       applyState('active');
     } else {
       // Revert to default only if the textarea isn't focused
-      const textarea = formRef.current?.querySelector('textarea');
-      if (document.activeElement !== textarea) {
+      if (document.activeElement !== textareaRef.current) {
         applyState('default');
       }
     }
@@ -60,6 +53,7 @@ export function ConversationForm({ formAction, isPending, startTransition }: Con
   return (
     <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex items-start gap-2">
       <Textarea
+        ref={textareaRef}
         name="query"
         placeholder={'Pose your query to the canon...'}
         required

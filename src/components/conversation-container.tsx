@@ -12,9 +12,8 @@ import { ConversationForm } from './conversation-form';
  */
 type ConversationContainerProps = {
     state: ConversationState;
-    formAction: (payload: FormData) => void;
+    formAction: (query: string) => void;
     isPending: boolean;
-    startTransition: React.TransitionStartFunction;
 }
 
 /**
@@ -23,7 +22,7 @@ type ConversationContainerProps = {
  * chat view once messages exist.
  * @param {ConversationContainerProps} props - The component's props.
  */
-export function ConversationContainer({ state, formAction, isPending, startTransition }: ConversationContainerProps) {
+export function ConversationContainer({ state, formAction, isPending }: ConversationContainerProps) {
 
   const hasConversation = state.conversation.length > 0;
 
@@ -36,7 +35,6 @@ export function ConversationContainer({ state, formAction, isPending, startTrans
                 <ConversationForm 
                     formAction={formAction} 
                     isPending={isPending} 
-                    startTransition={startTransition}
                 />
             </div>
         </>
@@ -50,7 +48,6 @@ export function ConversationContainer({ state, formAction, isPending, startTrans
                 <ConversationForm 
                     formAction={formAction} 
                     isPending={isPending} 
-                    startTransition={startTransition} 
                 />
             </div>
         </div>

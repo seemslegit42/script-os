@@ -1,30 +1,81 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { AethericStreams } from "@/components/aetheric-streams";
 import { Header } from "@/components/header";
 import Head from "next/head";
-import { useActionState, useTransition } from 'react';
-import { unifiedConversationAction, ConversationState } from '@/app/actions';
 import { ConversationContainer } from "@/components/conversation-container";
-
-const initialState: ConversationState = {
-  conversation: [],
-  error: null,
-};
+import { streamFlow } from '@genkit-ai/next/client';
+import type { ConversationState, ConversationMessage } from '@/app/actions';
 
 /**
  * The main page of the Scriptorium application.
  * This page serves as the primary interface for conversing with the AI Scribe.
  */
 export default function ScriptoriumPage() {
-  const [state, formAction, isPending] = useActionState(unifiedConversationAction, initialState);
-  const [isTransitioning, startTransition] = useTransition();
+  const [state, setState] = React.useState<ConversationState>({ conversation: [], error: null });
+  const { run: runConversation, value, running, traces } = streamFlow(
+    'unifiedConversationAction',
+    {
+      onSuccess: (result) => {
+        // Speech generation will happen here, once the final text is available.
+      },
+      onError: (err) => {
+        const agentErrorMessage: ConversationMessage = {
+          role: 'agent',
+          content: `An error occurred: ${err.message || 'Unknown error.'}`,
+          isError: true,
+        };
+        setState(prevState => {
+            const newConversation = [...prevState.conversation];
+            if (newConversation[newConversation.length-1]?.isThinking) {
+                newConversation[newConversation.length - 1] = agentErrorMessage;
+            } else {
+                newConversation.push(agentErrorMessage);
+            }
+            return { ...prevState, conversation: newConversation, error: err.message };
+        });
+      },
+    }
+  );
 
-  // Combine the pending states to give a complete picture of when the app is "thinking"
-  const isThinking = isPending || isTransitioning;
+  const handleSubmit = (query: string) => {
+    if (!query.trim()) return;
+
+    const userMessage: ConversationMessage = { role: 'user', content: query };
+    const agentThinkingMessage: ConversationMessage = {
+      role: 'agent',
+      content: 'The Oracle is contemplating...',
+      isThinking: true,
+    };
+    
+    setState(prevState => ({
+      ...prevState,
+      conversation: [...prevState.conversation, userMessage, agentThinkingMessage],
+      error: null,
+    }));
+
+    runConversation(query);
+  };
+  
+  useEffect(() => {
+    if(value) {
+        setState(prevState => {
+            const newConversation = [...prevState.conversation];
+            if (newConversation.length > 0 && newConversation[newConversation.length - 1].isThinking) {
+                // First chunk, replace thinking message
+                newConversation[newConversation.length - 1] = value;
+            } else if (newConversation.length > 0 && newConversation[newConversation.length - 1].role === 'agent') {
+                // Subsequent chunks, update the last agent message
+                newConversation[newConversation.length - 1] = value;
+            }
+            return { ...prevState, conversation: newConversation };
+        });
+    }
+  }, [value]);
+
 
   const pageVariants = {
     initial: {
@@ -46,7 +97,7 @@ export default function ScriptoriumPage() {
       <Head>
         <title>Scribe - Scriptorium</title>
       </Head>
-      <AethericStreams isThinking={isThinking} />
+      <AethericStreams isThinking={running} />
       <Header />
       
       <main className="container mx-auto flex flex-col items-center justify-center min-h-screen gap-8 pt-24 pb-8">
@@ -60,9 +111,8 @@ export default function ScriptoriumPage() {
         >
             <ConversationContainer
               state={state}
-              formAction={formAction}
-              isPending={isThinking}
-              startTransition={startTransition}
+              formAction={handleSubmit}
+              isPending={running}
             />
         </motion.div>
       </main>
