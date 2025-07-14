@@ -12,6 +12,7 @@ import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FocusLayer } from './focus-layer';
+import { Annotator } from './annotator';
 
 /**
  * Props for the ConversationManager component.
@@ -131,10 +132,12 @@ export function ConversationManager({ startTransition, isPending }: Conversation
                           )}
                           <AccordionContent>
                               <div className="border-t border-primary/20 mt-4 pt-4">
-                                <FocusLayer
-                                    whyContent={msg.sourceMarkdown || ''}
-                                    howContent={''}
-                                />
+                                <Annotator contentId={msg.sourceTitle || index.toString()}>
+                                    <FocusLayer
+                                        whyContent={msg.sourceMarkdown || ''}
+                                        howContent={''}
+                                    />
+                                </Annotator>
                               </div>
                           </AccordionContent>
                       </AccordionItem>

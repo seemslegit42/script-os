@@ -7,25 +7,26 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageSquareQuote } from 'lucide-react';
 import { Annotation } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Props for the Annotator component.
  * @property {React.ReactNode} children - The content that can be annotated.
  * @property {string} contentId - A unique identifier for the content being annotated.
- * @property {(annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => void} onAnnotate - Callback function when a new annotation is created.
  */
 type AnnotatorProps = {
   children: React.ReactNode;
   contentId: string;
-  onAnnotate: (annotation: Omit<Annotation, 'id' | 'targetId'>, contentId: string) => void;
 };
 
 /**
  * A component that wraps content and allows users to select text and create annotations.
- * It displays a popover on text selection to add a comment.
+ * It displays a popover on text selection to add a comment. This is a demonstration
+ * and does not persist annotations.
  * @param {AnnotatorProps} props - The component's props.
  */
-export function Annotator({ children, contentId, onAnnotate }: AnnotatorProps) {
+export function Annotator({ children, contentId }: AnnotatorProps) {
+  const { toast } = useToast();
   const [selection, setSelection] = useState<Selection | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [comment, setComment] = useState('');
@@ -68,13 +69,14 @@ export function Annotator({ children, contentId, onAnnotate }: AnnotatorProps) {
 
   const handleAnnotate = () => {
     if (!selection || !comment.trim()) return;
-    onAnnotate(
-      {
-        selection: selection.toString(),
-        comment: comment,
-      },
-      contentId
-    );
+    
+    // In a real app, you would persist this annotation.
+    // For now, we just show a toast notification.
+    toast({
+        title: "Annotation Saved",
+        description: "Your insight has been noted. (Demonstration only)",
+    });
+
     setComment('');
     setPopoverOpen(false);
     selection.removeAllRanges();
