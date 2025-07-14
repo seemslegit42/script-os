@@ -61,8 +61,6 @@ export function ConversationForm({ formAction, isPending, startTransition }: Con
         required
         className="flex-grow sigil-glyph bg-background/80 focus:bg-background resize-none"
         disabled={isPending}
-        onFocus={() => applyState('active')}
-        onBlur={() => applyState('default')}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
