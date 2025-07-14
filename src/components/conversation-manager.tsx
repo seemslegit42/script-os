@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useRef, useEffect, useActionState, useState } from 'react';
+import React, { useRef, useEffect, useActionState } from 'react';
 import { unifiedConversationAction, ConversationState, ConversationMessage } from '@/app/actions';
 import { useTypographicState } from '@/context/typographic-state-context';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, User, Send, CircleDashed, BookOpen } from 'lucide-react';
 import { ScribeSigil } from './icons';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FocusLayer } from './focus-layer';
 
 /**
@@ -38,10 +38,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { applyState } = useTypographicState();
   const [state, formAction, isActionPending] = useActionState(unifiedConversationAction, initialState);
-
-  // State for showing the full scripture text
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedScripture, setSelectedScripture] = useState<{title: string; markdown: string} | null>(null);
 
   useEffect(() => {
     startTransition(() => {});
@@ -75,16 +71,13 @@ export function ConversationManager({ startTransition, isPending }: Conversation
     });
 
     const textarea = e.currentTarget.querySelector('textarea');
-    if (textarea) textarea.value = '';
+    if (textarea) {
+      textarea.value = '';
+      // Manually trigger resize after clearing
+      textarea.style.height = 'auto';
+    }
     const event = new Event('input', { bubbles: true });
     textarea?.dispatchEvent(event);
-  };
-  
-  const viewFullScripture = (msg: ConversationMessage) => {
-    if (msg.sourceTitle && msg.sourceMarkdown) {
-        setSelectedScripture({ title: msg.sourceTitle, markdown: msg.sourceMarkdown });
-        setIsSheetOpen(true);
-    }
   };
 
   return (
@@ -102,7 +95,7 @@ export function ConversationManager({ startTransition, isPending }: Conversation
               <div key={index} className={cn("flex items-start gap-3 w-full", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                 {msg.role === 'agent' && <Bot className="flex-shrink-0 text-primary mt-2" />}
                 <div className={cn(
-                    "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex", 
+                    "p-3 rounded-lg max-w-2xl prose prose-invert prose-sm sigil-codex w-full", 
                     msg.role === 'user' ? 'bg-primary/30' : 'bg-background/50',
                     msg.isError && 'bg-destructive/20 text-destructive-foreground'
                   )}>
@@ -113,24 +106,39 @@ export function ConversationManager({ startTransition, isPending }: Conversation
                           <p className="m-0">{msg.content}</p>
                        </div>
                   ) : (
-                    <>
-                      {msg.sourceTitle && (
-                          <div className="border-b border-primary/20 pb-2 mb-3">
-                              <h4 className="text-xs uppercase tracking-widest text-primary sigil-obelisk not-prose flex items-center justify-between">
-                                  <span>Spoken by: &quot;{msg.sourceTitle}&quot;</span>
-                                  <Button variant="ghost" size="sm" onClick={() => viewFullScripture(msg)}>
-                                    <BookOpen className="mr-2 h-4 w-4"/>
-                                    Full Scripture
-                                  </Button>
-                              </h4>
-                          </div>
-                      )}
-                      <div className="prose prose-sm prose-invert" dangerouslySetInnerHTML={{ __html: msg.content }} />
-                    </>
-                  )}
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value={`item-${index}`} className="border-b-0">
+                          {msg.sourceTitle && (
+                              <div className="border-b border-primary/20 pb-2 mb-3">
+                                  <h4 className="text-xs uppercase tracking-widest text-primary sigil-obelisk not-prose flex items-center justify-between">
+                                      <span>Spoken by: &quot;{msg.sourceTitle}&quot;</span>
+                                  </h4>
+                              </div>
+                          )}
+                          <div className="prose prose-sm prose-invert" dangerouslySetInnerHTML={{ __html: msg.content }} />
 
-                  {msg.audioUrl && (
-                    <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
+                          {msg.audioUrl && (
+                            <audio controls src={msg.audioUrl} className="w-full mt-3 h-8" />
+                          )}
+
+                          {msg.sourceMarkdown && (
+                            <AccordionTrigger asChild>
+                               <Button variant="ghost" size="sm" className="mt-3 -ml-3 text-muted-foreground hover:text-foreground">
+                                    <BookOpen className="mr-2 h-4 w-4"/>
+                                    View Full Scripture
+                                </Button>
+                            </AccordionTrigger>
+                          )}
+                          <AccordionContent>
+                              <div className="border-t border-primary/20 mt-4 pt-4">
+                                <FocusLayer
+                                    whyContent={msg.sourceMarkdown || ''}
+                                    howContent={''}
+                                />
+                              </div>
+                          </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   )}
                 </div>
                 {msg.role === 'user' && <User className="flex-shrink-0 text-accent mt-2" />}
@@ -163,27 +171,6 @@ export function ConversationManager({ startTransition, isPending }: Conversation
           </form>
         </div>
       </div>
-
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-full md:w-[60vw] lg:w-[40vw] xl:w-[33vw] bg-card/90 backdrop-blur-lg border-primary/30 flex flex-col">
-          {selectedScripture && (
-            <>
-              <SheetHeader>
-                <SheetTitle className="sigil-obelisk truncate">{selectedScripture.title}</SheetTitle>
-                <SheetDescription className="sigil-codex">
-                  The full text of the canonical scripture.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="flex-grow overflow-y-auto pr-6 -mr-6 pl-6 -ml-6 mt-4">
-                  <FocusLayer
-                    whyContent={selectedScripture.markdown}
-                    howContent={''}
-                  />
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
     </>
   );
 }
