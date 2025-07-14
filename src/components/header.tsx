@@ -3,11 +3,12 @@
 
 import { ScribeSigil } from './icons';
 import Link from 'next/link';
+import { Button } from './ui/button';
+import { Library } from 'lucide-react';
 
 /**
  * The global header component for the application.
- * It provides the main branding. All other links have been removed
- * to focus on the single, unified Scriptorium experience.
+ * It provides the main branding and navigation links.
  */
 export function Header() {
     return (
@@ -20,7 +21,12 @@ export function Header() {
                     </span>
                 </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
-                    {/* All navigation links removed for a focused experience. */}
+                    <Button asChild variant="ghost">
+                        <Link href="/library">
+                            <Library className="mr-2 h-4 w-4" />
+                            Library
+                        </Link>
+                    </Button>
                 </div>
             </header>
         </>
