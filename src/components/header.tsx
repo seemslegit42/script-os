@@ -4,12 +4,11 @@
 import { ScribeSigil } from './icons';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Home } from 'lucide-react';
+import { Home, Library } from 'lucide-react';
 
 /**
  * The global header component for the application.
  * It provides the main branding and navigation links.
- * The direct "Library" link has been removed to encourage Oracle-first interaction.
  */
 export function Header() {
     return (
@@ -26,6 +25,12 @@ export function Header() {
                         <Link href="/">
                             <Home className="mr-2 h-4 w-4" />
                             Oracle
+                        </Link>
+                    </Button>
+                    <Button asChild variant="ghost">
+                        <Link href="/library">
+                            <Library className="mr-2 h-4 w-4" />
+                            Library
                         </Link>
                     </Button>
                 </div>
