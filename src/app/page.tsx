@@ -3,8 +3,8 @@
 
 import React from "react";
 import { Canvas } from "@/components/canvas";
-import { TopBar } from "@/components/top-bar";
 import { useAppStore } from "@/store/app-store";
+import { Header } from "@/components/header";
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -30,7 +30,7 @@ export default function CanvasPage() {
 
   return (
     <div className="h-screen w-screen bg-background overflow-hidden flex flex-col">
-      <TopBar user={mockUser} workspace={mockWorkspace} />
+      <Header user={mockUser} workspace={mockWorkspace} />
       <main className="flex-1">
         <Canvas 
           apps={microApps} 

@@ -4,7 +4,6 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
-import { Header } from '@/components/header';
 import { Sigil } from '@/components/sigil';
 import useSWR from 'swr';
 import { Scripture } from '@/lib/types';
@@ -59,7 +58,6 @@ export default function LibraryPage() {
 
   return (
     <>
-      <Header />
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         <Canvas camera={{ position: [0, 5, 20], fov: 60 }}>
           <ambientLight intensity={0.5} />
