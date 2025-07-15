@@ -10,36 +10,35 @@ import { AcquisitionButton } from '@/components/ui/acquisition-button';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { initiateMagicLinkLogin } from '@/app/actions';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('password'); // Mock password
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const router = useRouter();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // MOCK LOGIN: In a real app, this would use a proper auth flow.
-    // For this demo, we'll simulate a successful login and redirect.
-    setTimeout(() => {
-        setIsLoading(false);
-        setIsSubmitted(true);
-        toast({
-            title: "The Echo is Sent",
-            description: "A path has opened. Check your inbox for a message from the Oracle to cross the threshold.",
-        });
-        // In a real flow, you'd wait for the user to click the magic link.
-        // Here, we just redirect after a short delay to simulate that.
-        setTimeout(() => {
-            router.push('/');
-        }, 2000);
-    }, 1500);
+    const result = await initiateMagicLinkLogin(email);
+
+    setIsLoading(false);
+
+    if (result.success) {
+      setIsSubmitted(true);
+      toast({
+        title: "The Echo is Sent",
+        description: "A path has opened. Check your inbox for a message from the Oracle to cross the threshold.",
+      });
+    } else {
+      toast({
+        title: "Rite Interrupted",
+        description: result.error || 'An unknown error occurred. The path remains sealed.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -63,8 +62,8 @@ export default function LoginPage() {
                 className="text-center p-8 bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg flex flex-col items-center"
             >
                 <ScribeSigil className="h-16 w-16 text-primary mb-4" />
-                <h2 className="text-xl font-bold text-primary-foreground">Redirecting to the Canvas...</h2>
-                <p className="text-muted-foreground mt-2">The threshold has been crossed.</p>
+                <h2 className="text-xl font-bold text-primary-foreground">The Echo Has Been Sent</h2>
+                <p className="text-muted-foreground mt-2">Follow the path in your inbox to cross the threshold.</p>
             </motion.div>
         ) : (
             <motion.form
