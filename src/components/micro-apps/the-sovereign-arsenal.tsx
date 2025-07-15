@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BarChart, ShieldCheck, Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { GlassPane } from '../ui/glass-pane';
 
 interface Rite {
     title: string;
@@ -64,38 +65,38 @@ export function TheSovereignArsenal() {
   const lifetimeAetherBurned = 15230; // Mock data
 
   return (
-    <div className="h-full w-full flex flex-col bg-card/50 sigil-codex">
+    <div className="h-full w-full flex flex-col bg-transparent sigil-codex">
       <header className="p-4 border-b border-border">
         <h2 className="text-lg font-bold sigil-obelisk text-primary-foreground">The Sovereign Arsenal</h2>
         <p className="text-sm text-muted-foreground">Your path to digital sovereignty is paved with ritual and sacrifice.</p>
       </header>
       
       <div className="p-4 grid grid-cols-2 gap-4 border-b border-border">
-        <Card className="bg-transparent border-0 shadow-none">
-          <CardHeader className="p-2">
-            <CardDescription className="flex items-center gap-2"><BarChart className="h-4 w-4" /> CultRank Score</CardDescription>
-            <CardTitle className="sigil-glyph">{cultRankScore.toLocaleString()}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-2">
+        <div className="bg-transparent">
+          <div className="p-2">
+            <p className="text-sm text-muted-foreground flex items-center gap-2"><BarChart className="h-4 w-4" /> CultRank Score</p>
+            <p className="text-xl sigil-glyph font-bold">{cultRankScore.toLocaleString()}</p>
+          </div>
+          <div className="p-2 pt-0">
              <Progress value={(cultRankScore / 1000) * 100} className="h-2" />
-          </CardContent>
-        </Card>
-        <Card className="bg-transparent border-0 shadow-none">
-          <CardHeader className="p-2">
-            <CardDescription className="flex items-center gap-2"><Zap className="h-4 w-4" /> Lifetime Aether Burned</CardDescription>
-            <CardTitle className="sigil-glyph">{lifetimeAetherBurned.toLocaleString()} Ξ</CardTitle>
-          </CardHeader>
-           <CardContent className="p-2">
+          </div>
+        </div>
+        <div className="bg-transparent">
+          <div className="p-2">
+            <p className="text-sm text-muted-foreground flex items-center gap-2"><Zap className="h-4 w-4" /> Lifetime Aether Burned</p>
+            <p className="text-xl sigil-glyph font-bold">{lifetimeAetherBurned.toLocaleString()} Ξ</p>
+          </div>
+           <div className="p-2 pt-0">
             <p className="text-xs text-muted-foreground">Contributing to the Pillar of Eternity.</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <ScrollArea className="flex-grow">
         <div className="p-4 space-y-4">
           <h3 className="text-md font-bold text-primary-foreground sigil-obelisk mb-2">Rites of Ascension</h3>
           {ritesOfAscension.map((rite, index) => (
-            <Card key={index} className={`bg-card/70 border ${rite.status === 'active' ? 'border-primary/50' : 'border-border'}`}>
+            <GlassPane key={index} className={`border ${rite.status === 'active' ? 'border-primary/50' : 'border-border/30'}`}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                     <div>
@@ -118,7 +119,7 @@ export function TheSovereignArsenal() {
                     </Button>
                 </div>
               </CardContent>
-            </Card>
+            </GlassPane>
           ))}
         </div>
       </ScrollArea>

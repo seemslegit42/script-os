@@ -9,6 +9,7 @@ import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { GlassPane } from '../ui/glass-pane';
 
 // Define the shape of the usage data we expect from the API
 interface UsageDetails {
@@ -97,7 +98,7 @@ export function UsageMonitor() {
               <ScrollArea className="flex-grow">
                   <div className="space-y-2 pr-4">
                   {usage.transactions.length > 0 ? usage.transactions.map(tx => (
-                      <div key={tx.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
+                      <GlassPane variant="notification" key={tx.id} className="flex justify-between items-center text-sm p-2 rounded-md">
                           <div>
                               <p className="font-medium sigil-codex">{tx.description}</p>
                               <p className="text-xs text-muted-foreground sigil-glyph">{new Date(tx.timestamp).toLocaleString()}</p>
@@ -105,7 +106,7 @@ export function UsageMonitor() {
                           <p className={`font-mono font-bold ${tx.type === 'CREDIT' ? 'text-green-400' : 'text-amber-400'}`}>
                               {tx.type === 'CREDIT' ? '+' : '-'} {tx.amount.toLocaleString()} Ξ
                           </p>
-                      </div>
+                      </GlassPane>
                   )) : (
                     <div className="text-center text-muted-foreground text-sm py-8">
                         No tributes recorded in the ledger.
@@ -148,7 +149,7 @@ export function UsageMonitor() {
   };
 
   return (
-    <div className="h-full w-full bg-card">
+    <div className="h-full w-full bg-transparent">
       {renderContent()}
     </div>
   );

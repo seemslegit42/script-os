@@ -3,6 +3,7 @@ import { getDocs } from '@/lib/docs';
 import { notFound } from 'next/navigation';
 import { marked } from 'marked';
 import { FocusLayer } from '@/components/focus-layer';
+import { GlassPane } from '@/components/ui/glass-pane';
 
 /**
  * Defines the props for the DocPage component.
@@ -44,10 +45,12 @@ export default async function DocPage({ params }: DocPageProps) {
   return (
     <main className="container mx-auto max-w-3xl py-24 px-4 flex justify-center">
       {/* Main Content: The Scribe's Scroll, presented as a central, floating panel */}
-      <article className="prose prose-invert max-w-none w-full sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded bg-card/50 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg p-8 md:p-12">
-          <h1>{doc.title}</h1>
-          <FocusLayer content={doc.markdown || ''} />
-      </article>
+      <GlassPane>
+        <article className="prose prose-invert max-w-none w-full sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded p-8 md:p-12">
+            <h1>{doc.title}</h1>
+            <FocusLayer content={doc.markdown || ''} />
+        </article>
+      </GlassPane>
     </main>
   );
 }

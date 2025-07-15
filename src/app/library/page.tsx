@@ -9,6 +9,7 @@ import useSWR from 'swr';
 import { Scripture } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Html } from '@react-three/drei';
+import { GlassPane } from '@/components/ui/glass-pane';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -89,11 +90,11 @@ export default function LibraryPage() {
         </Canvas>
       </div>
        <main className="container mx-auto max-w-6xl py-24 px-4 h-screen flex flex-col justify-end items-center pointer-events-none">
-        <div className="text-center mb-12 bg-background/50 backdrop-blur-sm p-6 rounded-lg border border-primary/20 pointer-events-auto shadow-lg shadow-primary/10">
+        <GlassPane className="text-center mb-12 p-6 pointer-events-auto">
             <h1 className="text-4xl font-bold sigil-obelisk text-primary-foreground">The Scriptorium</h1>
             <p className="text-lg text-muted-foreground sigil-codex mt-2">A constellation of self-contained truths from the Nexus canon.</p>
             <p className="text-sm text-muted-foreground/70 sigil-glyph mt-4">Click and drag to explore the canon. Scroll to zoom.</p>
-        </div>
+        </GlassPane>
       </main>
     </>
   );

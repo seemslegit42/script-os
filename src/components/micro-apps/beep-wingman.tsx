@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -10,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Calendar, Clock, MapPin, MessageSquare, Shield, Smile, Copy } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
+import { GlassPane } from '../ui/glass-pane';
 
 interface WingmanResult {
     date: string;
@@ -70,7 +72,7 @@ export function BeepWingman() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col bg-card/50 sigil-codex p-4 gap-4">
+    <div className="h-full w-full flex flex-col bg-transparent sigil-codex p-4 gap-4">
         <div className="space-y-4">
             <div>
                 <Label htmlFor="chatHistory">Chat History</Label>
@@ -89,29 +91,24 @@ export function BeepWingman() {
         </div>
 
         {isLoading && (
-            <Card className="flex-grow bg-transparent border-primary/20 animate-pulse">
-                <CardHeader>
-                    <Skeleton className="h-6 w-3/5" />
-                    <Skeleton className="h-4 w-4/5" />
-                </CardHeader>
-                <CardContent className="space-y-4">
+            <GlassPane className="flex-grow animate-pulse p-4">
+                <Skeleton className="h-6 w-3/5 mb-2" />
+                <Skeleton className="h-4 w-4/5" />
+                <div className="space-y-4 mt-4">
                     <Skeleton className="h-10 w-full" />
                     <Skeleton className="h-10 w-full" />
                     <Skeleton className="h-10 w-full" />
-                </CardContent>
-                <CardFooter>
-                    <Skeleton className="h-8 w-full" />
-                </CardFooter>
-            </Card>
+                </div>
+            </GlassPane>
         )}
 
         {result && (
-            <Card className="flex-grow bg-transparent border-primary/20">
+            <GlassPane className="flex-grow flex flex-col">
                  <CardHeader>
                     <CardTitle className='text-primary'>💌 MISSION COMPLETE</CardTitle>
                     <CardDescription>The agent has secured a tentative engagement.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-3 flex-grow">
                     <div className='flex items-center gap-3 p-3 rounded-md bg-background/50'>
                         <Calendar className='h-5 w-5 text-muted-foreground'/>
                         <span className='font-mono'>{result.date}</span>
@@ -144,7 +141,7 @@ export function BeepWingman() {
                     </div>
                     <p className='text-xs text-muted-foreground italic'>Analysis: {result.cringeAnalysis}</p>
                 </CardFooter>
-            </Card>
+            </GlassPane>
         )}
     </div>
   );

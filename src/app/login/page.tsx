@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { initiateMagicLinkLogin } from '@/app/actions';
+import { GlassPane } from '@/components/ui/glass-pane';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -58,11 +59,12 @@ export default function LoginPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-center p-8 bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg flex flex-col items-center"
             >
-                <ScribeSigil className="h-16 w-16 text-primary mb-4" />
-                <h2 className="text-xl font-bold text-primary-foreground">The Echo Has Been Sent</h2>
-                <p className="text-muted-foreground mt-2">Follow the path in your inbox to cross the threshold.</p>
+                <GlassPane variant="modal" className="text-center p-8 flex flex-col items-center">
+                  <ScribeSigil className="h-16 w-16 text-primary mb-4" />
+                  <h2 className="text-xl font-bold text-primary-foreground">The Echo Has Been Sent</h2>
+                  <p className="text-muted-foreground mt-2">Follow the path in your inbox to cross the threshold.</p>
+                </GlassPane>
             </motion.div>
         ) : (
             <motion.form

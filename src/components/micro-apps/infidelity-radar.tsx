@@ -13,6 +13,7 @@ import { InfidelityRadarOutput } from '@/ai/flows/infidelity-radar-agent';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, FileText, Send, TestTube2 } from 'lucide-react';
 import { useAppStore } from '@/store/app-store';
+import { GlassPane } from '../ui/glass-pane';
 
 const RiskScoreGauge = ({ score }: { score: number }) => {
   const rotation = (score / 100) * 180;
@@ -93,7 +94,7 @@ export function InfidelityRadar() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-card/50 sigil-codex">
+    <div className="h-full w-full flex flex-col bg-transparent sigil-codex">
         <form onSubmit={handleSubmit} className="p-4 space-y-3 border-b border-border">
             <div>
                 <Label htmlFor="situation">Situation & Metadata Briefing</Label>
@@ -135,38 +136,30 @@ export function InfidelityRadar() {
                   </TabsList>
                   <TabsContent value="analysis" className="flex-grow p-4 space-y-4">
                         <RiskScoreGauge score={result.likelihood} />
-                        <Card className='bg-transparent'>
-                            <CardHeader className='p-2'>
-                                <CardTitle className='text-base flex items-center gap-2'><AlertTriangle className='h-4 w-4'/>Suspicious Patterns</CardTitle>
-                            </CardHeader>
-                            <CardContent className='p-2'>
-                               <ul className="list-disc list-inside space-y-1 text-sm">
-                                    {result.suspiciousPatterns.map((pattern, i) => (
-                                        <li key={i}>{pattern}</li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
+                        <GlassPane className='p-3'>
+                            <h3 className='text-base flex items-center gap-2 mb-2 font-semibold'><AlertTriangle className='h-4 w-4'/>Suspicious Patterns</h3>
+                            <ul className="list-disc list-inside space-y-1 text-sm">
+                                {result.suspiciousPatterns.map((pattern, i) => (
+                                    <li key={i}>{pattern}</li>
+                                ))}
+                            </ul>
+                        </GlassPane>
                         <Button variant="outline" onClick={handleExport} className='w-full'>
                             <FileText className='mr-2 h-4 w-4' />
                             Export Dossier
                         </Button>
                   </TabsContent>
                   <TabsContent value="decoy" className="flex-grow p-4">
-                      <Card className='bg-transparent h-full flex flex-col'>
-                          <CardHeader>
-                              <CardTitle className='text-base'>Calculated Decoy Message</CardTitle>
-                              <CardDescription>A plausible, short message to test loyalty.</CardDescription>
-                          </CardHeader>
-                          <CardContent className='flex-grow'>
-                              <blockquote className="border-l-2 border-primary pl-4 italic text-foreground">
-                                  {result.decoyMessage}
-                              </blockquote>
-                          </CardContent>
-                          <CardFooter>
-                              <Button className='w-full'><Send className='mr-2 h-4 w-4' />Deploy Seduction Agent™</Button>
-                          </CardFooter>
-                      </Card>
+                      <GlassPane className='h-full flex flex-col p-4'>
+                          <h3 className='text-base font-semibold'>Calculated Decoy Message</h3>
+                          <p className="text-sm text-muted-foreground">A plausible, short message to test loyalty.</p>
+                          <div className='flex-grow flex items-center justify-center'>
+                            <blockquote className="border-l-2 border-primary pl-4 italic text-foreground">
+                                {result.decoyMessage}
+                            </blockquote>
+                          </div>
+                          <Button className='w-full'><Send className='mr-2 h-4 w-4' />Deploy Seduction Agent™</Button>
+                      </GlassPane>
                   </TabsContent>
               </Tabs>
             )}
