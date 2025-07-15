@@ -12,6 +12,8 @@ import { InfidelityRadar } from "@/components/micro-apps/infidelity-radar";
 import { DossierViewer } from "@/components/micro-apps/dossier-viewer";
 import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
 import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -20,54 +22,34 @@ import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
 export default function CanvasPage() {
   const { microApps, activeMicroAppId, setActiveMicroAppId, closeMicroApp, addMicroApp } = useAppStore();
 
-  useEffect(() => {
-    // Register all available Micro-Apps with the central store.
-    // This allows BEEP to summon them by their type string.
-    useAppStore.setState({ 
-      appComponentRegistry: {
-        'Terminal': Terminal,
-        'FinancialAdvisor': FinancialAdvisor,
-        'BeepWingman': BeepWingman,
-        'InfidelityRadar': InfidelityRadar,
-        'DossierViewer': DossierViewer,
-        'TheSovereignArsenal': TheSovereignArsenal,
-        'UsageMonitor': UsageMonitor,
-      } 
-    });
-
-    // Launch the Terminal by default on first load.
-    if (microApps.length === 0) {
-        addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Mock user and workspace for demonstration purposes.
-  // In a real application, this would come from a session context.
-  const mockUser = {
-    id: 'user_clx01_sovereign_initiate',
-    firstName: 'Sovereign',
-    lastName: 'Initiate',
-    email: 'initiate@aevonos.com',
-    avatarUrl: 'https://placehold.co/100x100.png',
-  };
-  const mockWorkspace = {
-    id: 'ws_clx01',
-    name: 'The First Foundry',
-    aetherBalance: 15230,
-  };
+  // For this example, we'll treat the Canvas as a public-facing demo.
+  // We'll show a welcome screen instead of a login-gated canvas.
+  // In a real app, this would be protected by authentication.
 
   return (
     <div className="h-screen w-screen bg-background overflow-hidden flex flex-col">
-      <Header user={mockUser} workspace={mockWorkspace} />
-      <main className="flex-1">
-        <Canvas 
-          apps={microApps} 
-          activeAppId={activeMicroAppId}
-          onAppSelect={setActiveMicroAppId}
-          onAppClose={closeMicroApp}
-        />
+      <Header />
+      <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
+        <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-6xl font-bold sigil-obelisk tracking-tight text-primary-foreground">
+                The Scriptorium
+            </h1>
+            <p className="mt-4 text-lg md:text-xl text-muted-foreground sigil-codex max-w-xl mx-auto">
+                A living, sentient codex for personal and operational myth. This is not a product. It is a mythware artifact.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <Button asChild size="lg">
+                    <Link href="/library">Explore the Constellation</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                    <Link href="/library/CORE-MANIFESTO">Read the Doctrine</Link>
+                </Button>
+            </div>
+        </div>
       </main>
+      <footer className="p-4 text-xs text-muted-foreground/50 text-center">
+          <p>This is a technical demonstration of ΛΞVON OS. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
