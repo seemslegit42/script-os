@@ -41,7 +41,7 @@ export default function RootLayout({
             --font-code: 'Recursive', monospace;
           } 
         `}} />
-        <Script defer data-domain="your-domain.com" src="https://plausible.io/js/script.js" />
+        <Script defer data-domain="aevonos.com" src="https://plausible.io/js/script.js" />
       </head>
       <body className={cn('antialiased')}>
         <TypographicStateProvider>
