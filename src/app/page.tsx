@@ -5,8 +5,8 @@ import { Canvas } from "@/components/canvas";
 import { Header } from "@/components/header";
 import { useAppStore } from "@/store/app-store";
 import { Terminal } from "@/components/micro-apps/terminal";
-import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
-import { ThePantheon } from "@/components/micro-apps/the-pantheon";
+import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
+
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -21,12 +21,12 @@ export default function CanvasPage() {
     useAppStore.setState({ 
       appComponentRegistry: {
         'Terminal': Terminal,
-        'UsageMonitor': UsageMonitor,
-        'ThePantheon': ThePantheon,
+        'TheSovereignArsenal': TheSovereignArsenal,
       } 
     });
 
-    // Launch the Terminal by default for immediate interaction.
+    // Launch the Arsenal and Terminal by default.
+    addMicroApp({ type: 'TheSovereignArsenal', title: 'The Sovereign Arsenal' });
     addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
   }, [addMicroApp]);
 
@@ -42,7 +42,7 @@ export default function CanvasPage() {
   const mockWorkspace = {
     id: 'ws_clx01',
     name: 'The First Foundry',
-    creditBalance: 10000,
+    aetherBalance: 10000,
   };
 
   return (

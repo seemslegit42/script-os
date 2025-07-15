@@ -28,11 +28,11 @@ export type User = {
 export type Workspace = {
     id: string;
     name: string;
-    creditBalance: number;
+    aetherBalance: number; // Canon: Aether (Ξ) is the currency.
 };
 
 // Defines the available types of Micro-Apps that can be registered and launched.
-export type MicroAppType = 'Terminal' | 'UsageMonitor' | 'ThePantheon'; // Add other app types here as they are created
+export type MicroAppType = 'Terminal' | 'TheSovereignArsenal';
 
 // Represents the structure of a Micro-App instance on the Canvas.
 export type MicroApp = {
