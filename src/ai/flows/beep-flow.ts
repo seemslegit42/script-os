@@ -64,23 +64,23 @@ const beepFlow = ai.defineFlow(
 
     const lowerCommand = input.command.toLowerCase();
     
-    // Simple hard-coded routing for now.
+    // Routing for launching Micro-Apps
     if (lowerCommand.includes('terminal')) {
         return {
-            response: "BEEP: Summoning Terminal...",
+            response: "BEEP: Summoning Terminal... The raw conduit is open.",
             appToLaunch: { type: 'Terminal', title: 'BEEP Command Core' },
         };
     }
-    if (lowerCommand.includes('arsenal')) {
+    if (lowerCommand.includes('arsenal') || lowerCommand.includes('rites')) {
         return {
-            response: "BEEP: Revealing The Sovereign Arsenal...",
+            response: "BEEP: Revealing The Sovereign Arsenal and its Rites of Ascension.",
             appToLaunch: { type: 'TheSovereignArsenal', title: 'The Sovereign Arsenal' },
         };
     }
-     if (lowerCommand.includes('usage') || lowerCommand.includes('ledger')) {
+     if (lowerCommand.includes('usage') || lowerCommand.includes('ledger') || lowerCommand.includes('balance') || lowerCommand.includes('aether')) {
         return {
             response: "BEEP: Opening the Ledger of Tribute...",
-            appToLaunch: { type: 'UsageMonitor', title: 'Usage Monitor' },
+            appToLaunch: { type: 'UsageMonitor', title: 'Ledger of Tribute' },
         };
     }
      if (lowerCommand.includes('advisor') || lowerCommand.includes('canary')) {
@@ -95,22 +95,24 @@ const beepFlow = ai.defineFlow(
             appToLaunch: { type: 'BeepWingman', title: 'BeepWingman 2.5' },
         };
     }
-    if (lowerCommand.includes('infidelity') || lowerCommand.includes('radar')) {
+    if (lowerCommand.includes('infidelity') || lowerCommand.includes('radar') || lowerCommand.includes('spectre')) {
         return {
-            response: "BEEP: Engaging the Spectre...",
+            response: "BEEP: Engaging the Spectre... The Sovereign Mirror is active.",
             appToLaunch: { type: 'InfidelityRadar', title: 'Infidelity Radar' },
         };
     }
 
+    // Routing for tool use within apps
     if (lowerCommand.includes('rico') || lowerCommand.includes('tinder') || lowerCommand.includes('chat') || lowerCommand.includes('date')) {
         const result = await invokeRicoSauveBot({ chatHistory: input.command });
         return { response: JSON.stringify(result, null, 2) };
     }
-     if (lowerCommand.includes('relationship risk') || lowerCommand.includes('spectre') || lowerCommand.includes('decoy')) {
+     if (lowerCommand.includes('relationship risk') || lowerCommand.includes('decoy')) {
         const result = await analyzeRelationshipRisk({ situation: input.command });
         return { response: JSON.stringify(result, null, 2) };
     }
     
+    // Default fallback response
     return {
         response: `BEEP: Command received: "${input.command}". No specific action is configured for this yet.`,
     };
