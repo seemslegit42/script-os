@@ -17,6 +17,9 @@ export async function GET(req: Request) {
     return NextResponse.json(usageDetails);
   } catch (error) {
     console.error('Failed to get usage details:', error);
+    if (error instanceof Error) {
+        return NextResponse.json({ error: error.message }, { status: 404 });
+    }
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });
   }
 }
