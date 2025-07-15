@@ -10,6 +10,8 @@ import { FinancialAdvisor } from "@/components/micro-apps/financial-advisor";
 import { BeepWingman } from "@/components/micro-apps/beep-wingman";
 import { InfidelityRadar } from "@/components/micro-apps/infidelity-radar";
 import { DossierViewer } from "@/components/micro-apps/dossier-viewer";
+import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
+import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -28,6 +30,8 @@ export default function CanvasPage() {
         'BeepWingman': BeepWingman,
         'InfidelityRadar': InfidelityRadar,
         'DossierViewer': DossierViewer,
+        'TheSovereignArsenal': TheSovereignArsenal,
+        'UsageMonitor': UsageMonitor,
       } 
     });
 
@@ -41,7 +45,7 @@ export default function CanvasPage() {
   // Mock user and workspace for demonstration purposes.
   // In a real application, this would come from a session context.
   const mockUser = {
-    id: 'user_clx01',
+    id: 'user_clx01_sovereign_initiate',
     firstName: 'Sovereign',
     lastName: 'Initiate',
     email: 'initiate@aevonos.com',

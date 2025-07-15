@@ -49,11 +49,11 @@ const beepFlow = ai.defineFlow(
 
     Available apps and the commands to launch them:
     - Launching 'Terminal': "launch terminal", "open terminal"
-    - Launching 'The Sovereign Arsenal': "launch arsenal", "open sovereign arsenal"
-    - Launching 'Usage Monitor': "launch usage", "open ledger"
-    - Launching 'Financial Advisor': "launch advisor", "open financial advisor", "cash canary"
+    - Launching 'TheSovereignArsenal': "launch arsenal", "open sovereign arsenal"
+    - Launching 'UsageMonitor': "launch usage", "open ledger"
+    - Launching 'FinancialAdvisor': "launch advisor", "open financial advisor", "cash canary"
     - Launching 'BeepWingman': "launch wingman", "open beepwingman"
-    - Launching 'Infidelity Radar': "launch infidelity radar", "open radar"
+    - Launching 'InfidelityRadar': "launch infidelity radar", "open radar"
 
     Tool commands:
     - If the command mentions "rico", "tinder", "chat", or "date", use the 'invokeRicoSauveBot' tool.

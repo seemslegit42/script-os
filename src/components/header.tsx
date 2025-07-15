@@ -76,7 +76,7 @@ export function Header({ user, workspace }: HeaderProps) {
     );
   }
 
-  // Fallback public header, though direct access to Canvas page should be protected
+  // Fallback public header
   return (
     <header className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-background/30 backdrop-blur-lg border-b border-primary/20">
       <Link href="/" className="flex items-center gap-2 cursor-pointer">
