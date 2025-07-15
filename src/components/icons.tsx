@@ -1,4 +1,3 @@
-
 // src/components/icons.tsx
 'use client';
 
@@ -6,102 +5,102 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 /**
- * A decorative, animated SVG icon representing The Sovereign's Ledger.
- * It's a complex, multi-layered armillary sphere that embodies the project's philosophy.
+ * A decorative, animated SVG icon representing the canonical sigil of ΛΞVON OS.
+ * It's an interwoven, continuous path with a pulsing core, embodying flow and intelligence.
  * @param {React.ComponentProps<'svg'>} props - Standard SVG component props.
  */
 export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>) => {
+  const draw = {
+    hidden: { pathLength: 0, opacity: 0 },
+    visible: {
+      pathLength: 1,
+      opacity: 1,
+      transition: {
+        pathLength: { type: "spring", duration: 3, bounce: 0 },
+        opacity: { duration: 0.01 }
+      }
+    }
+  };
+
+  const pulse = {
+    animate: {
+      scale: [1, 1.1, 1],
+      opacity: [0.8, 1, 0.8],
+    },
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: 'easeInOut',
+    },
+  };
+
   return (
     <svg
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn('w-10 h-10', className)}
+      className={cn('w-20 h-20', className)}
       {...props}
     >
-      <defs>
+       <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <radialGradient id="core-gradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(var(--accent) / 0.8)" />
-            <stop offset="50%" stopColor="hsl(var(--secondary) / 0.7)" />
-            <stop offset="100%" stopColor="hsl(var(--primary) / 0)" />
-        </radialGradient>
-        <linearGradient id="crest-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--primary-foreground) / 0.9)" />
-            <stop offset="100%" stopColor="hsl(var(--primary-foreground) / 0.6)" />
-        </linearGradient>
       </defs>
-
-      <g id="rings">
-        {/* Ring 1 - Outer */}
-        <motion.circle
-          cx="50" cy="50" r="45"
-          fill="none" stroke="hsl(var(--primary) / 0.3)" strokeWidth="0.5"
-          initial={{ rotate: 0 }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        />
-        {/* Ring 2 - Inner Dashed */}
-        <motion.circle
-          cx="50" cy="50" r="38"
-          fill="none" stroke="hsl(var(--accent) / 0.4)" strokeWidth="1" strokeDasharray="5 10"
-          initial={{ rotate: 90 }}
-          animate={{ rotate: -270 }}
-          transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-        />
-         {/* Ring 3 - Vertical Ellipse */}
-        <motion.ellipse
-            cx="50" cy="50" rx="28" ry="42"
-            fill="none" stroke="hsl(var(--secondary) / 0.3)" strokeWidth="0.75"
-            initial={{ rotate: -20 }}
-            animate={{ rotate: 340 }}
-            transition={{ duration: 55, repeat: Infinity, ease: 'linear' }}
-        />
-         {/* Ring 4 - Horizontal Ellipse */}
-         <motion.ellipse
-            cx="50" cy="50" rx="42" ry="28"
-            fill="none" stroke="hsl(var(--secondary) / 0.3)" strokeWidth="0.75"
-            initial={{ rotate: 20 }}
-            animate={{ rotate: -340 }}
-            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-        />
-      </g>
-
-      {/* Central Core */}
+      
+      {/* Outer Circle */}
       <motion.circle
         cx="50"
         cy="50"
-        r="15"
-        fill="url(#core-gradient)"
-        filter="url(#glow)"
-        animate={{ 
-            scale: [1, 1.03, 1],
-            opacity: [0.9, 1, 0.9]
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        r="48"
+        stroke="hsl(var(--primary-foreground))"
+        strokeWidth="1.5"
+        fill="none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ duration: 1 }}
       />
       
-       {/* Winged Crest */}
-       <g transform="translate(50 50) scale(0.3)">
-        <motion.path
-          d="M-35,2 L-15,2 L-15,10 C-15,10 -5,15 0,25 C5,15 15,10 15,10 L15,2 L35,2 L35,12 C35,12 25,20 10,35 L-10,35 C-25,20 -35,12 -35,12Z M0,0 L10,15 L-10,15Z"
-          fill="url(#crest-gradient)"
-          stroke="hsl(var(--primary-foreground) / 0.5)"
-          strokeWidth="2"
-          initial={{ y: 2, opacity: 0.8 }}
-          animate={{ y: [2, 0, 2], opacity: [0.8, 0.95, 0.8] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </g>
+      {/* Interwoven Path */}
+      <motion.path
+        d="M 50,12 
+           C 50,28 38,28 38,40 
+           L 38,60 
+           C 38,72 50,72 50,88
+           M 12,50 
+           C 28,50 28,38 40,38 
+           L 60,38 
+           C 72,38 72,50 88,50"
+        stroke="hsl(var(--primary-foreground))"
+        strokeWidth="8"
+        strokeLinecap="round"
+        fill="none"
+        variants={draw}
+        initial="hidden"
+        animate="visible"
+        transform="rotate(45 50 50)"
+      />
 
+      {/* Central Core (Agentic Spark) */}
+       <motion.rect
+        x="42"
+        y="42"
+        width="16"
+        height="16"
+        rx="2"
+        fill="hsl(var(--primary))"
+        filter="url(#glow)"
+        initial={{ opacity: 0 }}
+        animate={{...pulse.animate, opacity: [0, 0.8] }}
+        transition={{...pulse.transition, opacity: { duration: 1, delay: 2.5 } }}
+      />
     </svg>
   );
 };
+
 
 /**
  * A decorative, animated SVG icon used to provide feedback when saving a scripture.
