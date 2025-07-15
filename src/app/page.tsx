@@ -34,7 +34,7 @@ const mockWorkspace: Workspace = {
  * This is the primary workspace where all user interaction with Micro-Apps occurs.
  */
 export default function CanvasPage() {
-  const { microApps, activeMicroAppId, setActiveMicroAppId, closeMicroApp, appComponentRegistry } = useAppStore();
+  const { microApps, activeMicroAppId, setActiveMicroAppId, closeMicroApp } = useAppStore();
 
   // Register all available Micro-Apps on component mount.
   // This is the "Agent Registry" for the frontend.

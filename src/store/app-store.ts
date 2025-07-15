@@ -23,7 +23,7 @@ interface AppState {
 
 // Function to get the highest z-index from the current apps
 const getHighestZIndex = (apps: MicroApp[]): number => {
-  if (apps.length === 0) return 0;
+  if (apps.length === 0) return 10; // Start z-index at 10
   return Math.max(...apps.map(app => app.zIndex));
 };
 
@@ -34,19 +34,20 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addMicroApp: (app) => {
     set((state) => {
-      // Check if an app of this type is already open and single-instance is desired.
-      // For now, we allow multiple instances but bring existing to front if re-launched.
-      // A more robust implementation might have a 'singleInstance' flag in app metadata.
-      const existingApp = state.microApps.find(a => a.type === app.type && !app.props);
-      if (existingApp) {
-        const highestZIndex = getHighestZIndex(state.microApps);
-        set({
-          activeMicroAppId: existingApp.id,
-          microApps: state.microApps.map(a =>
+      // Check if an app of this type that doesn't accept props is already open.
+      // If so, bring it to the front instead of creating a new one.
+      if (!app.props) {
+        const existingApp = state.microApps.find(a => a.type === app.type);
+        if (existingApp) {
+          const highestZIndex = getHighestZIndex(state.microApps);
+          const updatedApps = state.microApps.map(a =>
               a.id === existingApp.id ? { ...a, zIndex: highestZIndex + 1 } : a
-          ),
-        });
-        return {}; 
+          );
+          return {
+            microApps: updatedApps,
+            activeMicroAppId: existingApp.id,
+          };
+        }
       }
 
       const newId = `${app.type}-${Date.now()}`;
@@ -83,10 +84,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   }),
 
   closeMicroApp: (id: string) => {
-    set((state) => ({
-      microApps: state.microApps.filter((app) => app.id !== id),
-      activeMicroAppId: state.activeMicroAppId === id ? null : state.activeMicroAppId
-    }));
+    set((state) => {
+        const remainingApps = state.microApps.filter((app) => app.id !== id);
+        let newActiveAppId = null;
+        if (remainingApps.length > 0) {
+            // Find the app with the highest z-index among the remaining ones
+            newActiveAppId = remainingApps.reduce((prev, current) => (prev.zIndex > current.zIndex) ? prev : current).id;
+        }
+
+        return {
+            microApps: remainingApps,
+            activeMicroAppId: newActiveAppId,
+        };
+    });
   },
 
   handleCommandSubmit: async (command: string): Promise<string> => {

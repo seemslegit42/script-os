@@ -31,9 +31,9 @@ interface CanvasProps {
 export function Canvas({ apps, activeAppId, onAppSelect, onAppClose }: CanvasProps) {
   const { appComponentRegistry } = useAppStore.getState();
 
-  const renderAppContent = (appType: MicroAppType) => {
+  const renderAppContent = (appType: MicroAppType, props?: Record<string, any>) => {
     const AppComponent = appComponentRegistry[appType];
-    return AppComponent ? <AppComponent /> : <div>Error: App type '{appType}' not found in registry.</div>;
+    return AppComponent ? <AppComponent {...props} /> : <div>Error: App type '{appType}' not found in registry.</div>;
   }
 
   return (
@@ -51,7 +51,7 @@ export function Canvas({ apps, activeAppId, onAppSelect, onAppClose }: CanvasPro
               onClose={() => onAppClose(app.id)}
               zIndex={app.zIndex}
             >
-              {renderAppContent(app.type)}
+              {renderAppContent(app.type, app.props)}
             </MicroAppWindow>
         ))}
       </AnimatePresence>

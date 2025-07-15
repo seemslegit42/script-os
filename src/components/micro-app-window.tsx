@@ -46,14 +46,15 @@ export function MicroAppWindow({
         handle=".handle"
         onStart={onSelect}
         nodeRef={nodeRef}
+        bounds="parent"
         defaultPosition={{
-            x: window.innerWidth / 2 - 275 + (Math.random() - 0.5) * 100,
-            y: window.innerHeight / 3 - 200 + (Math.random() - 0.5) * 100
+            x: (window.innerWidth / 2 - 275) + ((Math.random() - 0.5) * 200),
+            y: (window.innerHeight / 3 - 200) + ((Math.random() - 0.5) * 150)
         }}
     >
         <motion.div
             ref={nodeRef}
-            style={{ zIndex, width: size.width, height: size.height }}
+            style={{ zIndex, width: size.width, height: 'auto' }}
             className="absolute"
             initial={{ opacity: 0, scale: 0.9, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -61,26 +62,33 @@ export function MicroAppWindow({
             transition={{ type: 'spring', stiffness: 260, damping: 30 }}
             onMouseDown={onSelect}
         >
-            <Resizable height={size.height} width={size.width} onResize={onResize} minConstraints={[300, 200]} maxConstraints={[1200, 800]} handleSize={[20, 20]}>
+            <Resizable 
+              height={size.height} 
+              width={size.width} 
+              onResize={onResize} 
+              minConstraints={[300, 200]} 
+              maxConstraints={[1200, 900]} 
+              handleSize={[20, 20]}
+            >
                 <Card 
                     className={`w-full h-full flex flex-col bg-card/80 backdrop-blur-lg border transition-all duration-300 ${isActive ? 'border-primary/50 shadow-2xl shadow-primary/20' : 'border-border/50 shadow-xl'}`}
                     style={{ width: size.width, height: size.height }}
                 >
-                    <CardHeader className="flex flex-row items-center justify-between p-2 pl-3 border-b cursor-move handle">
+                    <CardHeader className="flex flex-row items-center justify-between p-2 pl-3 border-b cursor-move handle shrink-0">
                     <div className="flex items-center gap-2">
                         <ScribeSigil className="h-5 w-5 text-primary/80" />
                         <h3 className="text-sm font-medium text-foreground">{title}</h3>
                     </div>
                     <div className="flex items-center">
                         <GripVertical className="h-5 w-5 text-muted-foreground/50 mr-2" />
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); onClose();}}>
                         <X className="h-4 w-4" />
                         <span className="sr-only">Close</span>
                         </Button>
                     </div>
                     </CardHeader>
                     <CardContent className="p-0 flex-grow overflow-auto">
-                    {children}
+                      {children}
                     </CardContent>
                 </Card>
             </Resizable>
