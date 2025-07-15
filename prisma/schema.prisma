@@ -1,82 +1,75 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
-// ===============================================
-//           Core Tenancy & User Models
-// ===============================================
-
-model Workspace {
-  id        String   @id @default(cuid())
-  uuid      String   @unique @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  members WorkspaceUser[]
-  contacts Contact[]
-
-  @@map("workspaces")
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
   id        String   @id @default(cuid())
-  uuid      String   @unique @default(uuid())
   email     String   @unique
-  firstName String?
-  lastName  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  workspaces WorkspaceUser[]
+  sovereigntyClass String @default("INITIATE") // INITIATE, SOVEREIGN, ARCHITECT
 
-  @@map("users")
+  wallet      UserWallet?
+  canvasState CanvasState?
+  psycheState PsycheState?
+  instances   MicroAppInstance[]
 }
 
-model WorkspaceUser {
-  id          String    @id @default(cuid())
-  role        String    @default("MEMBER") // e.g., OWNER, ADMIN, MEMBER
-  workspaceId String
-  userId      String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([workspaceId, userId])
-  @@map("workspace_users")
+model UserWallet {
+  id      String @id @default(cuid())
+  userId  String @unique
+  user    User   @relation(fields: [userId], references: [id])
+  balance BigInt @default(1000) // Starting balance
 }
 
+model CanvasState {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+  layout Json // JSON representation of Micro-App positions and sizes
+}
 
-// ===============================================
-//           CRM Service Schema
-// ===============================================
+model MicroApp {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  developerId String
+  instances   MicroAppInstance[]
+}
 
-model Contact {
-  id                String    @id @default(cuid())
-  uuid              String    @unique @default(uuid())
-  workspaceId       String
-  email             String?
-  firstName         String?
-  lastName          String?
-  phone             String?
-  customProperties  Json      @default("{}")
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+model MicroAppInstance {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  microAppId String
+  microApp   MicroApp @relation(fields: [microAppId], references: [id])
+  state      Json     // Specific state for this user's instance of the app
+  createdAt  DateTime @default(now())
+}
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+model Transaction {
+  id              String   @id @default(cuid())
+  amount          BigInt
+  memo            String
+  fromUserId      String
+  toUserId        String
+  createdAt       DateTime @default(now())
+  aegisSignature  String   // Signature from Aegis to verify integrity
+}
 
-  @@unique([workspaceId, email])
-  @@index([workspaceId])
-  @@map("contacts")
+model PsycheState {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  sreWave           Float    // Sine-Rhythm Engine value (-1.0 to 1.0)
+  lossStreak        Int      @default(0)
+  frustrationLevel  Float    @default(0.0) // Metric monitored by Aegis
+  isThrottled       Boolean  @default(false)
 }
