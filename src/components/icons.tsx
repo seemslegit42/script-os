@@ -16,7 +16,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
       pathLength: 1,
       opacity: 1,
       transition: {
-        pathLength: { type: "spring", duration: 3, bounce: 0 },
+        pathLength: { type: "spring", duration: 3, bounce: 0, delay: 0.5 },
         opacity: { duration: 0.01 }
       }
     }
@@ -31,6 +31,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
       duration: 3,
       repeat: Infinity,
       ease: 'easeInOut',
+      delay: 3,
     },
   };
 
@@ -43,7 +44,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
     >
        <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
@@ -64,24 +65,17 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
         transition={{ duration: 1 }}
       />
       
-      {/* Interwoven Path */}
+      {/* Interwoven Path - The True Form */}
       <motion.path
-        d="M 50,12 
-           C 50,28 38,28 38,40 
-           L 38,60 
-           C 38,72 50,72 50,88
-           M 12,50 
-           C 28,50 28,38 40,38 
-           L 60,38 
-           C 72,38 72,50 88,50"
+        d="M50 12C50 21 42 21 42 30V42H30C21 42 21 50 12 50C21 50 21 58 30 58H42V70C42 79 50 79 50 88C50 79 58 79 58 70V58H70C79 58 79 50 88 50C79 50 79 42 70 42H58V30C58 21 50 21 50 12Z"
         stroke="hsl(var(--primary-foreground))"
         strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
         fill="none"
         variants={draw}
         initial="hidden"
         animate="visible"
-        transform="rotate(45 50 50)"
       />
 
       {/* Central Core (Agentic Spark) */}
@@ -94,7 +88,7 @@ export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>
         fill="hsl(var(--primary))"
         filter="url(#glow)"
         initial={{ opacity: 0 }}
-        animate={{...pulse.animate, opacity: [0, 0.8] }}
+        animate={{...pulse.animate, opacity: [0, 0, 1] }}
         transition={{...pulse.transition, opacity: { duration: 1, delay: 2.5 } }}
       />
     </svg>
