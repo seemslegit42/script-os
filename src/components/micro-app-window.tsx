@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, GripVertical } from 'lucide-react';
@@ -39,6 +39,7 @@ export function MicroAppWindow({
     y: window.innerHeight / 2 - 200 + (Math.random() - 0.5) * 100 
   });
   const [size, setSize] = useState({ width: 550, height: 400 });
+  const nodeRef = useRef(null);
 
   const handleDrag = (e: DraggableEvent, data: DraggableData) => {
     setPosition({ x: position.x + data.deltaX, y: position.y + data.deltaY });
@@ -49,9 +50,10 @@ export function MicroAppWindow({
   };
 
   return (
-    <DraggableCore handle=".handle" onDrag={handleDrag} onStart={onSelect}>
-      <Resizable height={size.height} width={size.width} onResize={onResize} minConstraints={[300, 200]}>
+    <DraggableCore handle=".handle" onDrag={handleDrag} onStart={onSelect} nodeRef={nodeRef}>
+      <Resizable height={size.height} width={size.width} onResize={onResize} minConstraints={[300, 200]} handleSize={[20, 20]}>
         <motion.div
+          ref={nodeRef}
           initial={{ opacity: 0, scale: 0.9, y: 50 }}
           animate={{ 
             opacity: 1, 
