@@ -32,33 +32,40 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeMicroAppId: null,
   appComponentRegistry: {},
 
-  addMicroApp: (app) => set((state) => {
-    const existingApp = state.microApps.find(a => a.type === app.type);
-    if (existingApp) {
+  addMicroApp: (app) => {
+    set((state) => {
+      // Check if an app of this type is already open and single-instance is desired.
+      // For now, we allow multiple instances but bring existing to front if re-launched.
+      // A more robust implementation might have a 'singleInstance' flag in app metadata.
+      const existingApp = state.microApps.find(a => a.type === app.type && !app.props);
+      if (existingApp) {
+        const highestZIndex = getHighestZIndex(state.microApps);
+        set({
+          activeMicroAppId: existingApp.id,
+          microApps: state.microApps.map(a =>
+              a.id === existingApp.id ? { ...a, zIndex: highestZIndex + 1 } : a
+          ),
+        });
+        return {}; 
+      }
+
+      const newId = `${app.type}-${Date.now()}`;
       const highestZIndex = getHighestZIndex(state.microApps);
-      set({
-        activeMicroAppId: existingApp.id,
-        microApps: state.microApps.map(a =>
-            a.id === existingApp.id ? { ...a, zIndex: highestZIndex + 1 } : a
-        ),
-      });
-      return {}; 
-    }
+      
+      const newApp: MicroApp = {
+        id: newId,
+        type: app.type,
+        title: app.title,
+        zIndex: highestZIndex + 1,
+        props: app.props,
+      };
 
-    const newId = `${app.type}-${Date.now()}`;
-    const highestZIndex = getHighestZIndex(state.microApps);
-    
-    const newApp: MicroApp = {
-      ...app,
-      id: newId,
-      zIndex: highestZIndex + 1,
-    };
-
-    return { 
-      microApps: [...state.microApps, newApp],
-      activeMicroAppId: newId 
-    };
-  }),
+      return { 
+        microApps: [...state.microApps, newApp],
+        activeMicroAppId: newId 
+      };
+    })
+  },
   
   removeMicroApp: (id) => set((state) => ({
     microApps: state.microApps.filter(app => app.id !== id),

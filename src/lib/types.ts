@@ -37,7 +37,8 @@ export type MicroAppType =
     | 'Terminal'
     | 'FinancialAdvisor'
     | 'BeepWingman'
-    | 'InfidelityRadar';
+    | 'InfidelityRadar'
+    | 'DossierViewer';
 
 // Represents the structure of a Micro-App instance on the Canvas.
 export type MicroApp = {
@@ -45,6 +46,7 @@ export type MicroApp = {
     type: MicroAppType; // The type of the app, used to look up the component in the registry
     title: string;
     zIndex: number;
+    props?: Record<string, any>; // Optional props to pass to the component
 };
 
 // Defines the schema for inputs to the BEEP agent.
@@ -59,6 +61,7 @@ export const BeepOutputSchema = z.object({
   appToLaunch: z.object({
       type: z.custom<MicroAppType>(),
       title: z.string(),
+      props: z.record(z.any()).optional(),
   }).optional().describe('The Micro-App to launch, if any.'),
 });
 export type BeepOutput = z.infer<typeof BeepOutputSchema>;

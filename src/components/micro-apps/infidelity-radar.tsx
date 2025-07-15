@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -11,6 +12,7 @@ import { Skeleton } from '../ui/skeleton';
 import { InfidelityRadarOutput } from '@/ai/flows/infidelity-radar-agent';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, FileText, Send, TestTube2 } from 'lucide-react';
+import { useAppStore } from '@/store/app-store';
 
 const RiskScoreGauge = ({ score }: { score: number }) => {
   const rotation = (score / 100) * 180;
@@ -45,6 +47,7 @@ export function InfidelityRadar() {
   const [result, setResult] = useState<InfidelityRadarOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { addMicroApp } = useAppStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,10 +80,16 @@ export function InfidelityRadar() {
   };
   
   const handleExport = () => {
-      toast({
-          title: "Dossier Export Initiated",
-          description: "This is a premium feature. In a real scenario, a PDF would be generated.",
-      })
+    if (!result) return;
+    addMicroApp({
+        type: 'DossierViewer',
+        title: `Dossier: ${new Date().toISOString().split('T')[0]}`,
+        props: { analysis: result }
+    });
+    toast({
+        title: "Dossier Export Initiated",
+        description: "A new Dossier Viewer has been summoned to the Canvas.",
+    })
   }
 
   return (

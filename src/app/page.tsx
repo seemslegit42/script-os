@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect } from "react";
@@ -8,6 +9,7 @@ import { Terminal } from "@/components/micro-apps/terminal";
 import { FinancialAdvisor } from "@/components/micro-apps/financial-advisor";
 import { BeepWingman } from "@/components/micro-apps/beep-wingman";
 import { InfidelityRadar } from "@/components/micro-apps/infidelity-radar";
+import { DossierViewer } from "@/components/micro-apps/dossier-viewer";
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -25,6 +27,7 @@ export default function CanvasPage() {
         'FinancialAdvisor': FinancialAdvisor,
         'BeepWingman': BeepWingman,
         'InfidelityRadar': InfidelityRadar,
+        'DossierViewer': DossierViewer,
       } 
     });
 
@@ -32,7 +35,8 @@ export default function CanvasPage() {
     if (microApps.length === 0) {
         addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
     }
-  }, [addMicroApp, microApps.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Mock user and workspace for demonstration purposes.
   // In a real application, this would come from a session context.
