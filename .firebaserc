@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "von-os-juooq",
+    "staging": "von-os-juooq"
+  },
+  "targets": {},
+  "etags": {}
+}

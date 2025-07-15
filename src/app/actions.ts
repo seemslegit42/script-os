@@ -96,7 +96,7 @@ export async function processUserCommand(command: string): Promise<BeepOutput> {
         const response = await beep({ command });
         return response;
     } catch (error) {
-        console.error("Error processing BEEP command:", error);
+        console.error("Error processing BEEP command:", error); // Log the full error object
         return {
             response: "Aegis Alert: The BEEP agent has encountered a critical error. The command could not be processed.",
         };
