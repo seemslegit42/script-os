@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { useAppStore } from "@/store/app-store";
 import { Terminal } from "@/components/micro-apps/terminal";
 import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
+import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
 
 
 /**
@@ -22,6 +23,7 @@ export default function CanvasPage() {
       appComponentRegistry: {
         'Terminal': Terminal,
         'TheSovereignArsenal': TheSovereignArsenal,
+        'UsageMonitor': UsageMonitor,
       } 
     });
 
@@ -42,7 +44,7 @@ export default function CanvasPage() {
   const mockWorkspace = {
     id: 'ws_clx01',
     name: 'The First Foundry',
-    aetherBalance: 10000,
+    aetherBalance: 15230,
   };
 
   return (
