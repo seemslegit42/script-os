@@ -1,0 +1,18 @@
+
+{
+  "manifestVersion": 1,
+  "id": "com.aevon-systems.the-pantheon",
+  "name": "The Pantheon",
+  "version": "1.0.0",
+  "description": "A ritual interface for sovereign relationship and operational memory. The age of dashboards is over.",
+  "permissions": [],
+  "agentic_interface": {
+    "view_pantheon": {
+      "description": "Summons the Pantheon to the Canvas, providing a view into the workspace's collective soul.",
+      "parameters": {}
+    }
+  },
+  "monetization": {
+    "type": "included"
+  }
+}

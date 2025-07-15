@@ -1,99 +1,70 @@
 // src/components/icons.tsx
 'use client';
 
+import React, { useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Icosahedron, Torus } from '@react-three/drei';
+import * as THREE from 'three';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
+
 /**
- * A decorative, animated SVG icon representing the canonical sigil of ΛΞVON OS.
- * It's an interwoven, continuous path with a pulsing core, embodying flow and intelligence.
- * @param {React.ComponentProps<'svg'>} props - Standard SVG component props.
+ * A 3D, interactive representation of the Sovereign's Ledger, the canonical sigil of ΛΞVON OS.
+ * This component renders a full `react-three-fiber` scene.
+ * @param {React.ComponentProps<'div'>} props - Standard div component props.
  */
-export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'svg'>) => {
-  const draw = {
-    hidden: { pathLength: 0, opacity: 0 },
-    visible: {
-      pathLength: 1,
-      opacity: 1,
-      transition: {
-        pathLength: { type: "spring", duration: 3, bounce: 0, delay: 0.5 },
-        opacity: { duration: 0.01 }
-      }
-    }
-  };
-
-  const pulse = {
-    animate: {
-      scale: [1, 1.1, 1],
-      opacity: [0.8, 1, 0.8],
-    },
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: 'easeInOut',
-      delay: 3,
-    },
-  };
-
+export const ScribeSigil = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
-    <svg
-      viewBox="0 0 100 100"
-      xmlns="http://www.w3.org/2000/svg"
-      className={cn('w-20 h-20', className)}
-      {...props}
-    >
-       <defs>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      
-      {/* Outer Circle */}
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="48"
-        stroke="hsl(var(--primary-foreground))"
-        strokeWidth="1.5"
-        fill="none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.3 }}
-        transition={{ duration: 1 }}
-      />
-      
-      {/* Interwoven Path - The True Form */}
-      <motion.path
-        d="M50 12C50 21 42 21 42 30V42H30C21 42 21 50 12 50C21 50 21 58 30 58H42V70C42 79 50 79 50 88C50 79 58 79 58 70V58H70C79 58 79 50 88 50C79 50 79 42 70 42H58V30C58 21 50 21 50 12Z"
-        stroke="hsl(var(--primary-foreground))"
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        variants={draw}
-        initial="hidden"
-        animate="visible"
-      />
-
-      {/* Central Core (Agentic Spark) */}
-       <motion.rect
-        x="42"
-        y="42"
-        width="16"
-        height="16"
-        rx="2"
-        fill="hsl(var(--primary))"
-        filter="url(#glow)"
-        initial={{ opacity: 0 }}
-        animate={{...pulse.animate, opacity: [0, 0, 1] }}
-        transition={{...pulse.transition, opacity: { duration: 1, delay: 2.5 } }}
-      />
-    </svg>
+    <div className={className} {...props}>
+      <Canvas camera={{ position: [0, 0, 8], fov: 50 }}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[0, 0, 10]} intensity={2.5} color="hsl(var(--primary))" />
+        <pointLight position={[10, 10, 5]} intensity={1.5} color="hsl(var(--secondary))" />
+        <Ledger />
+      </Canvas>
+    </div>
   );
 };
+
+function Ledger() {
+  const groupRef = useRef<THREE.Group>(null!);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+        const rotationSpeed = hovered ? 0.3 : 0.05;
+        groupRef.current.rotation.y += delta * rotationSpeed;
+        groupRef.current.rotation.x += delta * (rotationSpeed * 0.5);
+    }
+  });
+
+  return (
+    <group ref={groupRef} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)}>
+      {/* Crystalline Core */}
+      <Icosahedron args={[1, 1]}>
+        <meshStandardMaterial
+          color="hsl(var(--secondary))"
+          emissive="hsl(var(--secondary))"
+          emissiveIntensity={hovered ? 0.8 : 0.3}
+          metalness={0.7}
+          roughness={0.1}
+        />
+      </Icosahedron>
+
+      {/* Runic Rings - a simplified representation of the complex interwoven paths */}
+       <Torus args={[3, 0.15, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
+        <meshStandardMaterial color="hsl(var(--muted-foreground))" metalness={0.9} roughness={0.1} emissive="hsl(var(--muted))" emissiveIntensity={0.1}/>
+      </Torus>
+      <Torus args={[3, 0.15, 16, 100]} rotation={[Math.PI / 2, Math.PI / 2, 0]}>
+         <meshStandardMaterial color="hsl(var(--muted-foreground))" metalness={0.9} roughness={0.1} emissive="hsl(var(--muted))" emissiveIntensity={0.1}/>
+      </Torus>
+       <Torus args={[2.2, 0.08, 16, 100]} rotation={[Math.PI / 2, Math.PI / 4, 0]}>
+         <meshStandardMaterial color="hsl(var(--ring))" metalness={0.9} roughness={0.2} emissive="hsl(var(--ring))" emissiveIntensity={hovered ? 0.5 : 0.2}/>
+      </Torus>
+    </group>
+  );
+}
 
 
 /**

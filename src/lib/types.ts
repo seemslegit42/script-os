@@ -40,7 +40,9 @@ export type MicroAppType =
     | 'InfidelityRadar'
     | 'DossierViewer'
     | 'TheSovereignArsenal'
-    | 'UsageMonitor';
+    | 'UsageMonitor'
+    | 'FollyFeedInterdiction'
+    | 'BurnoutExeFuneral';
 
 // Represents the structure of a Micro-App instance on the Canvas.
 export type MicroApp = {

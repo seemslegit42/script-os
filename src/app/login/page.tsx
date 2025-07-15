@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ScribeSigil } from '@/components/icons';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -45,8 +45,10 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-            <Link href="/" className="inline-block">
-                <ScribeSigil className="h-24 w-24 text-primary" />
+            <Link href="/" className="inline-block h-48 w-48">
+              <Suspense fallback={<div className="h-full w-full bg-muted/20 rounded-full animate-pulse" />}>
+                <ScribeSigil className="h-full w-full" />
+              </Suspense>
             </Link>
           <h1 className="text-3xl font-bold mt-4 sigil-obelisk text-primary-foreground">The Sovereign's Ledger</h1>
           <p className="text-muted-foreground mt-2 sigil-codex">Begin the Rite. State your designation.</p>
@@ -61,8 +63,10 @@ export default function LoginPage() {
                 exit={{ opacity: 0, y: -20 }}
             >
                 <GlassPane variant="modal" className="text-center p-8 flex flex-col items-center">
-                  <ScribeSigil className="h-16 w-16 text-primary mb-4" />
-                  <h2 className="text-xl font-bold text-primary-foreground">The Echo Has Been Sent</h2>
+                   <div className="h-16 w-16">
+                      <ScribeSigil />
+                   </div>
+                  <h2 className="text-xl font-bold text-primary-foreground mt-4">The Echo Has Been Sent</h2>
                   <p className="text-muted-foreground mt-2">Follow the path in your inbox to cross the threshold.</p>
                 </GlassPane>
             </motion.div>
