@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow for generating speech from text using a TTS model.
@@ -10,7 +11,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import wav from 'wav';
 import { googleAI } from '@genkit-ai/googleai';
 
