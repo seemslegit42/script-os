@@ -17,11 +17,11 @@
     --primary: 279 81% 36%; /* Imperial Purple #6A0DAD */
     --primary-foreground: 150 100% 98%;
  
-    --secondary: 158 51% 48%; /* Patina Green #3EB991 */
-    --secondary-foreground: 158 40% 10%;
+    --secondary: 161 50% 48%; /* Patina Green #3EB991 */
+    --secondary-foreground: 161 40% 10%;
  
     --muted: 227 13% 40%;
-    --muted-foreground: 227 13% 60%; /* Conchoidal Gray #8C94A8 */
+    --muted-foreground: 227 13% 66%; /* Conchoidal Gray #8C94A8 */
  
     --accent: 50 100% 50%; /* Gilded Accent #FFD700 */
     --accent-foreground: 50 100% 10%;
@@ -55,11 +55,11 @@
     --primary: 279 81% 36%; /* Imperial Purple #6A0DAD */
     --primary-foreground: 150 100% 98%;
  
-    --secondary: 158 51% 48%; /* Patina Green #3EB991 */
-    --secondary-foreground: 158 40% 10%;
+    --secondary: 161 50% 48%; /* Patina Green #3EB991 */
+    --secondary-foreground: 161 40% 10%;
  
     --muted: 227 13% 40%;
-    --muted-foreground: 227 13% 60%; /* Conchoidal Gray #8C94A8 */
+    --muted-foreground: 227 13% 66%; /* Conchoidal Gray #8C94A8 */
  
     --accent: 50 100% 50%; /* Gilded Accent #FFD700 */
     --accent-foreground: 50 100% 10%;
