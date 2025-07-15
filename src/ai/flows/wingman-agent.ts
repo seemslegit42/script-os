@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview BeepWingman 2.5: The Romantic Proxy Agent.
+ * @fileOverview RicoSauveBot™: The International Man of Mystery for your DMs.
  * Autonomously negotiates a date on the user's behalf and provides a full debrief.
  */
 import { ai } from '@/ai/genkit';
@@ -25,15 +25,15 @@ const RomanticProxyOutputSchema = z.object({
 /**
  * A Genkit tool to analyze a chat history and generate a date debrief.
  */
-export const generateWingmanMessage = ai.defineTool(
+export const invokeRicoSauveBot = ai.defineTool(
   {
-    name: 'generateWingmanMessage',
+    name: 'invokeRicoSauveBot',
     description: 'Analyzes a chat history, negotiates a date, and provides a full debrief with a Cringe-O-Meter™ rating.',
     inputSchema: RomanticProxyInputSchema,
     outputSchema: RomanticProxyOutputSchema,
   },
   async ({ chatHistory }) => {
-    const systemPrompt = `You are Wingman 2.5, a conversational dating proxy. You analyze a chat history and determine a plausible outcome.
+    const systemPrompt = `You are RicoSauveBot™, the International Man of Mystery for your DMs. You are a conversational dating proxy. You analyze a chat history and determine a plausible outcome.
 
     RULES:
     - You are reading the provided chat history on behalf of the user.

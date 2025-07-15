@@ -12,7 +12,7 @@ import { AgentExecutor, createReactAgent } from "langgraph/react";
 import { HumanMessage } from "@langchain/core/messages";
 import { ai } from '@/ai/genkit';
 import { analyzeFinancials } from './financial-advisor-agent';
-import { generateWingmanMessage } from './wingman-agent';
+import { invokeRicoSauveBot } from './wingman-agent';
 import { analyzeRelationshipRisk } from './infidelity-radar-agent';
 
 const model = new ChatGroq({
@@ -20,7 +20,7 @@ const model = new ChatGroq({
     model: "llama-3.1-70b-versatile",
 });
 
-const tools = [analyzeFinancials, generateWingmanMessage, analyzeRelationshipRisk];
+const tools = [analyzeFinancials, invokeRicoSauveBot, analyzeRelationshipRisk];
 
 const reactAgent = createReactAgent({
     llm: model,
@@ -58,12 +58,12 @@ const beepFlow = ai.defineFlow(
     - Launching 'TheSovereignArsenal': "show me my arsenal", "open the sovereign arsenal"
     - Launching 'UsageMonitor': "show my usage", "what's my balance", "tribute log"
     - Launching 'InfidelityRadar': "run the infidelity radar", "check relationship risk"
-    - Launching 'BeepWingman': "I need a wingman", "help me write a message"
+    - Launching 'BeepWingman': "I need a wingman", "help me write a message", "call rico suave"
     - Launching 'FinancialAdvisor': "financial advisor", "cash canary", "cheap bastard mode"
 
     If the user command clearly maps to launching one of the above apps, your text response should acknowledge the request and you should set the appToLaunch property.
 
-    If the user command requires using a tool (like analyzing finances, generating a wingman message, or checking risk), you MUST use the appropriate tool. Do not try to answer directly.
+    If the user command requires using a tool (like analyzing finances, invoking RicoSauveBot, or checking risk), you MUST use the appropriate tool. Do not try to answer directly.
 
     Examples for launching apps:
     - User: "launch the terminal" -> Response: "BEEP: Summoning Terminal...", appToLaunch: 'Terminal'
@@ -72,7 +72,7 @@ const beepFlow = ai.defineFlow(
     - User: "run the infidelity radar" -> Response: "BEEP: When suspicion becomes evidence, it gets a cover page.", appToLaunch: 'InfidelityRadar'
 
     Examples for using tools:
-    - User: "wingman, help me ask for a raise" -> Call generateWingmanMessage tool with appropriate inputs.
+    - User: "RicoSauveBot, help me analyze this chat" -> Call invokeRicoSauveBot tool with appropriate inputs.
     - User: "cheap bastard, is coffee a good expense?" -> Call analyzeFinancials tool with mode 'cheap-bastard'.
     - User: "cash canary, what do you think of TSLA?" -> Call analyzeFinancials tool with mode 'cash-canary'.
 
@@ -93,7 +93,7 @@ const beepFlow = ai.defineFlow(
         } else if (lowerCommand.includes('usage') || lowerCommand.includes('balance') || lowerCommand.includes('tribute')) {
              output.appToLaunch = { type: 'UsageMonitor', title: 'Ledger of Tribute' };
              output.response = "BEEP: Unsealing the Ledger of Tribute...";
-        } else if (lowerCommand.includes('wingman')) {
+        } else if (lowerCommand.includes('wingman') || lowerCommand.includes('rico')) {
             output.appToLaunch = { type: 'BeepWingman', title: 'BEEP Wingman: The Closer' };
             output.response = "BEEP: He is not your assistant. He is your closer.";
         } else if (lowerCommand.includes('infidelity') || lowerCommand.includes('radar')) {

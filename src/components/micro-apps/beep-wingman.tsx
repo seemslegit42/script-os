@@ -44,7 +44,7 @@ export function BeepWingman() {
     setIsLoading(true);
     setResult(null);
 
-    const command = `wingman, analyze this chat: ${chatHistory}`;
+    const command = `RicoSauveBot, analyze this chat: ${chatHistory}`;
     try {
         const rawResponse = await processUserCommand(command);
         const parsedResult = JSON.parse(rawResponse.replace(/```json\n|\n```/g, ''));
