@@ -6,6 +6,7 @@ import { generateSpeech } from '@/ai/flows/generate-speech-flow';
 import { marked } from 'marked';
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+import { redirect } from 'next/navigation';
 
 /**
  * Represents a single message in the conversation.
@@ -94,3 +95,14 @@ export const unifiedConversationAction = ai.defineFlow(
     }
   }
 );
+
+
+/**
+ * Server action to handle user sign-out.
+ * In a real application, this would clear the session cookie or token.
+ * For now, it just redirects to the login page.
+ */
+export async function signOut() {
+  // In a real app: await clearSessionCookie();
+  redirect('/login');
+}

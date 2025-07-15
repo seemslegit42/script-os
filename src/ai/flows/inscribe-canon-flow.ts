@@ -11,7 +11,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { getDocs } from '@/lib/docs';
-import { embed } from 'genkit/ai';
+import { embed } from 'genkit';
 import { textEmbedding004 } from '@genkit-ai/googleai';
 import { Firestore, FieldValue } from '@google-cloud/firestore';
 
