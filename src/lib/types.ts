@@ -41,7 +41,6 @@ export type MicroAppType =
     | 'DossierViewer'
     | 'TheSovereignArsenal'
     | 'UsageMonitor'
-    | 'FollyFeedInterdiction'
     | 'BurnoutExeFuneral';
 
 // Represents the structure of a Micro-App instance on the Canvas.

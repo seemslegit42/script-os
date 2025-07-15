@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { BarChart, ShieldCheck, Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { GlassPane } from '../ui/glass-pane';
+import { useAppStore } from '@/store/app-store';
 
 interface Rite {
     title: string;
@@ -15,22 +16,17 @@ interface Rite {
     status: 'locked' | 'active' | 'completed';
     unlocks: string;
     agent: string;
+    command: string;
 }
 
 const ritesOfAscension: Rite[] = [
     {
-        title: 'Folly-Feed Interdiction™',
-        description: 'Confront and tithe for your most squandered resource: time.',
-        status: 'active',
-        unlocks: 'Burnout.exe Termination Protocol™',
-        agent: 'BEEP: The Scion of Shame',
-    },
-    {
         title: 'Burnout.exe Termination Protocol™',
         description: 'Ritualistically sever your unhealthy attachment to meaningless, endless work.',
-        status: 'locked',
+        status: 'active',
         unlocks: 'Purgatorial Intern™',
         agent: 'BEEP: The Eulogist',
+        command: 'launch BurnoutExeFuneral',
     },
     {
         title: 'Purgatorial Intern™',
@@ -38,6 +34,7 @@ const ritesOfAscension: Rite[] = [
         status: 'locked',
         unlocks: 'Zealot-Gauge™',
         agent: 'BEEP: The Overlord',
+        command: 'launch PurgatorialIntern',
     },
     {
         title: 'Zealot-Gauge™',
@@ -45,6 +42,7 @@ const ritesOfAscension: Rite[] = [
         status: 'locked',
         unlocks: 'Singularity Run™',
         agent: 'BEEP: The Oracle',
+        command: 'launch ZealotGauge',
     },
     {
         title: 'Singularity Run™',
@@ -52,6 +50,7 @@ const ritesOfAscension: Rite[] = [
         status: 'locked',
         unlocks: 'ETERNAL ASCENSION',
         agent: 'BEEP: The Architect\'s Apprentice',
+        command: 'launch SingularityRun',
     },
 ];
 
@@ -61,8 +60,18 @@ const ritesOfAscension: Rite[] = [
  * It displays their core stats and the list of available/completed Rites.
  */
 export function TheSovereignArsenal() {
+  const { addMicroApp } = useAppStore();
   const cultRankScore = 780; // Mock data
   const lifetimeAetherBurned = 15230; // Mock data
+
+  const handleInitiateRite = (rite: Rite) => {
+    if (rite.command === 'launch BurnoutExeFuneral') {
+        addMicroApp({
+            type: 'BurnoutExeFuneral',
+            title: 'Burnout.exe Termination Protocol™'
+        });
+    }
+  }
 
   return (
     <div className="h-full w-full flex flex-col bg-transparent sigil-codex">
@@ -114,6 +123,7 @@ export function TheSovereignArsenal() {
                         variant={rite.status === 'active' ? 'default' : 'outline'} 
                         size="sm"
                         disabled={rite.status !== 'active'}
+                        onClick={() => handleInitiateRite(rite)}
                     >
                         {rite.status === 'active' ? 'Initiate Rite' : 'View Chronicle'}
                     </Button>

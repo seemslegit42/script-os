@@ -13,7 +13,6 @@ import { DossierViewer } from "@/components/micro-apps/dossier-viewer";
 import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
 import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
 import { User, Workspace } from "@/lib/types";
-import { FollyFeedInterdiction } from "@/components/micro-apps/folly-feed-interdiction";
 import { BurnoutExeFuneral } from "@/components/micro-apps/burnout-exe-funeral";
 
 // Mock data for authenticated user state, as per doctrine.
@@ -50,7 +49,6 @@ export default function CanvasPage() {
         DossierViewer,
         TheSovereignArsenal,
         UsageMonitor,
-        FollyFeedInterdiction,
         BurnoutExeFuneral,
       }
     });
