@@ -5,16 +5,6 @@ import React, { useEffect } from "react";
 import { Canvas } from "@/components/canvas";
 import { useAppStore } from "@/store/app-store";
 import { Header } from "@/components/header";
-import { Terminal } from "@/components/micro-apps/terminal";
-
-// Register Micro-App components into the store.
-// This fulfills the "Micro-App Registry" requirement.
-useAppStore.setState({ 
-  appComponentRegistry: {
-    ...useAppStore.getState().appComponentRegistry,
-    Terminal: Terminal,
-  } 
-});
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -37,15 +27,6 @@ export default function CanvasPage() {
   }
 
   const { microApps, activeMicroAppId, setActiveMicroAppId, closeMicroApp, addMicroApp } = useAppStore();
-
-  useEffect(() => {
-    // Launch the terminal by default on first load for demonstration
-    if (microApps.length === 0) {
-      addMicroApp({ type: 'Terminal', title: 'Terminal' });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
 
   return (
     <div className="h-screen w-screen bg-background overflow-hidden flex flex-col">

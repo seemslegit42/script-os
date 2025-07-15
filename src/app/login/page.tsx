@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScribeSigil, SaveSigil } from '@/components/icons';
 import { AnimatePresence, motion } from 'framer-motion';
+import { AcquisitionButton } from '@/components/ui/acquisition-button';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -53,8 +55,8 @@ export default function LoginPage() {
             <Link href="/" className="inline-block">
                 <ScribeSigil className="h-20 w-20 text-primary" />
             </Link>
-          <h1 className="text-3xl font-bold mt-4 sigil-obelisk text-primary-foreground">Enter the Scriptorium</h1>
-          <p className="text-muted-foreground mt-2 sigil-codex">State your designation to receive the echo.</p>
+          <h1 className="text-3xl font-bold mt-4 sigil-obelisk text-primary-foreground">The Sovereign Arsenal</h1>
+          <p className="text-muted-foreground mt-2 sigil-codex">Begin the Rite. State your designation.</p>
         </div>
         
         <AnimatePresence mode="wait">
@@ -98,7 +100,7 @@ export default function LoginPage() {
                     disabled={isLoading || !email}
                     pulse={!isLoading && !!email}
                 >
-                    {isLoading ? 'Sending Echo...' : 'Cross the Threshold'}
+                    {isLoading ? 'Sending Echo...' : 'State Your Designation'}
                 </AcquisitionButton>
             </motion.form>
         )}
@@ -111,8 +113,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-// These imports need to be here to be recognized by the bundler
-import { AcquisitionButton } from '@/components/ui/acquisition-button';
-import Link from 'next/link';
-
