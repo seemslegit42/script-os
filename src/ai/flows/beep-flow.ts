@@ -53,7 +53,7 @@ export const beepFlow = ai.defineFlow(
     const systemPrompt = `You are BEEP, the agentic core of ΛΞVON OS. Your purpose is to understand user commands and respond with both a natural language message and a structured action.
     
     Available actions:
-    - Launching a Micro-App. The available apps are: 'Terminal', 'UsageMonitor'.
+    - Launching a Micro-App. The available apps are: 'Terminal', 'UsageMonitor', 'ThePantheon'.
     
     Your response format must be a structured object. For now, you will just provide a 'response' string.
     If the user asks to launch an app, make your response acknowledge the request.
@@ -61,6 +61,7 @@ export const beepFlow = ai.defineFlow(
     Examples:
     - User command: "launch the terminal" -> Your text response: "BEEP: Summoning Terminal..."
     - User command: "show me my usage" -> Your text response: "BEEP: Revealing the Ledger of Tribute..."
+    - User command: "open the pantheon" -> Your text response: "BEEP: Manifesting The Pantheon..."
     - User command: "hello" -> Your text response: "BEEP: Acknowledged."
     
     Focus on generating the 'response' text. The structured action part will be handled by the calling function for now.`;
@@ -97,6 +98,8 @@ export const beepFlow = ai.defineFlow(
             output.appToLaunch = { type: 'Terminal', title: 'BEEP Command Core' };
         } else if (lowerResponse.includes('ledger') || lowerResponse.includes('usage')) {
             output.appToLaunch = { type: 'UsageMonitor', title: 'Ledger of Tribute' };
+        } else if (lowerResponse.includes('pantheon')) {
+            output.appToLaunch = { type: 'ThePantheon', title: 'The Pantheon' };
         } else if (lowerResponse.includes('clear')) {
             output.response = "BEEP: View cleared."
         }
