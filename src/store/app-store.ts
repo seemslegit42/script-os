@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { MicroApp, MicroAppType } from '@/lib/types';
 import React from 'react';
+import { processUserCommand } from '@/app/actions';
 
 /**
  * Defines the state and actions for the main application store.
@@ -17,7 +18,7 @@ interface AppState {
   removeMicroApp: (id: string) => void;
   setActiveMicroAppId: (id: string) => void;
   closeMicroApp: (id: string) => void;
-  handleCommandSubmit: (command: string) => string; // Returns a response for the terminal
+  handleCommandSubmit: (command: string) => Promise<string>; // Returns a response for the terminal
 }
 
 // Function to get the highest z-index from the current apps
@@ -37,12 +38,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (existingApp) {
       // Bring the existing app to the front instead of adding a new one.
       const highestZIndex = getHighestZIndex(state.microApps);
-      return {
+      set({
         activeMicroAppId: existingApp.id,
         microApps: state.microApps.map(a =>
             a.id === existingApp.id ? { ...a, zIndex: highestZIndex + 1 } : a
         ),
-      };
+      });
+      return;
     }
 
     const newId = `${app.type}-${Date.now()}`;
@@ -54,10 +56,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       zIndex: highestZIndex + 1,
     };
 
-    return { 
+    set({ 
       microApps: [...get().microApps, newApp],
       activeMicroAppId: newId 
-    };
+    });
   }),
   
   removeMicroApp: (id) => set((state) => ({
@@ -82,36 +84,23 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
   },
 
-  handleCommandSubmit: (command: string): string => {
-    const lowerCommand = command.toLowerCase().trim();
+  handleCommandSubmit: async (command: string): Promise<string> => {
     const { addMicroApp, microApps } = get();
 
-    const launchApp = (type: MicroAppType, title: string) => {
-        const existingApp = microApps.find(a => a.type === type);
-        addMicroApp({ type, title });
-        if (existingApp) {
-            return `BEEP: ${title} is already active. Bringing it to the forefront.`;
-        }
-        return `BEEP: Summoning ${title}...`;
-    };
+    // Call the server-side BEEP agent
+    const result = await processUserCommand(command);
 
-    if (lowerCommand.startsWith('launch')) {
-      const appType = lowerCommand.split(' ')[1];
-      if (appType === 'terminal') {
-        return launchApp('Terminal', 'BEEP Command Core');
+    // If the agent wants to launch an app, do it.
+    if (result.appToLaunch) {
+      const existingApp = microApps.find(a => a.type === result.appToLaunch!.type);
+      addMicroApp(result.appToLaunch);
+
+      if (existingApp) {
+        return `BEEP: ${result.appToLaunch.title} is already active. Bringing it to the forefront.`;
       }
-      if (appType === 'usagemonitor') {
-        return launchApp('UsageMonitor', 'Ledger of Tribute');
-      }
-      return `BEEP: Unknown Micro-App type "${appType}".`;
     }
 
-    if (lowerCommand === 'clear') {
-        // This is a special command handled by the UI, but we can acknowledge it.
-        return `BEEP: Clearing view.`;
-    }
-    
-    // Default response for unhandled commands
-    return `BEEP: Command processed - "${command}"`;
+    // Return the agent's natural language response to be displayed in the terminal
+    return result.response;
   },
 }));

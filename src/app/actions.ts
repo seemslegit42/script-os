@@ -7,6 +7,8 @@ import { marked } from 'marked';
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
+import { beep } from '@/ai/flows/beep-flow';
+import { BeepOutput } from '@/lib/types';
 
 /**
  * Represents a single message in the conversation.
@@ -105,4 +107,22 @@ export const unifiedConversationAction = ai.defineFlow(
 export async function signOut() {
   // In a real app: await clearSessionCookie();
   redirect('/login');
+}
+
+
+/**
+ * Server action that acts as the bridge between the client and the BEEP agent.
+ * @param {string} command - The user's command text.
+ * @returns {Promise<BeepOutput>} The structured output from the BEEP agent.
+ */
+export async function processUserCommand(command: string): Promise<BeepOutput> {
+    try {
+        const response = await beep({ command });
+        return response;
+    } catch (error) {
+        console.error("Error processing BEEP command:", error);
+        return {
+            response: "Aegis Alert: The BEEP agent has encountered a critical error. The command could not be processed.",
+        };
+    }
 }

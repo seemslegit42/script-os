@@ -1,4 +1,4 @@
-
+import { z } from 'zod';
 
 /**
  * Represents a single scripture, which can be either canonical or user-forged.
@@ -39,10 +39,21 @@ export type MicroApp = {
     id: string; // Unique instance ID
     type: MicroAppType; // The type of the app, used to look up the component in the registry
     title: string;
-    // Position and size are managed by the windowing component
-    // x: number;
-    // y: number;
-    // width: number;
-    // height: number;
     zIndex: number;
 };
+
+// Defines the schema for inputs to the BEEP agent.
+export const BeepInputSchema = z.object({
+    command: z.string().describe('The natural language command from the user.'),
+});
+export type BeepInput = z.infer<typeof BeepInputSchema>;
+
+// Defines the schema for the structured output from the BEEP agent.
+export const BeepOutputSchema = z.object({
+  response: z.string().describe('The natural language response for the user.'),
+  appToLaunch: z.object({
+      type: z.custom<MicroAppType>(),
+      title: z.string(),
+  }).optional().describe('The Micro-App to launch, if any.'),
+});
+export type BeepOutput = z.infer<typeof BeepOutputSchema>;

@@ -13,22 +13,24 @@ import React, { useState, useRef, useEffect } from "react";
 export function Terminal() {
     const [history, setHistory] = useState<string[]>(['Welcome to the BEEP command core. The raw conduit is open.']);
     const [command, setCommand] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const handleCommandSubmit = useAppStore((state) => state.handleCommandSubmit);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (command.trim()) {
-            const newHistory = [...history, `> ${command}`];
-            
-            // The central store now handles the command
-            const response = handleCommandSubmit(command);
+        if (command.trim() && !isLoading) {
+            setIsLoading(true);
+            const currentCommand = command;
+            setHistory(prev => [...prev, `> ${currentCommand}`]);
+            setCommand('');
+
+            // The central store now handles the command asynchronously
+            const response = await handleCommandSubmit(currentCommand);
             
             // Add BEEP's response to history
-            newHistory.push(response);
-
-            setHistory(newHistory);
-            setCommand('');
+            setHistory(prev => [...prev, response]);
+            setIsLoading(false);
         }
     };
 
@@ -49,6 +51,7 @@ export function Terminal() {
                     {history.map((line, index) => (
                         <p key={index} className={line.startsWith('>') ? 'text-accent' : ''}>{line}</p>
                     ))}
+                    {isLoading && <p className="text-muted-foreground animate-pulse">BEEP is thinking...</p>}
                 </div>
             </ScrollArea>
             <form onSubmit={handleSubmit} className="p-2 border-t border-border">
@@ -60,6 +63,7 @@ export function Terminal() {
                         placeholder="Speak directly into the storm..."
                         className="w-full pl-8 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                         autoFocus
+                        disabled={isLoading}
                     />
                 </div>
             </form>
