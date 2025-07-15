@@ -1,6 +1,7 @@
 
 import { create } from 'zustand';
-import { MicroApp } from '@/lib/types';
+import { MicroApp, MicroAppType } from '@/lib/types';
+import React from 'react';
 
 /**
  * Defines the state and actions for the main application store.
@@ -10,6 +11,7 @@ import { MicroApp } from '@/lib/types';
 interface AppState {
   microApps: MicroApp[];
   activeMicroAppId: string | null;
+  appComponentRegistry: Record<MicroAppType, React.ComponentType<any>>;
   addMicroApp: (app: Omit<MicroApp, 'id' | 'x' | 'y' | 'width' | 'height' | 'zIndex'>) => void;
   removeMicroApp: (id: string) => void;
   setActiveMicroAppId: (id: string) => void;
@@ -25,8 +27,22 @@ const getHighestZIndex = (apps: MicroApp[]): number => {
 export const useAppStore = create<AppState>((set) => ({
   microApps: [],
   activeMicroAppId: null,
+  appComponentRegistry: {} as Record<MicroAppType, React.ComponentType<any>>,
 
   addMicroApp: (app) => set((state) => {
+    // Prevent duplicate apps of the same type for now
+    if (state.microApps.some(existingApp => existingApp.type === app.type)) {
+      // Bring the existing app to the front instead of adding a new one
+      const existingApp = state.microApps.find(a => a.type === app.type)!;
+      const highestZIndex = getHighestZIndex(state.microApps);
+      return {
+        activeMicroAppId: existingApp.id,
+        microApps: state.microApps.map(a =>
+            a.id === existingApp.id ? { ...a, zIndex: highestZIndex + 1 } : a
+        ),
+      };
+    }
+
     const newId = `${app.type}-${Date.now()}`;
     const highestZIndex = getHighestZIndex(state.microApps);
     
@@ -35,8 +51,8 @@ export const useAppStore = create<AppState>((set) => ({
       id: newId,
       x: 100 + Math.random() * 200, // Random initial position
       y: 100 + Math.random() * 100,
-      width: 400,
-      height: 300,
+      width: 550, // Default width
+      height: 400, // Default height
       zIndex: highestZIndex + 1,
     };
 

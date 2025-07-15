@@ -14,6 +14,7 @@ import { UserMenu } from './user-menu';
 interface HeaderProps {
   user?: User;
   workspace?: Workspace;
+  onCommandSubmit?: (command: string) => void;
 }
 
 /**
@@ -21,15 +22,15 @@ interface HeaderProps {
  * bar for public pages (like the Scriptorium) and transforms into the
  * full TopBar command interface for authenticated users on the Canvas.
  */
-export function Header({ user, workspace }: HeaderProps) {
+export function Header({ user, workspace, onCommandSubmit }: HeaderProps) {
 
-  const handleCommandSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const command = formData.get('command') as string;
-    // In a real app, this would be passed to a global command handler (e.g., via Zustand)
-    console.log('Command submitted:', command);
-    // For now, just clear the input
+    if (command && onCommandSubmit) {
+      onCommandSubmit(command);
+    }
     event.currentTarget.reset();
   };
 
@@ -45,7 +46,7 @@ export function Header({ user, workspace }: HeaderProps) {
         </div>
 
         <div className="flex-1 max-w-lg">
-          <form onSubmit={handleCommandSubmit}>
+          <form onSubmit={handleFormSubmit}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input 
@@ -62,6 +63,12 @@ export function Header({ user, workspace }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-4">
+          <Link href="/library" className="hidden sm:block">
+             <Button variant="ghost">
+                <Library className="mr-2 h-4 w-4" />
+                Library
+            </Button>
+          </Link>
           <div className="hidden sm:flex items-center gap-2 border-r border-border pr-4">
               <span className="text-sm font-semibold text-primary-foreground sigil-obelisk">Ξ</span>
               <span className="text-sm font-mono font-medium text-muted-foreground">

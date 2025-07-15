@@ -34,7 +34,7 @@ export type User = {
   // Represents the structure of a Micro-App instance on the Canvas.
   export type MicroApp = {
     id: string; // Unique instance ID
-    type: string; // e.g., 'Terminal', 'UsageMonitor'
+    type: MicroAppType;
     title: string;
     x: number;
     y: number;
@@ -42,3 +42,5 @@ export type User = {
     height: number;
     zIndex: number;
   };
+
+  export type MicroAppType = 'Terminal' | 'UsageMonitor' // Add other app types here

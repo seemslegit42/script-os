@@ -2,8 +2,11 @@
 'use client';
 
 import React from 'react';
-import { MicroApp } from '@/lib/types';
+import { MicroApp, MicroAppType } from '@/lib/types';
 import { AethericStreams } from './aetheric-streams';
+import { useAppStore } from '@/store/app-store';
+import { MicroAppWindow } from './micro-app-window';
+import { AnimatePresence } from 'framer-motion';
 
 /**
  * Defines the props for the Canvas component.
@@ -21,15 +24,37 @@ interface CanvasProps {
 
 /**
  * The main Canvas component, serving as the workspace for all Micro-Apps.
- * It is responsible for rendering the grid of apps and handling basic interactions.
- * Currently, it's a placeholder waiting for apps to be launched.
+ * It renders the grid of apps and handles their lifecycle.
  * @param {CanvasProps} props - The component's props.
  */
 export function Canvas({ apps, activeAppId, onAppSelect, onAppClose }: CanvasProps) {
+  const { appComponentRegistry } = useAppStore.getState();
+
+  const renderAppContent = (appType: MicroAppType) => {
+    const AppComponent = appComponentRegistry[appType];
+    return AppComponent ? <AppComponent /> : <div>Error: App type '{appType}' not found.</div>;
+  }
+
   return (
     <div className="relative h-full w-full overflow-hidden">
       <AethericStreams isThinking={false} />
-      {/* App rendering logic will go here in the future */}
+
+      <AnimatePresence>
+        {apps.map((app) => (
+            <MicroAppWindow
+              key={app.id}
+              id={app.id}
+              title={app.title}
+              isActive={app.id === activeAppId}
+              onSelect={() => onAppSelect(app.id)}
+              onClose={() => onAppClose(app.id)}
+              zIndex={app.zIndex}
+            >
+              {renderAppContent(app.type)}
+            </MicroAppWindow>
+        ))}
+      </AnimatePresence>
+
       {apps.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
