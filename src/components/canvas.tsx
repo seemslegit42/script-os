@@ -24,7 +24,8 @@ interface CanvasProps {
 
 /**
  * The main Canvas component, serving as the workspace for all Micro-Apps.
- * It renders the grid of apps and handles their lifecycle.
+ * It renders the grid of apps and handles their lifecycle. It uses the
+ * appComponentRegistry from the Zustand store to dynamically render app content.
  * @param {CanvasProps} props - The component's props.
  */
 export function Canvas({ apps, activeAppId, onAppSelect, onAppClose }: CanvasProps) {
@@ -32,7 +33,7 @@ export function Canvas({ apps, activeAppId, onAppSelect, onAppClose }: CanvasPro
 
   const renderAppContent = (appType: MicroAppType) => {
     const AppComponent = appComponentRegistry[appType];
-    return AppComponent ? <AppComponent /> : <div>Error: App type '{appType}' not found.</div>;
+    return AppComponent ? <AppComponent /> : <div>Error: App type '{appType}' not found in registry.</div>;
   }
 
   return (

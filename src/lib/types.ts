@@ -24,23 +24,25 @@ export type User = {
     avatarUrl?: string;
   };
   
-  // Represents a workspace (or tenant) in the multi-tenant architecture.
-  export type Workspace = {
+// Represents a workspace (or tenant) in the multi-tenant architecture.
+export type Workspace = {
     id: string;
     name: string;
     creditBalance: number;
-  };
-  
-  // Represents the structure of a Micro-App instance on the Canvas.
-  export type MicroApp = {
-    id: string; // Unique instance ID
-    type: MicroAppType;
-    title: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    zIndex: number;
-  };
+};
 
-  export type MicroAppType = 'Terminal' | 'UsageMonitor' // Add other app types here
+// Defines the available types of Micro-Apps that can be registered and launched.
+export type MicroAppType = 'Terminal' | 'UsageMonitor' // Add other app types here as they are created
+
+// Represents the structure of a Micro-App instance on the Canvas.
+export type MicroApp = {
+    id: string; // Unique instance ID
+    type: MicroAppType; // The type of the app, used to look up the component in the registry
+    title: string;
+    // Position and size are managed by the windowing component
+    // x: number;
+    // y: number;
+    // width: number;
+    // height: number;
+    zIndex: number;
+};

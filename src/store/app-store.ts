@@ -6,13 +6,14 @@ import React from 'react';
 /**
  * Defines the state and actions for the main application store.
  * This store, powered by Zustand, manages the global state for the Canvas,
- * including the list of open Micro-Apps and their states.
+ * including the list of open Micro-Apps and their states, and a registry
+ * for dynamically rendering Micro-App components.
  */
 interface AppState {
   microApps: MicroApp[];
   activeMicroAppId: string | null;
   appComponentRegistry: Record<MicroAppType, React.ComponentType<any>>;
-  addMicroApp: (app: Omit<MicroApp, 'id' | 'x' | 'y' | 'width' | 'height' | 'zIndex'>) => void;
+  addMicroApp: (app: Omit<MicroApp, 'id' | 'zIndex'>) => void;
   removeMicroApp: (id: string) => void;
   setActiveMicroAppId: (id: string) => void;
   closeMicroApp: (id: string) => void;
@@ -32,9 +33,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addMicroApp: (app) => set((state) => {
     // Prevent duplicate apps of the same type for now
-    if (state.microApps.some(existingApp => existingApp.type === app.type)) {
+    const existingApp = state.microApps.find(a => a.type === app.type);
+    if (existingApp) {
       // Bring the existing app to the front instead of adding a new one
-      const existingApp = state.microApps.find(a => a.type === app.type)!;
       const highestZIndex = getHighestZIndex(state.microApps);
       return {
         activeMicroAppId: existingApp.id,
@@ -50,10 +51,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newApp: MicroApp = {
       ...app,
       id: newId,
-      x: 100 + Math.random() * 200, // Random initial position
-      y: 100 + Math.random() * 100,
-      width: 550, // Default width
-      height: 400, // Default height
       zIndex: highestZIndex + 1,
     };
 
