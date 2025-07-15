@@ -13,12 +13,12 @@ import { processUserCommand } from '@/app/actions';
 interface AppState {
   microApps: MicroApp[];
   activeMicroAppId: string | null;
-  appComponentRegistry: Partial<Record<MicroAppType, React.ComponentType<any>>>; // Use Partial as it's populated at runtime
+  appComponentRegistry: Partial<Record<MicroAppType, React.ComponentType<any>>>;
   addMicroApp: (app: Omit<MicroApp, 'id' | 'zIndex'>) => void;
   removeMicroApp: (id: string) => void;
   setActiveMicroAppId: (id: string) => void;
   closeMicroApp: (id: string) => void;
-  handleCommandSubmit: (command: string) => Promise<string>; // Returns a response for the terminal
+  handleCommandSubmit: (command: string) => Promise<string>;
 }
 
 // Function to get the highest z-index from the current apps
@@ -33,10 +33,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   appComponentRegistry: {},
 
   addMicroApp: (app) => set((state) => {
-    // Prevent duplicate apps of the same type.
     const existingApp = state.microApps.find(a => a.type === app.type);
     if (existingApp) {
-      // Bring the existing app to the front instead of adding a new one.
       const highestZIndex = getHighestZIndex(state.microApps);
       set({
         activeMicroAppId: existingApp.id,
@@ -44,7 +42,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             a.id === existingApp.id ? { ...a, zIndex: highestZIndex + 1 } : a
         ),
       });
-      return;
+      return {}; 
     }
 
     const newId = `${app.type}-${Date.now()}`;
@@ -56,10 +54,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       zIndex: highestZIndex + 1,
     };
 
-    set({ 
-      microApps: [...get().microApps, newApp],
+    return { 
+      microApps: [...state.microApps, newApp],
       activeMicroAppId: newId 
-    });
+    };
   }),
   
   removeMicroApp: (id) => set((state) => ({
@@ -85,22 +83,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   handleCommandSubmit: async (command: string): Promise<string> => {
-    const { addMicroApp, microApps } = get();
-
-    // Call the server-side BEEP agent
+    const { addMicroApp } = get();
     const result = await processUserCommand(command);
 
-    // If the agent wants to launch an app, do it.
     if (result.appToLaunch) {
-      const existingApp = microApps.find(a => a.type === result.appToLaunch!.type);
       addMicroApp(result.appToLaunch);
-
-      if (existingApp) {
-        return `BEEP: ${result.appToLaunch.title} is already active. Bringing it to the forefront.`;
-      }
     }
-
-    // Return the agent's natural language response to be displayed in the terminal
+    
     return result.response;
   },
 }));

@@ -4,16 +4,18 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ScribeSigil, SaveSigil } from '@/components/icons';
+import { ScribeSigil } from '@/components/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AcquisitionButton } from '@/components/ui/acquisition-button';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('password'); // Mock password
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
@@ -23,29 +25,21 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const response = await fetch('/api/auth/initiate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to initiate login.');
-      }
-      
-      // If successful, show the confirmation state
-      setIsSubmitted(true);
-      
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: 'Error',
-        description: 'Could not initiate login. Please try again.',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-    }
+    // MOCK LOGIN: In a real app, this would use a proper auth flow.
+    // For this demo, we'll simulate a successful login and redirect.
+    setTimeout(() => {
+        setIsLoading(false);
+        setIsSubmitted(true);
+        toast({
+            title: "The Echo is Sent",
+            description: "A path has opened. Check your inbox for a message from the Oracle to cross the threshold.",
+        });
+        // In a real flow, you'd wait for the user to click the magic link.
+        // Here, we just redirect after a short delay to simulate that.
+        setTimeout(() => {
+            router.push('/');
+        }, 2000);
+    }, 1500);
   };
 
   return (
@@ -68,9 +62,9 @@ export default function LoginPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="text-center p-8 bg-card/80 backdrop-blur-sm border border-primary/20 shadow-lg shadow-primary/10 rounded-lg flex flex-col items-center"
             >
-                <SaveSigil className="h-16 w-16 text-primary mb-4" />
-                <h2 className="text-xl font-bold text-primary-foreground">The Echo is Sent</h2>
-                <p className="text-muted-foreground mt-2">A path has opened. Check your inbox for a message from the Oracle to cross the threshold.</p>
+                <ScribeSigil className="h-16 w-16 text-primary mb-4" />
+                <h2 className="text-xl font-bold text-primary-foreground">Redirecting to the Canvas...</h2>
+                <p className="text-muted-foreground mt-2">The threshold has been crossed.</p>
             </motion.div>
         ) : (
             <motion.form

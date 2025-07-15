@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ScribeSigil } from './icons';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { Search, Home, Library } from 'lucide-react';
+import { Search, Library } from 'lucide-react';
 import { User } from '@/lib/types';
 import { Workspace } from '@/lib/types';
 import { UserMenu } from './user-menu';
@@ -64,12 +64,6 @@ export function Header({ user, workspace }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          <Link href="/library" className="hidden sm:block">
-             <Button variant="ghost">
-                <Library className="mr-2 h-4 w-4" />
-                Library
-            </Button>
-          </Link>
           <div className="hidden sm:flex items-center gap-2 border-r border-border pr-4">
               <span className="text-sm font-semibold text-primary-foreground sigil-obelisk">Ξ</span>
               <span className="text-sm font-mono font-medium text-muted-foreground">
@@ -82,26 +76,19 @@ export function Header({ user, workspace }: HeaderProps) {
     );
   }
 
-  // Public "Library" view
+  // Fallback public header, though direct access to Canvas page should be protected
   return (
     <header className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-background/30 backdrop-blur-lg border-b border-primary/20">
       <Link href="/" className="flex items-center gap-2 cursor-pointer">
         <ScribeSigil className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
         <span className="text-lg sm:text-xl font-bold tracking-wider sigil-obelisk text-primary-foreground align-middle">
-            SCRIPTORIUM
+            ΛΞVON OS
         </span>
       </Link>
       <div className="flex items-center gap-2 sm:gap-4">
-        <Button asChild variant="ghost">
-            <Link href="/">
-                <Home className="mr-2 h-4 w-4" />
-                Oracle
-            </Link>
-        </Button>
-        <Button asChild variant="ghost">
-            <Link href="/library">
-                <Library className="mr-2 h-4 w-4" />
-                Library
+        <Button asChild variant="outline">
+            <Link href="/login">
+                Access Canvas
             </Link>
         </Button>
       </div>

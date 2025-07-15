@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect } from "react";
@@ -5,12 +6,6 @@ import { Canvas } from "@/components/canvas";
 import { Header } from "@/components/header";
 import { useAppStore } from "@/store/app-store";
 import { Terminal } from "@/components/micro-apps/terminal";
-import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
-import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
-import { InfidelityRadar } from "@/components/micro-apps/infidelity-radar";
-import { BeepWingman } from "@/components/micro-apps/beep-wingman";
-import { FinancialAdvisor } from "@/components/micro-apps/financial-advisor";
-
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -25,18 +20,14 @@ export default function CanvasPage() {
     useAppStore.setState({ 
       appComponentRegistry: {
         'Terminal': Terminal,
-        'TheSovereignArsenal': TheSovereignArsenal,
-        'UsageMonitor': UsageMonitor,
-        'InfidelityRadar': InfidelityRadar,
-        'BeepWingman': BeepWingman,
-        'FinancialAdvisor': FinancialAdvisor,
       } 
     });
 
-    // Launch the Arsenal and Terminal by default.
-    addMicroApp({ type: 'TheSovereignArsenal', title: 'The Sovereign Arsenal' });
-    addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
-  }, [addMicroApp]);
+    // Launch the Terminal by default on first load.
+    if (microApps.length === 0) {
+        addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
+    }
+  }, [addMicroApp, microApps.length]);
 
   // Mock user and workspace for demonstration purposes.
   // In a real application, this would come from a session context.

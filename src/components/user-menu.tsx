@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from './ui/button';
-import { User, CreditCard, Settings, LogOut } from 'lucide-react';
+import { Settings, LogOut } from 'lucide-react';
 import { signOut } from '@/app/actions';
+import { useAppStore } from '@/store/app-store';
 
 interface UserMenuProps {
   user: {
@@ -30,6 +31,8 @@ interface UserMenuProps {
  * It displays the user's avatar and provides links for settings, billing, and signing out.
  */
 export function UserMenu({ user, workspaceName }: UserMenuProps) {
+  const { addMicroApp } = useAppStore();
+
   const getInitials = (firstName: string | null, lastName: string | null) => {
     const firstInitial = firstName ? firstName.charAt(0) : '';
     const lastInitial = lastName ? lastName.charAt(0) : '';
@@ -59,10 +62,6 @@ export function UserMenu({ user, workspaceName }: UserMenuProps) {
         <DropdownMenuItem>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <CreditCard className="mr-2 h-4 w-4" />
-          <span>Billing</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <form action={signOut}>

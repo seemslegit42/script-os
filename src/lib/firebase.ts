@@ -1,10 +1,6 @@
 
-// Note: Firebase client-side features are no longer used in this application.
-// This file is kept solely because the server-side @google-cloud/firestore
-// library may implicitly look for it. All user authentication and client-side
-// database interactions have been removed for simplification.
-
 import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,5 +13,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
 
-export { app };
+export { app, auth };
