@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { ScribeSigil } from '@/components/icons';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -46,9 +45,9 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
             <Link href="/" className="inline-block">
-                <ScribeSigil className="h-20 w-20 text-primary" />
+                <ScribeSigil className="h-24 w-24 text-primary" />
             </Link>
-          <h1 className="text-3xl font-bold mt-4 sigil-obelisk text-primary-foreground">The Sovereign Arsenal</h1>
+          <h1 className="text-3xl font-bold mt-4 sigil-obelisk text-primary-foreground">The Sovereign's Ledger</h1>
           <p className="text-muted-foreground mt-2 sigil-codex">Begin the Rite. State your designation.</p>
         </div>
         
