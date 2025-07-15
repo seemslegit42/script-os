@@ -10,6 +10,7 @@ import { ai } from '@/ai/genkit';
 import { aegisAnomalyScan } from './aegis-sentinel-flow';
 import { analyzeStock } from './financial-advisor-agent';
 import { invokeRicoSauveBot } from './wingman-agent';
+import { analyzeRelationshipRisk } from './infidelity-radar-agent';
 
 const THREAT_THRESHOLD = 0.8;
 
@@ -103,6 +104,10 @@ const beepFlow = ai.defineFlow(
 
     if (lowerCommand.includes('rico') || lowerCommand.includes('tinder') || lowerCommand.includes('chat') || lowerCommand.includes('date')) {
         const result = await invokeRicoSauveBot({ chatHistory: input.command });
+        return { response: JSON.stringify(result, null, 2) };
+    }
+     if (lowerCommand.includes('relationship risk') || lowerCommand.includes('spectre') || lowerCommand.includes('decoy')) {
+        const result = await analyzeRelationshipRisk({ situation: input.command });
         return { response: JSON.stringify(result, null, 2) };
     }
     

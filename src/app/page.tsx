@@ -6,6 +6,8 @@ import { Header } from "@/components/header";
 import { useAppStore } from "@/store/app-store";
 import { Terminal } from "@/components/micro-apps/terminal";
 import { FinancialAdvisor } from "@/components/micro-apps/financial-advisor";
+import { BeepWingman } from "@/components/micro-apps/beep-wingman";
+import { InfidelityRadar } from "@/components/micro-apps/infidelity-radar";
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -21,6 +23,8 @@ export default function CanvasPage() {
       appComponentRegistry: {
         'Terminal': Terminal,
         'FinancialAdvisor': FinancialAdvisor,
+        'BeepWingman': BeepWingman,
+        'InfidelityRadar': InfidelityRadar,
       } 
     });
 

@@ -47,7 +47,7 @@ export function BeepWingman() {
     const command = `RicoSauveBot, analyze this chat: ${chatHistory}`;
     try {
         const rawResponse = await processUserCommand(command);
-        const parsedResult = JSON.parse(rawResponse.replace(/```json\n|\n```/g, ''));
+        const parsedResult = JSON.parse(rawResponse.response.replace(/```json\n|\n```/g, ''));
         setResult(parsedResult);
     } catch (error) {
       console.error(error);

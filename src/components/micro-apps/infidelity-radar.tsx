@@ -42,8 +42,7 @@ export function InfidelityRadar() {
     const command = `analyze relationship risk: ${situation}`;
     try {
       const rawResponse = await processUserCommand(command);
-       // This is a temporary hack until the agent executor returns structured data correctly.
-      const parsedResult = JSON.parse(rawResponse.replace(/```json\n|\n```/g, ''));
+      const parsedResult = JSON.parse(rawResponse.response.replace(/```json\n|\n```/g, ''));
       setResult(parsedResult);
     } catch (error) {
       console.error(error);
