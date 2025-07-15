@@ -4,37 +4,39 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { processUserCommand } from '@/app/actions';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Shield, Smile, Copy } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Calendar, Clock, MapPin, MessageSquare, Shield, Smile, Copy } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
+import { Badge } from '../ui/badge';
 
 interface WingmanResult {
-    suggestedMessage: string;
+    date: string;
+    time: string;
+    location: string;
+    finalMatchMessage: string;
     cringeScore: number;
+    cringeAnalysis: string;
     regretShield: boolean;
-    analysis: string;
 }
 
 /**
- * A Micro-App for the BEEP Wingman, the social engineer daemon.
- * Fulfills the 'Beep-Wingman.md' scripture.
+ * A Micro-App for BeepWingman 2.5, the Romantic Proxy Agent™.
+ * Fulfills the advanced scripture for autonomous date negotiation.
  */
 export function BeepWingman() {
-  const [situation, setSituation] = useState('');
-  const [messageMode, setMessageMode] = useState('charming');
+  const [chatHistory, setChatHistory] = useState('');
   const [result, setResult] = useState<WingmanResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!situation) {
+    if (!chatHistory) {
       toast({
-        title: 'Briefing Required',
-        description: 'Please describe the situation for your Wingman.',
+        title: 'Chat History Required',
+        description: 'Please provide the conversation for the agent to analyze.',
         variant: 'destructive',
       });
       return;
@@ -42,11 +44,9 @@ export function BeepWingman() {
     setIsLoading(true);
     setResult(null);
 
-    const command = `wingman, mode ${messageMode}, help me with this: ${situation}`;
+    const command = `wingman, analyze this chat: ${chatHistory}`;
     try {
         const rawResponse = await processUserCommand(command);
-        // In a real app, the response would be structured JSON. Here we parse the text.
-        // This is a temporary hack until the agent executor returns structured data.
         const parsedResult = JSON.parse(rawResponse.replace(/```json\n|\n```/g, ''));
         setResult(parsedResult);
     } catch (error) {
@@ -65,7 +65,7 @@ export function BeepWingman() {
     navigator.clipboard.writeText(text);
     toast({
         title: 'Message Copied',
-        description: 'The suggested message has been copied to your clipboard.',
+        description: 'The message has been copied to your clipboard.',
     });
   };
 
@@ -73,85 +73,77 @@ export function BeepWingman() {
     <div className="h-full w-full flex flex-col bg-card/50 sigil-codex p-4 gap-4">
         <div className="space-y-4">
             <div>
-                <Label htmlFor="situation">The Briefing</Label>
+                <Label htmlFor="chatHistory">Chat History</Label>
                 <Textarea
-                    id="situation"
-                    placeholder="e.g., I need to ask my boss for a raise..."
-                    value={situation}
-                    onChange={(e) => setSituation(e.target.value)}
-                    className="min-h-[80px]"
+                    id="chatHistory"
+                    placeholder="Paste the entire Tinder conversation here..."
+                    value={chatHistory}
+                    onChange={(e) => setChatHistory(e.target.value)}
+                    className="min-h-[120px] sigil-glyph"
                     disabled={isLoading}
                 />
             </div>
-            <div>
-                <Label htmlFor="messageMode">Message Mode</Label>
-                <Select value={messageMode} onValueChange={setMessageMode} disabled={isLoading}>
-                    <SelectTrigger id="messageMode">
-                        <SelectValue placeholder="Select a mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="charming">Charming AF</SelectItem>
-                        <SelectItem value="direct">Cool & Collected</SelectItem>
-                        <SelectItem value="funny">Funny & Disarming</SelectItem>
-                        <SelectItem value="saying-no">Help Me Say No</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
-                {isLoading ? 'Deploying Charm...' : 'Call The Wingman'}
+            <Button onClick={handleSubmit} disabled={isLoading || !chatHistory} className="w-full">
+                {isLoading ? 'Negotiating...' : 'Deploy Romantic Proxy Agent™'}
             </Button>
         </div>
 
         {isLoading && (
-            <Card className="flex-grow bg-transparent">
+            <Card className="flex-grow bg-transparent border-primary/20 animate-pulse">
                 <CardHeader>
-                    <Skeleton className="h-5 w-2/5" />
+                    <Skeleton className="h-6 w-3/5" />
                     <Skeleton className="h-4 w-4/5" />
                 </CardHeader>
-                <CardContent className="space-y-3">
-                    <Skeleton className="h-16 w-full" />
-                    <div className="flex justify-between">
-                       <Skeleton className="h-8 w-1/3" />
-                       <Skeleton className="h-8 w-1/3" />
-                    </div>
+                <CardContent className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
                 </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-8 w-full" />
+                </CardFooter>
             </Card>
         )}
 
         {result && (
             <Card className="flex-grow bg-transparent border-primary/20">
                  <CardHeader>
-                    <CardTitle>The Play</CardTitle>
-                    <CardDescription>{result.analysis}</CardDescription>
+                    <CardTitle className='text-primary'>💌 MISSION COMPLETE</CardTitle>
+                    <CardDescription>The agent has secured a tentative engagement.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className='relative p-4 border rounded-md bg-background'>
-                        <p className='text-primary-foreground'>{result.suggestedMessage}</p>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-2 right-2 h-7 w-7"
-                            onClick={() => copyToClipboard(result.suggestedMessage)}
-                        >
-                            <Copy className="h-4 w-4" />
-                        </Button>
+                <CardContent className="space-y-3">
+                    <div className='flex items-center gap-3 p-3 rounded-md bg-background/50'>
+                        <Calendar className='h-5 w-5 text-muted-foreground'/>
+                        <span className='font-mono'>{result.date}</span>
                     </div>
-                    <div className="flex justify-between items-center gap-4">
-                        <div className="flex items-center gap-2 text-sm">
-                            <Smile className="h-5 w-5 text-muted-foreground" />
-                            <span className="font-bold">Cringe Score:</span>
-                            <span className={result.cringeScore > 6 ? 'text-destructive' : 'text-green-400'}>
-                                {result.cringeScore}/10
-                            </span>
-                        </div>
-                        {result.regretShield && (
-                             <div className="flex items-center gap-2 text-sm text-amber-400">
-                                <Shield className="h-5 w-5" />
-                                <span className="font-bold">Regret Shield™ Active</span>
-                            </div>
-                        )}
+                    <div className='flex items-center gap-3 p-3 rounded-md bg-background/50'>
+                        <Clock className='h-5 w-5 text-muted-foreground'/>
+                        <span className='font-mono'>{result.time}</span>
+                    </div>
+                    <div className='flex items-center gap-3 p-3 rounded-md bg-background/50'>
+                        <MapPin className='h-5 w-5 text-muted-foreground'/>
+                        <span className='font-mono'>{result.location}</span>
+                    </div>
+                    <div className='flex items-start gap-3 p-3 rounded-md bg-background/50'>
+                        <MessageSquare className='h-5 w-5 text-muted-foreground mt-1 shrink-0'/>
+                        <blockquote className="border-l-2 border-primary pl-3 text-sm italic">
+                          {result.finalMatchMessage}
+                        </blockquote>
                     </div>
                 </CardContent>
+                <CardFooter className='flex-col items-start gap-3'>
+                    <div className='flex items-center gap-2'>
+                        <span className='font-bold'>Cringe-O-Meter™:</span>
+                        <Badge variant={result.cringeScore > 7 ? 'destructive' : 'secondary'}>{result.cringeScore}/10</Badge>
+                         {result.regretShield && (
+                            <Badge variant="destructive">
+                                <Shield className="h-3 w-3 mr-1" />
+                                Regret Shield™ Deployed
+                            </Badge>
+                        )}
+                    </div>
+                    <p className='text-xs text-muted-foreground italic'>Analysis: {result.cringeAnalysis}</p>
+                </CardFooter>
             </Card>
         )}
     </div>

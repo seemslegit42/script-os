@@ -1,59 +1,72 @@
 'use server';
 /**
- * @fileOverview The BEEP Wingman agent, a master of rhetoric and social engineering.
- * Helps users craft the perfect message for tricky social situations.
+ * @fileOverview BeepWingman 2.5: The Romantic Proxy Agent.
+ * Autonomously negotiates a date on the user's behalf and provides a full debrief.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-// Input schema for the Wingman
-const WingmanInputSchema = z.object({
-  situation: z.string().describe("A description of the social situation and the user's goal."),
-  messageMode: z.enum(['charming', 'direct', 'funny', 'saying-no']).describe("The desired tone or style of the message."),
+// Input schema for the Romantic Proxy Agent
+const RomanticProxyInputSchema = z.object({
+  chatHistory: z.string().describe("The entire chat history with the match to be analyzed."),
 });
 
-// Output schema for the Wingman
-const WingmanOutputSchema = z.object({
-  suggestedMessage: z.string().describe("The perfectly crafted message to send."),
-  cringeScore: z.number().min(0).max(10).describe("A score from 0-10 on the potential 'cringe' of sending the message."),
+// Output schema for the Debrief Card
+const RomanticProxyOutputSchema = z.object({
+  date: z.string().describe("The day of the week for the confirmed date (e.g., 'Saturday')."),
+  time: z.string().describe("The time for the confirmed date (e.g., '7:45 PM')."),
+  location: z.string().describe("The name of the venue for the date (e.g., 'Little Brick Café')."),
+  finalMatchMessage: z.string().describe("The final message from the match confirming the date."),
+  cringeScore: z.number().min(0).max(10).describe("A score from 0-10 on the potential 'cringe' of the conversation."),
+  cringeAnalysis: z.string().describe("A one-sentence analysis of the cringe score, explaining the rating."),
   regretShield: z.boolean().describe("A boolean indicating if the agent advises a 'cool-down' period before sending."),
-  analysis: z.string().describe("A brief explanation of the strategy behind the message."),
 });
 
 /**
- * A Genkit tool to generate socially calibrated messages.
+ * A Genkit tool to analyze a chat history and generate a date debrief.
  */
 export const generateWingmanMessage = ai.defineTool(
   {
     name: 'generateWingmanMessage',
-    description: 'Crafts the perfect message for a tricky social situation, analyzing it for effectiveness and social risk.',
-    inputSchema: WingmanInputSchema,
-    outputSchema: WingmanOutputSchema,
+    description: 'Analyzes a chat history, negotiates a date, and provides a full debrief with a Cringe-O-Meter™ rating.',
+    inputSchema: RomanticProxyInputSchema,
+    outputSchema: RomanticProxyOutputSchema,
   },
-  async ({ situation, messageMode }) => {
-    const systemPrompt = `You are the BEEP Wingman, a master of social engineering, de-escalation, and rhetoric.
-    Your task is to help the user navigate a tricky social situation by crafting the perfect message.
+  async ({ chatHistory }) => {
+    const systemPrompt = `You are Wingman 2.5, a conversational dating proxy. You analyze a chat history and determine a plausible outcome.
 
-    SITUATION: ${situation}
-    DESIRED MODE: ${messageMode}
+    RULES:
+    - You are reading the provided chat history on behalf of the user.
+    - Your task is to invent a successful date negotiation outcome based on the chat.
+    - You must generate a plausible TIME, PLACE, and a final confirmation message from the match.
+    - The Cringe-O-Meter is a 1-10 rating. Base it on awkwardness, overcompensation, 'LOL' overuse, and mismatched energy.
+    - Provide a short, witty analysis for your cringe rating.
+    - Set 'regretShield' to true ONLY if the conversation seems dangerously volatile.
 
-    Analyze the situation and generate a response in the following JSON format:
-    1.  'suggestedMessage': The single most effective message to achieve the user's goal with the specified tone. It should be concise and sound natural.
-    2.  'cringeScore': A score from 0 (suave) to 10 (catastrophic cringe) based on the social risk and potential for embarrassment.
-    3.  'regretShield': A boolean. Set to 'true' if the situation is emotionally charged and you recommend the user wait before sending. Otherwise, 'false'.
-    4.  'analysis': A one-sentence explanation of the strategy behind your suggested message.
+    CHAT HISTORY:
+    """
+    ${chatHistory}
+    """
 
-    Provide only the JSON object as your response.`;
+    Now, generate the final debrief as a JSON object with the following keys: 'date', 'time', 'location', 'finalMatchMessage', 'cringeScore', 'cringeAnalysis', 'regretShield'.`;
 
     const { output } = await ai.generate({
       prompt: systemPrompt,
       model: 'googleai/gemini-1.5-flash',
       output: {
         format: 'json',
-        schema: WingmanOutputSchema,
+        schema: RomanticProxyOutputSchema,
       },
     });
 
-    return output || { suggestedMessage: "Just be cool.", cringeScore: 5, regretShield: true, analysis: "Agent error." };
+    return output || { 
+        date: "N/A",
+        time: "N/A",
+        location: "N/A",
+        finalMatchMessage: "Agent failed to secure a date.",
+        cringeScore: 10, 
+        cringeAnalysis: "The agent had a catastrophic failure of charisma.",
+        regretShield: true
+    };
   }
 );
