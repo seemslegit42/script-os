@@ -5,33 +5,33 @@
 
 @layer base {
   :root {
-    --background: 246 33% 15%; /* Obsidian Black */
-    --foreground: 150 100% 98%; /* Vitreous White */
+    --background: 246 34% 15%; /* Obsidian Black #1C1934 */
+    --foreground: 150 100% 98%; /* Vitreous White #F5FFFA */
 
-    --card: 246 33% 18%; /* Slightly lighter than background */
+    --card: 246 34% 18%; /* Slightly lighter than background */
     --card-foreground: 150 100% 98%;
  
-    --popover: 246 33% 15%;
+    --popover: 246 34% 15%;
     --popover-foreground: 150 100% 98%;
  
-    --primary: 279 81% 36%; /* Imperial Purple */
+    --primary: 279 81% 36%; /* Imperial Purple #6A0DAD */
     --primary-foreground: 150 100% 98%;
  
-    --secondary: 158 51% 48%; /* Patina Green */
+    --secondary: 158 51% 48%; /* Patina Green #3EB991 */
     --secondary-foreground: 158 40% 10%;
  
     --muted: 227 13% 40%;
-    --muted-foreground: 227 13% 60%; /* Conchoidal Gray */
+    --muted-foreground: 227 13% 60%; /* Conchoidal Gray #8C94A8 */
  
-    --accent: 50 100% 50%; /* Gilded Accent */
+    --accent: 50 100% 50%; /* Gilded Accent #FFD700 */
     --accent-foreground: 50 100% 10%;
  
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 227 13% 30%;
     --input: 227 13% 30%;
-    --ring: 279 81% 66%; /* Lighter primary for focus rings */
+    --ring: 178 68% 41%; /* Roman Aqua #20B2AA */
 
     --radius: 0.5rem;
 
@@ -43,33 +43,33 @@
   }
 
   .dark {
-    --background: 246 33% 15%; /* Obsidian Black */
-    --foreground: 150 100% 98%; /* Vitreous White */
+    --background: 246 34% 15%; /* Obsidian Black #1C1934 */
+    --foreground: 150 100% 98%; /* Vitreous White #F5FFFA */
  
-    --card: 246 33% 18%;
+    --card: 246 34% 18%;
     --card-foreground: 150 100% 98%;
  
-    --popover: 246 33% 15%;
+    --popover: 246 34% 15%;
     --popover-foreground: 150 100% 98%;
  
-    --primary: 279 81% 36%; /* Imperial Purple */
+    --primary: 279 81% 36%; /* Imperial Purple #6A0DAD */
     --primary-foreground: 150 100% 98%;
  
-    --secondary: 158 51% 48%; /* Patina Green */
+    --secondary: 158 51% 48%; /* Patina Green #3EB991 */
     --secondary-foreground: 158 40% 10%;
  
     --muted: 227 13% 40%;
-    --muted-foreground: 227 13% 60%; /* Conchoidal Gray */
+    --muted-foreground: 227 13% 60%; /* Conchoidal Gray #8C94A8 */
  
-    --accent: 50 100% 50%; /* Gilded Accent */
+    --accent: 50 100% 50%; /* Gilded Accent #FFD700 */
     --accent-foreground: 50 100% 10%;
  
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 227 13% 30%;
     --input: 227 13% 30%;
-    --ring: 279 81% 66%;
+    --ring: 178 68% 41%; /* Roman Aqua #20B2AA */
   }
 }
 
@@ -97,7 +97,7 @@
     background: 
       radial-gradient(ellipse 80% 70% at 20% 30%, hsl(var(--primary) / 0.1), transparent),
       radial-gradient(ellipse 70% 60% at 80% 60%, hsl(var(--secondary) / 0.1), transparent),
-      radial-gradient(ellipse 80% 70% at 50% 95%, hsl(var(--accent) / 0.1), transparent);
+      radial-gradient(ellipse 80% 70% at 50% 95%, hsl(var(--accent) / 0.05), transparent);
     z-index: -20;
     pointer-events: none;
     transform-origin: center;
