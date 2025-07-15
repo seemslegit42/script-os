@@ -83,13 +83,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   handleCommandSubmit: async (command: string): Promise<string> => {
-    const { addMicroApp } = get();
-    const result = await processUserCommand(command);
+    try {
+        const { addMicroApp } = get();
+        const result = await processUserCommand(command);
 
-    if (result.appToLaunch) {
-      addMicroApp(result.appToLaunch);
+        if (result.appToLaunch) {
+            addMicroApp(result.appToLaunch);
+        }
+        
+        return result.response;
+    } catch (error) {
+        console.error("Error in handleCommandSubmit:", error);
+        return "Aegis Alert: A critical error occurred in the command processing pipeline.";
     }
-    
-    return result.response;
   },
 }));
