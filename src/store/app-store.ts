@@ -12,7 +12,7 @@ import React from 'react';
 interface AppState {
   microApps: MicroApp[];
   activeMicroAppId: string | null;
-  appComponentRegistry: Record<MicroAppType, React.ComponentType<any>>;
+  appComponentRegistry: Partial<Record<MicroAppType, React.ComponentType<any>>>; // Use Partial as it's populated at runtime
   addMicroApp: (app: Omit<MicroApp, 'id' | 'zIndex'>) => void;
   removeMicroApp: (id: string) => void;
   setActiveMicroAppId: (id: string) => void;
@@ -29,7 +29,7 @@ const getHighestZIndex = (apps: MicroApp[]): number => {
 export const useAppStore = create<AppState>((set, get) => ({
   microApps: [],
   activeMicroAppId: null,
-  appComponentRegistry: {} as Record<MicroAppType, React.ComponentType<any>>,
+  appComponentRegistry: {},
 
   addMicroApp: (app) => set((state) => {
     // Prevent duplicate apps of the same type for now
@@ -84,15 +84,20 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   handleCommandSubmit: (command: string): string => {
     const lowerCommand = command.toLowerCase().trim();
+    const { addMicroApp } = get();
     // This is the centralized command processor.
     // It will eventually call the BEEP LangGraph agent.
-    // For now, it contains the simple parser logic.
+    // For now, it contains simple command parsing.
 
     if (lowerCommand.startsWith('launch')) {
       const appType = lowerCommand.split(' ')[1];
       if (appType === 'terminal') {
-        get().addMicroApp({ type: 'Terminal', title: 'Terminal' });
+        addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
         return `BEEP: Summoning Terminal...`;
+      }
+      if (appType === 'usagemonitor') {
+        addMicroApp({ type: 'UsageMonitor', title: 'Ledger of Tribute' });
+        return `BEEP: Revealing the Ledger of Tribute...`;
       }
       return `BEEP: Unknown Micro-App type "${appType}".`;
     }

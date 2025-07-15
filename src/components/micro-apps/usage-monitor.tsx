@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Define the shape of the usage data we expect from the API
 interface UsageDetails {
@@ -26,7 +27,7 @@ interface UsageDetails {
 /**
  * A Micro-App that displays a workspace's economic activity, including
  * agent action usage and transaction history. It fetches this data from
- * a dedicated API endpoint.
+ * a dedicated API endpoint. Fulfills the 'Usage-Monitor.md' scripture.
  */
 export function UsageMonitor() {
   const [usage, setUsage] = useState<UsageDetails | null>(null);
@@ -54,63 +55,81 @@ export function UsageMonitor() {
 
   const usagePercentage = usage ? (usage.actionsUsed / usage.actionLimit) * 100 : 0;
 
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className="p-4 space-y-4">
-          <Skeleton className="h-8 w-1/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-6 w-full" />
-          <div className="space-y-2 pt-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
+  const renderLoadingSkeleton = () => (
+    <div className="p-4 space-y-4">
+      <Skeleton className="h-8 w-1/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-6 w-full" />
+      <div className="space-y-2 pt-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  );
+
+  const renderUsageDashboard = () => (
+    usage && (
+      <div className="p-4 h-full flex flex-col">
+          <div className='pb-4'>
+              <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-bold sigil-obelisk text-primary-foreground">Agent Actions</h3>
+                  <Badge variant="outline" className='sigil-glyph'>{usage.planName} Plan</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3 sigil-codex">
+                  Your workspace has used {usage.actionsUsed.toLocaleString()} of {usage.actionLimit.toLocaleString()} available agent actions this cycle.
+              </p>
+              <Progress value={usagePercentage} className="w-full" />
           </div>
-        </div>
-      );
-    }
+          <Separator className="my-2" />
+          <div className="pt-2 flex-grow flex flex-col min-h-0">
+              <h4 className="text-md font-bold text-primary-foreground sigil-obelisk mb-2">Tribute Log</h4>
+              <ScrollArea className="flex-grow">
+                  <div className="space-y-2 pr-4">
+                  {usage.transactions.map(tx => (
+                      <div key={tx.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
+                          <div>
+                              <p className="font-medium sigil-codex">{tx.description}</p>
+                              <p className="text-xs text-muted-foreground sigil-glyph">{new Date(tx.timestamp).toLocaleString()}</p>
+                          </div>
+                          <p className={`font-mono font-bold ${tx.type === 'CREDIT' ? 'text-green-400' : 'text-amber-400'}`}>
+                              {tx.type === 'CREDIT' ? '+' : '-'} {tx.amount.toLocaleString()} Ξ
+                          </p>
+                      </div>
+                  ))}
+                  </div>
+              </ScrollArea>
+          </div>
+      </div>
+    )
+  );
 
-    if (error) {
-      return <div className="p-4 text-destructive">Error: {error}</div>;
-    }
+  const renderChaosArsenal = () => (
+    <div className="p-4 h-full flex flex-col items-center justify-center text-center">
+        <h3 className="text-lg font-bold sigil-obelisk text-primary-foreground">Chaos Arsenal</h3>
+        <p className="text-sm text-muted-foreground mt-2 sigil-codex">
+            This is where your acquired Chaos Cards will appear.
+        </p>
+    </div>
+  );
 
-    if (usage) {
-      return (
-        <div className="p-4 h-full flex flex-col">
-            <div className='pb-4'>
-                <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-lg font-bold sigil-obelisk text-primary-foreground">Agent Actions</h3>
-                    <Badge variant="outline" className='sigil-glyph'>{usage.planName} Plan</Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3 sigil-codex">
-                    Your workspace has used {usage.actionsUsed.toLocaleString()} of {usage.actionLimit.toLocaleString()} available agent actions this cycle.
-                </p>
-                <Progress value={usagePercentage} className="w-full" />
-            </div>
-            <Separator className="my-2" />
-            <div className="pt-2 flex-grow flex flex-col min-h-0">
-                <h4 className="text-md font-bold text-primary-foreground sigil-obelisk mb-2">Tribute Log</h4>
-                <ScrollArea className="flex-grow">
-                    <div className="space-y-2 pr-4">
-                    {usage.transactions.map(tx => (
-                        <div key={tx.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
-                            <div>
-                                <p className="font-medium sigil-codex">{tx.description}</p>
-                                <p className="text-xs text-muted-foreground sigil-glyph">{new Date(tx.timestamp).toLocaleString()}</p>
-                            </div>
-                            <p className={`font-mono font-bold ${tx.type === 'CREDIT' ? 'text-green-400' : 'text-amber-400'}`}>
-                                {tx.type === 'CREDIT' ? '+' : '-'} {tx.amount.toLocaleString()} Ξ
-                            </p>
-                        </div>
-                    ))}
-                    </div>
-                </ScrollArea>
-            </div>
-        </div>
-      );
-    }
-    
-    return null;
+  const renderContent = () => {
+    if (isLoading) return renderLoadingSkeleton();
+    if (error) return <div className="p-4 text-destructive">Error: {error}</div>;
+    return (
+        <Tabs defaultValue="dashboard" className="w-full h-full flex flex-col">
+            <TabsList className="mx-4 mt-4">
+                <TabsTrigger value="dashboard">Usage Dashboard</TabsTrigger>
+                <TabsTrigger value="arsenal">Chaos Arsenal</TabsTrigger>
+            </TabsList>
+            <TabsContent value="dashboard" className="flex-grow">
+                {renderUsageDashboard()}
+            </TabsContent>
+            <TabsContent value="arsenal" className="flex-grow">
+                {renderChaosArsenal()}
+            </TabsContent>
+        </Tabs>
+    );
   };
 
   return (
