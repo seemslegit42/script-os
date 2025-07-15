@@ -3,6 +3,7 @@
 
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAppStore } from "@/store/app-store";
 import React, { useState, useRef, useEffect } from "react";
 
 /**
@@ -13,14 +14,17 @@ export function Terminal() {
     const [history, setHistory] = useState<string[]>(['Welcome to the BEEP command core. The raw conduit is open.']);
     const [command, setCommand] = useState('');
     const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const handleCommandSubmit = useAppStore((state) => state.handleCommandSubmit);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (command.trim()) {
             const newHistory = [...history, `> ${command}`];
             
-            // Mock BEEP response for now
-            const response = `BEEP Agent: Command processed - "${command}"`;
+            // The central store now handles the command
+            const response = handleCommandSubmit(command);
+            
+            // Add BEEP's response to history
             newHistory.push(response);
 
             setHistory(newHistory);

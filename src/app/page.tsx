@@ -37,20 +37,6 @@ export default function CanvasPage() {
 
   const { microApps, activeMicroAppId, setActiveMicroAppId, closeMicroApp, addMicroApp } = useAppStore();
 
-  const handleCommand = (command: string) => {
-    // This is a simplified command parser for demonstration.
-    // In a real system, this would be a sophisticated NLU call.
-    const lowerCommand = command.toLowerCase().trim();
-    if (lowerCommand.startsWith('launch')) {
-      const appType = lowerCommand.split(' ')[1]; // e.g., 'terminal'
-      
-      if (appType === 'terminal') {
-        addMicroApp({ type: 'Terminal', title: 'Terminal' });
-      }
-      // Add more app types here in the future
-    }
-  };
-
   useEffect(() => {
     // Launch the terminal by default on first load for demonstration
     if (microApps.length === 0) {
@@ -62,7 +48,7 @@ export default function CanvasPage() {
 
   return (
     <div className="h-screen w-screen bg-background overflow-hidden flex flex-col">
-      <Header user={mockUser} workspace={mockWorkspace} onCommandSubmit={handleCommand} />
+      <Header user={mockUser} workspace={mockWorkspace} />
       <main className="flex-1">
         <Canvas 
           apps={microApps} 

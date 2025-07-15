@@ -10,11 +10,11 @@ import { Search, Home, Library } from 'lucide-react';
 import { User } from '@/lib/types';
 import { Workspace } from '@/lib/types';
 import { UserMenu } from './user-menu';
+import { useAppStore } from '@/store/app-store';
 
 interface HeaderProps {
   user?: User;
   workspace?: Workspace;
-  onCommandSubmit?: (command: string) => void;
 }
 
 /**
@@ -22,14 +22,15 @@ interface HeaderProps {
  * bar for public pages (like the Scriptorium) and transforms into the
  * full TopBar command interface for authenticated users on the Canvas.
  */
-export function Header({ user, workspace, onCommandSubmit }: HeaderProps) {
+export function Header({ user, workspace }: HeaderProps) {
+  const handleCommandSubmit = useAppStore((state) => state.handleCommandSubmit);
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const command = formData.get('command') as string;
-    if (command && onCommandSubmit) {
-      onCommandSubmit(command);
+    if (command) {
+      handleCommandSubmit(command);
     }
     event.currentTarget.reset();
   };
