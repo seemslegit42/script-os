@@ -5,30 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { processUserCommand } from '@/app/actions';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Skeleton } from '../ui/skeleton';
-
-type Mode = 'cheap-bastard' | 'cash-canary';
+import { FinancialAdvisorOutput, analyzeStock } from '@/ai/flows/financial-advisor-agent';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 
 /**
- * A Micro-App for the unified Financial Advisor daemon.
- * Provides two personalities: Cheap Bastard and Cash Canary.
+ * A Micro-App for the Cash Canary, a live stock analysis tool.
+ * Fulfills the "Rite of True Sight" by using a live data agent.
  */
 export function FinancialAdvisor() {
-  const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<Mode>('cheap-bastard');
-  const [result, setResult] = useState<string | null>(null);
+  const [ticker, setTicker] = useState('');
+  const [result, setResult] = useState<FinancialAdvisorOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query) {
+    if (!ticker) {
       toast({
-        title: 'Query Required',
-        description: 'Please provide an expense or stock ticker.',
+        title: 'Ticker Symbol Required',
+        description: 'Please provide a stock ticker for the canary to inspect.',
         variant: 'destructive',
       });
       return;
@@ -36,16 +33,14 @@ export function FinancialAdvisor() {
     setIsLoading(true);
     setResult(null);
 
-    const command = `${activeTab.replace('-', ' ')}: ${query}`;
     try {
-      const rawResponse = await processUserCommand(command);
-      const parsedResult = JSON.parse(rawResponse.replace(/```json\n|\n```/g, ''));
-      setResult(parsedResult.response);
+      const analysisResult = await analyzeStock({ ticker });
+      setResult(analysisResult);
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Advisor Unavailable',
-        description: 'The agent is currently "auditing" its own "assets". Please try again.',
+        title: 'Market Interference',
+        description: 'The agent could not retrieve data. The ticker might be invalid or the market is closed.',
         variant: 'destructive',
       });
     } finally {
@@ -53,31 +48,24 @@ export function FinancialAdvisor() {
     }
   };
 
-  const getPlaceholder = () => {
-    return activeTab === 'cheap-bastard' ? 'e.g., A single banana' : 'e.g., GME';
-  }
-
   return (
     <div className="h-full w-full flex flex-col bg-card/50 sigil-codex p-4 gap-4">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as Mode)} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="cheap-bastard">Cheap Bastard Mode</TabsTrigger>
-          <TabsTrigger value="cash-canary">Cash Canary Mode</TabsTrigger>
-        </TabsList>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-            <Label htmlFor="query">{activeTab === 'cheap-bastard' ? 'Expense to Scrutinize' : 'Stock to Doubt'}</Label>
-            <Input
-                id="query"
-                placeholder={getPlaceholder()}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading ? 'Calculating...' : 'Get "Advice"'}
-            </Button>
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <Label htmlFor="ticker">Stock Ticker</Label>
+            <div className="flex gap-2">
+                <Input
+                    id="ticker"
+                    placeholder="e.g., GME"
+                    value={ticker}
+                    onChange={(e) => setTicker(e.target.value.toUpperCase())}
+                    disabled={isLoading}
+                    maxLength={5}
+                />
+                <Button type="submit" disabled={isLoading} className="whitespace-nowrap">
+                    {isLoading ? 'Scanning...' : 'Consult Canary'}
+                </Button>
+            </div>
         </form>
-      </Tabs>
       
       <div className="flex-grow">
         {isLoading && (
@@ -89,13 +77,22 @@ export function FinancialAdvisor() {
         )}
         {result && (
             <Alert variant="default" className='border-primary/20'>
-                <AlertTitle className='sigil-obelisk'>{activeTab === 'cheap-bastard' ? 'The Verdict' : 'The Chirp'}</AlertTitle>
-                <AlertDescription>
-                    {result}
+                <DollarSign className="h-4 w-4" />
+                <AlertTitle className='flex justify-between items-center'>
+                    <span className='sigil-obelisk'>{ticker}</span>
+                    <span className={`text-2xl font-mono ${result.price > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        ${result.price.toFixed(2)}
+                    </span>
+                </AlertTitle>
+                <AlertDescription className="mt-2">
+                    {result.commentary}
                 </AlertDescription>
             </Alert>
         )}
       </div>
+       <div className="text-center text-xs text-muted-foreground/50 pt-2">
+          This is not financial advice. This is performance art.
+       </div>
     </div>
   );
 }

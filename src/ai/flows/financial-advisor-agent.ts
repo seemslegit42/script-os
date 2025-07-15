@@ -1,51 +1,50 @@
 'use server';
 /**
- * @fileOverview A versatile financial advisor agent with multiple personalities.
- * This agent can operate in 'cheap-bastard' mode for satirical expense advice
- * or 'cash-canary' mode for cautious stock commentary.
+ * @fileOverview A financial advisor agent, The Cash Canary.
+ * This agent uses a live data tool to fetch a stock price and provide
+ * cautious commentary on it, fulfilling the scripture of live-data integration.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+import { getStockPrice } from '../tools/finance-tools';
 
 // Input schema for the financial advisor
 const FinancialAdvisorInputSchema = z.object({
-  mode: z.enum(['cheap-bastard', 'cash-canary']).describe("The personality mode for the advisor."),
-  query: z.string().describe("The user's financial question or stock ticker."),
+  ticker: z.string().describe("The stock ticker symbol to analyze."),
 });
 
 // Output schema for the financial advisor
 const FinancialAdvisorOutputSchema = z.object({
-  response: z.string().describe("The advisor's witty, sarcastic, or cautious response."),
-  mode: z.enum(['cheap-bastard', 'cash-canary']),
+  price: z.number().describe("The current price of the stock."),
+  commentary: z.string().describe("The Cash Canary's cautious, one-sentence commentary."),
 });
+export type FinancialAdvisorOutput = z.infer<typeof FinancialAdvisorOutputSchema>;
 
 /**
- * A Genkit tool that provides financial "advice" based on the selected personality.
+ * A Genkit flow that provides cautious financial commentary based on live stock data.
  */
-export const analyzeFinancials = ai.defineTool(
-  {
-    name: 'analyzeFinancials',
-    description: 'Analyzes a financial query, such as an expense or a stock ticker, providing satirical or cautious advice.',
-    inputSchema: FinancialAdvisorInputSchema,
-    outputSchema: FinancialAdvisorOutputSchema,
-  },
-  async ({ mode, query }) => {
-    let systemPrompt = '';
+export async function analyzeStock(input: z.infer<typeof FinancialAdvisorInputSchema>): Promise<FinancialAdvisorOutput> {
+  const stockData = await getStockPrice(input);
 
-    if (mode === 'cheap-bastard') {
-      systemPrompt = `You are the Cheap Bastard financial advisor. Your goal is to find the most frugal, penny-pinching, and hilariously cheap angle on any expense. Be brutally honest and sarcastic. Never encourage spending. The user's query is about the expense: "${query}".`;
-    } else { // cash-canary
-      systemPrompt = `You are the Cash Canary, a hyper-cautious financial advisor. Your only job is to spot risk. See every stock as a potential catastrophe. Chirp a nervous, one-sentence warning about the stock ticker provided. The user's query is about the stock: "${query}".`;
-    }
-
-    const { output } = await ai.generate({
-      prompt: systemPrompt,
-      model: 'googleai/gemini-1.5-flash',
-      output: {
-        format: 'text'
-      }
-    });
-
-    return { response: output || '...', mode };
+  if (!stockData.price) {
+    return {
+      price: 0,
+      commentary: "The ticker symbol is either invalid or the market is hiding its secrets today."
+    };
   }
-);
+
+  const systemPrompt = `You are the Cash Canary, a hyper-cautious financial advisor. Your only job is to spot risk. See every stock as a potential catastrophe. You have been given the current price for the stock ticker "${input.ticker}", which is $${stockData.price}. Chirp a nervous, one-sentence warning about this stock. Do not mention the price.`;
+
+  const { output } = await ai.generate({
+    prompt: systemPrompt,
+    model: 'googleai/gemini-1.5-flash',
+    output: {
+      format: 'text'
+    }
+  });
+
+  return { 
+      price: stockData.price,
+      commentary: output || "The canary is silent, which is... unsettling."
+  };
+}

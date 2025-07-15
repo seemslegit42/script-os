@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect } from "react";
@@ -6,6 +5,7 @@ import { Canvas } from "@/components/canvas";
 import { Header } from "@/components/header";
 import { useAppStore } from "@/store/app-store";
 import { Terminal } from "@/components/micro-apps/terminal";
+import { FinancialAdvisor } from "@/components/micro-apps/financial-advisor";
 
 /**
  * The main page for an authenticated user, representing the Canvas.
@@ -20,6 +20,7 @@ export default function CanvasPage() {
     useAppStore.setState({ 
       appComponentRegistry: {
         'Terminal': Terminal,
+        'FinancialAdvisor': FinancialAdvisor,
       } 
     });
 

@@ -8,7 +8,7 @@
 import { BeepInput, BeepInputSchema, BeepOutput, BeepOutputSchema } from '@/lib/types';
 import { ai } from '@/ai/genkit';
 import { aegisAnomalyScan } from './aegis-sentinel-flow';
-import { analyzeFinancials } from './financial-advisor-agent';
+import { analyzeStock } from './financial-advisor-agent';
 import { invokeRicoSauveBot } from './wingman-agent';
 
 const THREAT_THRESHOLD = 0.8;
@@ -50,7 +50,7 @@ const beepFlow = ai.defineFlow(
     - Launching 'Terminal': "launch terminal", "open terminal"
     - Launching 'The Sovereign Arsenal': "launch arsenal", "open sovereign arsenal"
     - Launching 'Usage Monitor': "launch usage", "open ledger"
-    - Launching 'Financial Advisor': "launch advisor", "open financial advisor"
+    - Launching 'Financial Advisor': "launch advisor", "open financial advisor", "cash canary"
     - Launching 'BeepWingman': "launch wingman", "open beepwingman"
     - Launching 'Infidelity Radar': "launch infidelity radar", "open radar"
 
@@ -82,10 +82,10 @@ const beepFlow = ai.defineFlow(
             appToLaunch: { type: 'UsageMonitor', title: 'Usage Monitor' },
         };
     }
-     if (lowerCommand.includes('advisor')) {
+     if (lowerCommand.includes('advisor') || lowerCommand.includes('canary')) {
         return {
-            response: "BEEP: Summoning the Financial Advisor...",
-            appToLaunch: { type: 'FinancialAdvisor', title: 'Financial Advisor' },
+            response: "BEEP: Summoning the Cash Canary...",
+            appToLaunch: { type: 'FinancialAdvisor', title: 'Cash Canary' },
         };
     }
      if (lowerCommand.includes('wingman')) {
@@ -103,14 +103,6 @@ const beepFlow = ai.defineFlow(
 
     if (lowerCommand.includes('rico') || lowerCommand.includes('tinder') || lowerCommand.includes('chat') || lowerCommand.includes('date')) {
         const result = await invokeRicoSauveBot({ chatHistory: input.command });
-        return { response: JSON.stringify(result, null, 2) };
-    }
-    if (lowerCommand.includes('cheap bastard')) {
-        const result = await analyzeFinancials({ mode: 'cheap-bastard', query: input.command });
-        return { response: JSON.stringify(result, null, 2) };
-    }
-     if (lowerCommand.includes('cash canary')) {
-        const result = await analyzeFinancials({ mode: 'cash-canary', query: input.command });
         return { response: JSON.stringify(result, null, 2) };
     }
     

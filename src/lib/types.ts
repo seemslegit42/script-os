@@ -34,7 +34,8 @@ export type Workspace = {
 
 // Defines the available types of Micro-Apps that can be registered and launched.
 export type MicroAppType = 
-    | 'Terminal';
+    | 'Terminal'
+    | 'FinancialAdvisor';
 
 // Represents the structure of a Micro-App instance on the Canvas.
 export type MicroApp = {
