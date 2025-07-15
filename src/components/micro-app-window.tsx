@@ -1,8 +1,6 @@
-
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, GripVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -10,6 +8,9 @@ import { ScribeSigil } from './icons';
 import Draggable from 'react-draggable';
 import { Resizable } from 'react-resizable';
 import 'react-resizable/css/styles.css';
+import { GlassPane } from './ui/glass-pane';
+import { cn } from '@/lib/utils';
+import { CardHeader, CardContent } from './ui/card';
 
 interface MicroAppWindowProps {
   id: string;
@@ -70,11 +71,15 @@ export function MicroAppWindow({
               maxConstraints={[1200, 900]} 
               handleSize={[20, 20]}
             >
-                <Card 
-                    className={`w-full h-full flex flex-col bg-card/80 backdrop-blur-lg border transition-all duration-300 ${isActive ? 'border-primary/50 shadow-2xl shadow-primary/20' : 'border-border/50 shadow-xl'}`}
+                <GlassPane 
+                    className={cn(
+                        `w-full h-full flex flex-col`,
+                        isActive ? 'border-primary/50 shadow-2xl shadow-primary/20' : 'border-border/50 shadow-xl'
+                    )}
                     style={{ width: size.width, height: size.height }}
+                    variant="default"
                 >
-                    <CardHeader className="flex flex-row items-center justify-between p-2 pl-3 border-b cursor-move handle shrink-0">
+                    <CardHeader className="flex flex-row items-center justify-between p-2 pl-3 border-b cursor-move handle shrink-0 bg-transparent">
                     <div className="flex items-center gap-2">
                         <ScribeSigil className="h-5 w-5 text-primary/80" />
                         <h3 className="text-sm font-medium text-foreground">{title}</h3>
@@ -87,10 +92,10 @@ export function MicroAppWindow({
                         </Button>
                     </div>
                     </CardHeader>
-                    <CardContent className="p-0 flex-grow overflow-auto">
+                    <CardContent className="p-0 flex-grow overflow-auto bg-transparent">
                       {children}
                     </CardContent>
-                </Card>
+                </GlassPane>
             </Resizable>
         </motion.div>
     </Draggable>
