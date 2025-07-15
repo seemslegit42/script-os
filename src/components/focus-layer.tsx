@@ -7,6 +7,7 @@ import Link from 'next/link';
 import React from 'react';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Copy } from 'lucide-react';
 
 /**
  * Props for the FocusLayer component.
@@ -44,9 +45,18 @@ export function FocusLayer({ content }: FocusLayerProps) {
   const proseClasses = "prose prose-sm prose-invert max-w-none sigil-codex prose-headings:sigil-obelisk prose-headings:text-primary prose-code:sigil-glyph prose-code:bg-black/30 prose-code:p-1 prose-code:rounded";
 
   const handleCommandClick = (command: string) => {
-    toast({
-      title: "Command Forged",
-      description: `Action triggered: "${command}" (This is a demonstration).`,
+    navigator.clipboard.writeText(command).then(() => {
+        toast({
+            title: "Command Copied",
+            description: `The command has been copied to your clipboard.`,
+        });
+    }).catch(err => {
+        console.error('Failed to copy command: ', err);
+        toast({
+            title: "Error",
+            description: "Failed to copy command.",
+            variant: "destructive",
+        });
     });
   };
 
@@ -66,6 +76,7 @@ export function FocusLayer({ content }: FocusLayerProps) {
             elements.push(
                 <div key={`cmd-${textIndex}`} className="flex justify-center my-4">
                     <Button onClick={() => handleCommandClick(command)} variant="outline" className="shadow-lg shadow-primary/10 border-primary hover:bg-primary/10 hover:shadow-primary/20">
+                        <Copy className="mr-2 h-4 w-4" />
                         {buttonText}
                     </Button>
                 </div>
