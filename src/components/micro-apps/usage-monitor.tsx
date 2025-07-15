@@ -15,6 +15,7 @@ interface UsageDetails {
   planName: string;
   actionsUsed: number;
   actionLimit: number;
+  aetherBalance: number;
   transactions: {
     id: string;
     type: 'DEBIT' | 'CREDIT' | 'TRIBUTE';
@@ -36,10 +37,12 @@ export function UsageMonitor() {
 
   useEffect(() => {
     async function fetchUsage() {
+      setIsLoading(true);
+      setError(null);
       try {
         const response = await fetch('/api/billing/usage');
         if (!response.ok) {
-          throw new Error('Failed to fetch usage data.');
+          throw new Error('Failed to fetch usage data from the ledger.');
         }
         const data = await response.json();
         setUsage(data);
@@ -57,13 +60,17 @@ export function UsageMonitor() {
 
   const renderLoadingSkeleton = () => (
     <div className="p-4 space-y-4">
-      <Skeleton className="h-8 w-1/4" />
-      <Skeleton className="h-4 w-1/2" />
-      <Skeleton className="h-6 w-full" />
-      <div className="space-y-2 pt-4">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
+      <div className="space-y-2">
+        <Skeleton className="h-6 w-1/2" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-2 w-full" />
+      </div>
+      <Separator />
+      <div className="space-y-3 pt-2">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
       </div>
     </div>
   );
@@ -72,21 +79,24 @@ export function UsageMonitor() {
     usage && (
       <div className="p-4 h-full flex flex-col">
           <div className='pb-4'>
-              <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-bold sigil-obelisk text-primary-foreground">Agent Actions</h3>
-                  <Badge variant="outline" className='sigil-glyph'>{usage.planName} Plan</Badge>
+              <div className="flex justify-between items-center mb-1">
+                  <h3 className="text-lg font-bold sigil-obelisk text-primary-foreground">Aether Balance</h3>
+                  <p className={`font-mono font-bold text-xl text-primary`}>
+                    {usage.aetherBalance.toLocaleString()} Ξ
+                  </p>
               </div>
-              <p className="text-sm text-muted-foreground mb-3 sigil-codex">
-                  Your workspace has used {usage.actionsUsed.toLocaleString()} of {usage.actionLimit.toLocaleString()} available agent actions this cycle.
-              </p>
-              <Progress value={usagePercentage} className="w-full" />
+               <div className="flex justify-between items-center text-sm text-muted-foreground mt-2">
+                  <p>Agent Actions</p>
+                  <p>{usage.actionsUsed.toLocaleString()} / {usage.actionLimit.toLocaleString()}</p>
+              </div>
+              <Progress value={usagePercentage} className="w-full mt-1 h-2" />
           </div>
           <Separator className="my-2" />
           <div className="pt-2 flex-grow flex flex-col min-h-0">
               <h4 className="text-md font-bold text-primary-foreground sigil-obelisk mb-2">Tribute Log</h4>
               <ScrollArea className="flex-grow">
                   <div className="space-y-2 pr-4">
-                  {usage.transactions.map(tx => (
+                  {usage.transactions.length > 0 ? usage.transactions.map(tx => (
                       <div key={tx.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
                           <div>
                               <p className="font-medium sigil-codex">{tx.description}</p>
@@ -96,7 +106,11 @@ export function UsageMonitor() {
                               {tx.type === 'CREDIT' ? '+' : '-'} {tx.amount.toLocaleString()} Ξ
                           </p>
                       </div>
-                  ))}
+                  )) : (
+                    <div className="text-center text-muted-foreground text-sm py-8">
+                        No tributes recorded in the ledger.
+                    </div>
+                  )}
                   </div>
               </ScrollArea>
           </div>
@@ -110,19 +124,20 @@ export function UsageMonitor() {
         <p className="text-sm text-muted-foreground mt-2 sigil-codex">
             This is where your acquired Chaos Cards will appear.
         </p>
+        <Badge variant="outline" className="mt-4">Coming Soon</Badge>
     </div>
   );
 
   const renderContent = () => {
     if (isLoading) return renderLoadingSkeleton();
-    if (error) return <div className="p-4 text-destructive">Error: {error}</div>;
+    if (error) return <div className="p-4 text-center text-destructive sigil-codex">Error: {error}<br/>The ledger is sealed.</div>;
     return (
         <Tabs defaultValue="dashboard" className="w-full h-full flex flex-col">
-            <TabsList className="mx-4 mt-4">
-                <TabsTrigger value="dashboard">Usage Dashboard</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="dashboard">Ledger of Tribute</TabsTrigger>
                 <TabsTrigger value="arsenal">Chaos Arsenal</TabsTrigger>
             </TabsList>
-            <TabsContent value="dashboard" className="flex-grow">
+            <TabsContent value="dashboard" className="flex-grow min-h-0">
                 {renderUsageDashboard()}
             </TabsContent>
             <TabsContent value="arsenal" className="flex-grow">
