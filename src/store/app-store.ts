@@ -32,10 +32,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   appComponentRegistry: {},
 
   addMicroApp: (app) => set((state) => {
-    // Prevent duplicate apps of the same type for now
+    // Prevent duplicate apps of the same type.
     const existingApp = state.microApps.find(a => a.type === app.type);
     if (existingApp) {
-      // Bring the existing app to the front instead of adding a new one
+      // Bring the existing app to the front instead of adding a new one.
       const highestZIndex = getHighestZIndex(state.microApps);
       return {
         activeMicroAppId: existingApp.id,
@@ -84,20 +84,24 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   handleCommandSubmit: (command: string): string => {
     const lowerCommand = command.toLowerCase().trim();
-    const { addMicroApp } = get();
-    // This is the centralized command processor.
-    // It will eventually call the BEEP LangGraph agent.
-    // For now, it contains simple command parsing.
+    const { addMicroApp, microApps } = get();
+
+    const launchApp = (type: MicroAppType, title: string) => {
+        const existingApp = microApps.find(a => a.type === type);
+        addMicroApp({ type, title });
+        if (existingApp) {
+            return `BEEP: ${title} is already active. Bringing it to the forefront.`;
+        }
+        return `BEEP: Summoning ${title}...`;
+    };
 
     if (lowerCommand.startsWith('launch')) {
       const appType = lowerCommand.split(' ')[1];
       if (appType === 'terminal') {
-        addMicroApp({ type: 'Terminal', title: 'BEEP Command Core' });
-        return `BEEP: Summoning Terminal...`;
+        return launchApp('Terminal', 'BEEP Command Core');
       }
       if (appType === 'usagemonitor') {
-        addMicroApp({ type: 'UsageMonitor', title: 'Ledger of Tribute' });
-        return `BEEP: Revealing the Ledger of Tribute...`;
+        return launchApp('UsageMonitor', 'Ledger of Tribute');
       }
       return `BEEP: Unknown Micro-App type "${appType}".`;
     }
