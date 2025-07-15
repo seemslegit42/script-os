@@ -5,33 +5,33 @@
 
 @layer base {
   :root {
-    --background: 246 33% 4%; /* #08080B */
-    --foreground: 0 0% 98%;
+    --background: 246 33% 15%; /* Obsidian Black */
+    --foreground: 150 100% 98%; /* Vitreous White */
 
-    --card: 246 33% 7%; /* Slightly lighter than background */
-    --card-foreground: 0 0% 98%;
+    --card: 246 33% 18%; /* Slightly lighter than background */
+    --card-foreground: 150 100% 98%;
  
-    --popover: 246 33% 4%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 246 33% 15%;
+    --popover-foreground: 150 100% 98%;
  
-    --primary: 279 100% 41%; /* #9400D3 */
-    --primary-foreground: 0 0% 98%;
+    --primary: 279 81% 36%; /* Imperial Purple */
+    --primary-foreground: 150 100% 98%;
  
-    --secondary: 158 51% 55%; /* Default from previous, can be tuned */
+    --secondary: 158 51% 48%; /* Patina Green */
     --secondary-foreground: 158 40% 10%;
  
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 227 13% 40%;
+    --muted-foreground: 227 13% 60%; /* Conchoidal Gray */
  
-    --accent: 60 100% 78%; /* #FFFF8F */
-    --accent-foreground: 60 50% 10%;
+    --accent: 50 100% 50%; /* Gilded Accent */
+    --accent-foreground: 50 100% 10%;
  
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 279 80% 70%; /* Lighter primary for focus rings */
+    --border: 227 13% 30%;
+    --input: 227 13% 30%;
+    --ring: 279 81% 66%; /* Lighter primary for focus rings */
 
     --radius: 0.5rem;
 
@@ -43,33 +43,33 @@
   }
 
   .dark {
-    --background: 246 33% 4%; /* #08080B */
-    --foreground: 0 0% 98%;
+    --background: 246 33% 15%; /* Obsidian Black */
+    --foreground: 150 100% 98%; /* Vitreous White */
  
-    --card: 246 33% 7%;
-    --card-foreground: 0 0% 98%;
+    --card: 246 33% 18%;
+    --card-foreground: 150 100% 98%;
  
-    --popover: 246 33% 4%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 246 33% 15%;
+    --popover-foreground: 150 100% 98%;
  
-    --primary: 279 100% 41%; /* #9400D3 */
-    --primary-foreground: 0 0% 98%;
+    --primary: 279 81% 36%; /* Imperial Purple */
+    --primary-foreground: 150 100% 98%;
  
-    --secondary: 158 51% 55%;
+    --secondary: 158 51% 48%; /* Patina Green */
     --secondary-foreground: 158 40% 10%;
  
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 227 13% 40%;
+    --muted-foreground: 227 13% 60%; /* Conchoidal Gray */
  
-    --accent: 60 100% 78%; /* #FFFF8F */
-    --accent-foreground: 60 50% 10%;
+    --accent: 50 100% 50%; /* Gilded Accent */
+    --accent-foreground: 50 100% 10%;
  
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 279 80% 70%;
+    --border: 227 13% 30%;
+    --input: 227 13% 30%;
+    --ring: 279 81% 66%;
   }
 }
 
