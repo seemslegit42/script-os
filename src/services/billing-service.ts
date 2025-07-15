@@ -25,6 +25,9 @@ export async function getUsageDetails(workspaceId: string) {
         { id: 'tx_03', type: 'CREDIT', description: 'Boon: Sisyphus\'s Ascent', amount: 1200, timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
         { id: 'tx_04', type: 'DEBIT', description: 'Micro-App: The Rolodex', amount: 75, timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString() },
         { id: 'tx_05', type: 'DEBIT', description: 'Agent: BEEP Command', amount: 10, timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'tx_06', type: 'DEBIT', description: 'Agent: Vandelay Industries', amount: 25, timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'tx_07', type: 'TRIBUTE', description: 'Folly: Merchant of Cabbage', amount: 100, timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+        { id: 'tx_08', type: 'DEBIT', description: 'Agent: BEEP Command', amount: 10, timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() },
     ]
   };
 

@@ -5,33 +5,33 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 246 33% 4%; /* #08080B */
     --foreground: 0 0% 98%;
 
-    --card: 240 4.8% 9.5%;
+    --card: 246 33% 7%; /* Slightly lighter than background */
     --card-foreground: 0 0% 98%;
  
-    --popover: 240 10% 3.9%;
+    --popover: 246 33% 4%;
     --popover-foreground: 0 0% 98%;
  
-    --primary: 279 80% 60%;
+    --primary: 279 100% 41%; /* #9400D3 */
     --primary-foreground: 0 0% 98%;
  
-    --secondary: 158 51% 55%;
+    --secondary: 158 51% 55%; /* Default from previous, can be tuned */
     --secondary-foreground: 158 40% 10%;
  
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
  
-    --accent: 177 80% 50%;
-    --accent-foreground: 177 50% 10%;
+    --accent: 60 100% 78%; /* #FFFF8F */
+    --accent-foreground: 60 50% 10%;
  
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --ring: 279 80% 70%; /* Lighter primary for focus rings */
 
     --radius: 0.5rem;
 
@@ -43,16 +43,16 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 246 33% 4%; /* #08080B */
     --foreground: 0 0% 98%;
  
-    --card: 240 4.8% 9.5%;
+    --card: 246 33% 7%;
     --card-foreground: 0 0% 98%;
  
-    --popover: 240 10% 3.9%;
+    --popover: 246 33% 4%;
     --popover-foreground: 0 0% 98%;
  
-    --primary: 279 80% 60%;
+    --primary: 279 100% 41%; /* #9400D3 */
     --primary-foreground: 0 0% 98%;
  
     --secondary: 158 51% 55%;
@@ -61,15 +61,15 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
  
-    --accent: 177 80% 50%;
-    --accent-foreground: 177 50% 10%;
+    --accent: 60 100% 78%; /* #FFFF8F */
+    --accent-foreground: 60 50% 10%;
  
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --ring: 279 80% 70%;
   }
 }
 

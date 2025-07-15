@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
+import { Separator } from '../ui/separator';
 
 // Define the shape of the usage data we expect from the API
 interface UsageDetails {
@@ -86,7 +87,8 @@ export function UsageMonitor() {
                 </p>
                 <Progress value={usagePercentage} className="w-full" />
             </div>
-            <div className="border-t border-border mt-2 pt-4 flex-grow flex flex-col">
+            <Separator className="my-2" />
+            <div className="pt-2 flex-grow flex flex-col min-h-0">
                 <h4 className="text-md font-bold text-primary-foreground sigil-obelisk mb-2">Tribute Log</h4>
                 <ScrollArea className="flex-grow">
                     <div className="space-y-2 pr-4">
