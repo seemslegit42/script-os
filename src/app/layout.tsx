@@ -8,7 +8,7 @@ import Script from 'next/script';
 
 /**
  * Defines the metadata for the application, including the title and description.
- * This information is used by search engines and the browser.
+ * This information is used by search engines and a browser.
  */
 export const metadata: Metadata = {
   title: 'Scriptorium',
@@ -41,7 +41,7 @@ export default function RootLayout({
             --font-code: 'Recursive', monospace;
           } 
         `}} />
-        <Script defer data-domain="aevonos.com" src="https://plausible.io/js/script.js" />
+        <Script defer data-domain="docs.aevonos.com" src="https://plausible.io/js/script.js" />
       </head>
       <body className={cn('antialiased')}>
         <TypographicStateProvider>
