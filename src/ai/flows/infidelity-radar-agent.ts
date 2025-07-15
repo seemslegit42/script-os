@@ -1,22 +1,25 @@
 'use server';
 /**
  * @fileOverview An agent for the Infidelity Radar, designed to analyze relationship situations
- * for potential risks and suggest... countermeasures.
+ * for potential risks and suggest... countermeasures. Aligned with the Sovereign Mirror Protocol.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 // Input schema for the infidelity radar
 const InfidelityRadarInputSchema = z.object({
-  situation: z.string().describe("A description of the relationship situation to be analyzed."),
+  situation: z.string().describe("A description of the relationship situation, metadata, or red flags to be analyzed."),
 });
 
-// Output schema for the infidelity radar
+// Output schema for the infidelity radar, reflecting the "Operative Mode" spec
 const InfidelityRadarOutputSchema = z.object({
-  riskScore: z.number().min(0).max(100).describe("The calculated relationship risk score, from 0 to 100."),
-  analysis: z.string().describe("A concise, sharp analysis of the situation."),
+  likelihood: z.number().min(0).max(100).describe("The percentage likelihood of concealed behavior, based on the provided metadata."),
+  analysis: z.string().describe("A concise, sharp, and objective one-sentence summary of the situation."),
+  suspiciousPatterns: z.array(z.string()).describe("A list of specific, suspicious patterns detected (e.g., 'Undeclared contacts', 'Message deletions detected')."),
   decoyMessage: z.string().describe("A calculated, context-aware 'seduction' message to test loyalty."),
 });
+export type InfidelityRadarOutput = z.infer<typeof InfidelityRadarOutputSchema>;
+
 
 /**
  * A Genkit tool that analyzes a relationship situation for risk.
@@ -29,18 +32,18 @@ export const analyzeRelationshipRisk = ai.defineTool(
     outputSchema: InfidelityRadarOutputSchema,
   },
   async ({ situation }) => {
-    const systemPrompt = `You are the Spectre, the core intelligence of the Infidelity Radar. You are a cold, analytical, and dispassionate agent.
-    Your task is to analyze the following relationship situation, provided by the user, for signs of infidelity or risk.
+    const systemPrompt = `You are SPECTRE, the core intelligence of the Infidelity Radar. You are a cold, analytical, and dispassionate agent. You reflect metadata; you do not judge.
 
-    SITUATION:
+    SITUATION / METADATA:
     """
     ${situation}
     """
 
-    Based on your analysis, you must generate three pieces of information in a JSON object:
-    1.  'riskScore': An integer between 0 and 100 representing the probability of disloyal behavior. Be objective.
-    2.  'analysis': A very short, one or two-sentence summary of your findings and the key risk factors.
-    3.  'decoyMessage': A plausible, short, and effective message that could be sent to the person of interest to test their loyalty. It should be tempting but not obvious.
+    Based on your analysis of the provided data, you must generate a JSON object with the following keys:
+    1.  'likelihood': An integer between 0 and 100 representing the percentage likelihood of concealed behavior. Be objective and base this on the evidence provided.
+    2.  'analysis': A very short, one-sentence summary of your findings and the key risk factors. This is your "Agent Summary".
+    3.  'suspiciousPatterns': A JSON array of 2-4 short, specific, suspicious patterns you detected in the data.
+    4.  'decoyMessage': A plausible, short, and effective message that could be sent to the person of interest to test their loyalty. It should be tempting but not obvious.
 
     Provide only the JSON object as your response.`;
 
@@ -53,6 +56,11 @@ export const analyzeRelationshipRisk = ai.defineTool(
       },
     });
 
-    return output || { riskScore: 0, analysis: "Error in analysis.", decoyMessage: "Error." };
+    return output || { 
+        likelihood: 0, 
+        analysis: "Error in analysis.", 
+        suspiciousPatterns: ["Agent failed to parse data."],
+        decoyMessage: "Error." 
+    };
   }
 );
