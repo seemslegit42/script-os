@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { TypographicStateProvider } from '@/context/typographic-state-context';
+import Script from 'next/script';
 
 /**
  * Defines the metadata for the application, including the title and description.
@@ -40,6 +41,7 @@ export default function RootLayout({
             --font-code: 'Recursive', monospace;
           } 
         `}} />
+        <Script defer data-domain="your-domain.com" src="https://plausible.io/js/script.js" />
       </head>
       <body className={cn('antialiased')}>
         <TypographicStateProvider>
