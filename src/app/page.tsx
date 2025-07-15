@@ -7,6 +7,9 @@ import { useAppStore } from "@/store/app-store";
 import { Terminal } from "@/components/micro-apps/terminal";
 import { TheSovereignArsenal } from "@/components/micro-apps/the-sovereign-arsenal";
 import { UsageMonitor } from "@/components/micro-apps/usage-monitor";
+import { InfidelityRadar } from "@/components/micro-apps/infidelity-radar";
+import { BeepWingman } from "@/components/micro-apps/beep-wingman";
+import { FinancialAdvisor } from "@/components/micro-apps/financial-advisor";
 
 
 /**
@@ -24,6 +27,9 @@ export default function CanvasPage() {
         'Terminal': Terminal,
         'TheSovereignArsenal': TheSovereignArsenal,
         'UsageMonitor': UsageMonitor,
+        'InfidelityRadar': InfidelityRadar,
+        'BeepWingman': BeepWingman,
+        'FinancialAdvisor': FinancialAdvisor,
       } 
     });
 
